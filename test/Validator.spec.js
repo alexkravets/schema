@@ -1,0 +1,169 @@
+'use strict'
+
+const { expect } = require('chai')
+const { Schema, Validator } = require('src')
+
+const SCHEMAS = [
+  'test/schemas/Status.yaml',
+  'test/schemas/Profile.yaml',
+  'test/schemas/Preferences.yaml',
+  'test/schemas/FavoriteItem.yaml'
+].map(path => Schema.loadSync(path))
+
+describe('Validator', () => {
+  describe('Validator.constructor(schemas)', () => {
+    it('create validator for schemas', () => {
+      new Validator(SCHEMAS)
+    })
+
+    it('throws error if no schemas provided', () => {
+      expect(
+        () => new Validator()
+      ).to.throw('No schemas provided')
+    })
+
+    it('throws error if referenced schema not found', () => {
+      const entitySchema = new Schema({ name: { $ref: 'MissingSchema' } }, 'Entity')
+
+      expect(
+        () => new Validator([ ...SCHEMAS, entitySchema ])
+      ).to.throw('Schemas validation failed:')
+    })
+  })
+
+  describe('.validate(object)', () => {
+    it('returns validated, cleaned and normalized object', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const _createdAt = new Date().toISOString()
+
+      const input = {
+        name: 'Oleksandr',
+        contactDetails: {
+          email: 'a@kra.vc'
+        },
+        favoriteItems: [{
+          id:         '1',
+          name:       'Student Book',
+          categories: [ 'Education' ],
+          _createdAt
+        }],
+        locations: [{
+          name: 'Home',
+          address: {
+            type:         'Primary',
+            zip:          '03119',
+            city:         'Kyiv',
+            addressLine1: 'Melnikova 83-D, 78',
+            _createdAt
+          },
+          _createdAt
+        }],
+        preferences: {
+          height:                180,
+          isNotificationEnabled: true,
+          _createdAt
+        },
+        status: 'Active',
+        _createdAt
+      }
+
+      const validInput = validator.validate(input, 'Profile')
+
+      expect(validInput._createdAt).to.not.exist
+      expect(validInput.preferences._createdAt).to.not.exist
+      expect(validInput.locations[0]._createdAt).to.not.exist
+      expect(validInput.locations[0].address._createdAt).to.not.exist
+      expect(validInput.favoriteItems[0]._createdAt).to.not.exist
+
+      expect(validInput.name).to.eql('Oleksandr')
+      expect(validInput.gender).to.eql('Other')
+      expect(validInput.status).to.eql('Active')
+      expect(validInput.locations[0].name).to.eql('Home')
+      expect(validInput.locations[0].address.country).to.eql('Ukraine')
+      expect(validInput.locations[0].address.zip).to.eql('03119')
+      expect(validInput.locations[0].address.city).to.eql('Kyiv')
+      expect(validInput.locations[0].address.addressLine1).to.eql('Melnikova 83-D, 78',)
+      expect(validInput.locations[0].address.type).to.eql('Primary')
+      expect(validInput.favoriteItems[0].id).to.eql('1')
+      expect(validInput.favoriteItems[0].name).to.eql('Student Book')
+      expect(validInput.favoriteItems[0].categories).to.deep.eql([ 'Education' ])
+      expect(validInput.favoriteItems[0].status).to.eql('Pending')
+      expect(validInput.contactDetails.email).to.eql('a@kra.vc')
+      expect(validInput.contactDetails.mobileNumber).to.eql('+380504112171')
+      expect(validInput.preferences.height).to.eql(180)
+      expect(validInput.preferences.isNotificationEnabled).to.eql(true)
+    })
+
+    it('normalizes object attributes according to property type', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {
+        name: 'Oleksandr',
+        contactDetails: {
+          email: 'a@kra.vc'
+        },
+        preferences: {
+          height:                '180',
+          isNotificationEnabled: 'true'
+        }
+      }
+
+      let validInput
+
+      validInput = validator.validate(input, 'Profile')
+      expect(validInput.preferences.height).to.eql(180)
+      expect(validInput.preferences.isNotificationEnabled).to.eql(true)
+
+      input.preferences.isNotificationEnabled = '1'
+      validInput = validator.validate(input, 'Profile')
+      expect(validInput.preferences.isNotificationEnabled).to.eql(true)
+
+      input.preferences.isNotificationEnabled = '0'
+      validInput = validator.validate(input, 'Profile')
+      expect(validInput.preferences.isNotificationEnabled).to.eql(false)
+
+      input.preferences.isNotificationEnabled = 0
+      validInput = validator.validate(input, 'Profile')
+      expect(validInput.preferences.isNotificationEnabled).to.eql(false)
+
+      expect(() => {
+        input.preferences.height = 'NaN'
+        validInput = validator.validate(input, 'Profile')
+        expect(validInput.preferences.height).to.eql('NaN')
+      }).to.throw('"Profile" validation failed')
+    })
+
+    it('throws error if validation failed', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {}
+
+      try {
+        validator.validate(input, 'Profile')
+
+      } catch (validationError) {
+        const error = validationError.toJSON()
+
+        expect(error.object).to.exist
+        expect(error.code).to.eql('ValidationError')
+        expect(error.message).to.eql('"Profile" validation failed')
+        expect(error.schemaId).to.eql('Profile')
+
+        expect(error.validationErrors).to.have.lengthOf(2)
+
+        return
+      }
+
+      throw new Error('Validation error is not thrown')
+    })
+
+    it('throws error if schema not found', () => {
+      const validator = new Validator(SCHEMAS)
+
+      expect(
+        () => validator.validate({}, 'Account')
+      ).to.throw('Schema "Account" not found')
+    })
+  })
+})

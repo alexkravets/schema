@@ -1,0 +1,19 @@
+id:
+  required: true
+
+name:
+  required: true
+
+description: {}
+
+status:
+  $ref: 'Status'
+  default: 'Pending'
+
+categories:
+  items:
+    enum:
+      - 'Education'
+      - 'Work'
+      - 'Lifestyle'
+      - 'Games'

@@ -1,0 +1,51 @@
+'use strict'
+
+const keyBy               = require('lodash.keyby')
+const ZSchema             = require('z-schema')
+const cloneDeep           = require('lodash.clonedeep')
+const ValidationError     = require('./ValidationError')
+const cleanupAttributes   = require('./helpers/cleanupAttributes')
+const normalizeAttributes = require('./helpers/normalizeAttributes')
+
+class Validator {
+  constructor(schemas = []) {
+    if (schemas.length === 0) {
+      throw new Error('No schemas provided')
+    }
+
+    this._engine = new ZSchema({ ignoreUnknownFormats: true })
+
+    const jsonSchemas = schemas.map(({ jsonSchema }) => jsonSchema)
+    const isValid     = this._engine.validateSchema(jsonSchemas)
+
+    if (!isValid) {
+      const json = JSON.stringify(this._engine.lastReport.errors, null, 2)
+      throw new Error(`Schemas validation failed:\n${json}`)
+    }
+
+    this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
+  }
+
+  validate(object, schemaId) {
+    const jsonSchema = this._jsonSchemasMap[schemaId]
+
+    if (!jsonSchema) {
+      throw new Error(`Schema "${schemaId}" not found`)
+    }
+
+    const result = cloneDeep(object)
+    cleanupAttributes(result, jsonSchema, this._jsonSchemasMap)
+    normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
+
+    const isValid = this._engine.validate(result, jsonSchema)
+
+    if (!isValid) {
+      const validationErrors = this._engine.getLastErrors()
+      throw new ValidationError(schemaId, result, validationErrors)
+    }
+
+    return result
+  }
+}
+
+module.exports = Validator
