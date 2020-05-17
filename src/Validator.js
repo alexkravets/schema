@@ -46,6 +46,19 @@ class Validator {
 
     return result
   }
+
+  normalize(object, schemaId) {
+    const jsonSchema = this._jsonSchemasMap[schemaId]
+
+    if (!jsonSchema) {
+      throw new Error(`Schema "${schemaId}" not found`)
+    }
+
+    const result = cloneDeep(object)
+    normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
+
+    return result
+  }
 }
 
 module.exports = Validator

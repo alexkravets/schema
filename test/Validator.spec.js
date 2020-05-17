@@ -31,7 +31,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object)', () => {
+  describe('.validate(object, schemaId)', () => {
     it('returns validated, cleaned and normalized object', () => {
       const validator = new Validator(SCHEMAS)
 
@@ -163,6 +163,27 @@ describe('Validator', () => {
 
       expect(
         () => validator.validate({}, 'Account')
+      ).to.throw('Schema "Account" not found')
+    })
+  })
+
+  describe('.normalize(object, schemaId)', () => {
+    it('returns normalized object clone', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {}
+
+      const normalizedInput = validator.normalize(input, 'Profile')
+
+      expect(normalizedInput.gender).to.eql('Other')
+      expect(normalizedInput.status).to.eql('Pending')
+    })
+
+    it('throws error if schema not found', () => {
+      const validator = new Validator(SCHEMAS)
+
+      expect(
+        () => validator.normalize({}, 'Account')
       ).to.throw('Schema "Account" not found')
     })
   })
