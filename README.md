@@ -10,3 +10,8 @@ Install:
 ```sh
 npm i --save @kravc/schema
 ```
+
+Check specs for usage examples:
+
+- [Schema](./test/Schema.spec.js)
+- [Validator](./test/Validator.spec.js)
