@@ -11,7 +11,7 @@ Install:
 npm i --save @kravc/schema
 ```
 
-Get started:
+### Get started
 
 ```js
 const { Schema, Validator } = require('@kravc/schema')
@@ -37,7 +37,7 @@ Expected output:
 { name: 'John', status: 'Pending' }
 ```
 
-Advanced usage examples:
+### Advanced usage examples
 
 - [Schema](./test/Schema.spec.js)
 - [Validator](./test/Validator.spec.js)
