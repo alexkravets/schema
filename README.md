@@ -1,6 +1,6 @@
 # @kravc/schema
 
-Advanced JSON schema manipulation validation library based on
+Advanced JSON schema manipulation and validation library based on
 [z-schema](https://github.com/zaggino/z-schema).
 
 ## API
