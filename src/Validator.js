@@ -2,7 +2,6 @@
 
 const keyBy               = require('lodash.keyby')
 const ZSchema             = require('z-schema')
-const cloneDeep           = require('lodash.clonedeep')
 const ValidationError     = require('./ValidationError')
 const cleanupAttributes   = require('./helpers/cleanupAttributes')
 const normalizeAttributes = require('./helpers/normalizeAttributes')
@@ -33,7 +32,7 @@ class Validator {
       throw new Error(`Schema "${schemaId}" not found`)
     }
 
-    const result = cloneDeep(object)
+    const result = JSON.parse(JSON.stringify(object))
     cleanupAttributes(result, jsonSchema, this._jsonSchemasMap)
     normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
 
@@ -54,7 +53,7 @@ class Validator {
       throw new Error(`Schema "${schemaId}" not found`)
     }
 
-    const result = cloneDeep(object)
+    const result = JSON.parse(JSON.stringify(object))
     normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
 
     return result
