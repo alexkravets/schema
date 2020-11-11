@@ -1,25 +1,48 @@
 'use strict'
 
-const pick                = require('lodash.pick')
-const cloneDeep           = require('lodash.clonedeep')
-const { safeLoad }        = require('js-yaml')
-const { readFileSync }    = require('fs')
-const normalizeRequired   = require('./helpers/normalizeRequired')
-const normalizeProperties = require('./helpers/normalizeProperties')
+const pick                 = require('lodash.pick')
+const cloneDeep            = require('lodash.clonedeep')
+const validateId           = require('./helpers/validateId')
+const normalizeRequired    = require('./helpers/normalizeRequired')
+const normalizeProperties  = require('./helpers/normalizeProperties')
+const getLinkedDataContext = require('./ld/getLinkedDataContext')
 const removeRequiredAndDefault = require('./helpers/removeRequiredAndDefault')
 
 const UNDEFINED_SCHEMA_ID = 'UNDEFINED_SCHEMA_ID'
 
 class Schema {
-  constructor(source = {}, id = UNDEFINED_SCHEMA_ID) {
+  constructor(source = {}, id = UNDEFINED_SCHEMA_ID, url) {
     this._id     = id
+    this._url    = url
     this._source = source instanceof Schema ? source.source : source
+
+    if (url) {
+      validateId('url', url)
+
+      this._source.type = { required: true, type: 'string', default: id }
+
+      if (this._source.id) {
+        this._source.id = { required: true, type: 'string', format: 'url' }
+      }
+
+      const uri =
+        (url.endsWith('/') || url.endsWith('#')) ? `${url}${id}` : `${url}#${id}`
+
+      this._linkedDataType = {
+        '@id':      uri,
+        '@context': getLinkedDataContext(this._source, url)
+      }
+    }
 
     normalizeProperties(this._source)
   }
 
   get id() {
     return this._id
+  }
+
+  get url() {
+    return this._url
   }
 
   get source() {
@@ -43,6 +66,10 @@ class Schema {
     normalizeRequired(jsonSchema)
 
     return jsonSchema
+  }
+
+  get linkedDataType() {
+    return this._linkedDataType
   }
 
   clone(id) {
@@ -70,13 +97,6 @@ class Schema {
         ...options
       }
     }
-
-    return new Schema(source, id)
-  }
-
-  static loadSync(yamlPath) {
-    const id     = yamlPath.split('.')[0].split('/').reverse()[0]
-    const source = safeLoad(readFileSync(yamlPath))
 
     return new Schema(source, id)
   }

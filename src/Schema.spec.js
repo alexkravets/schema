@@ -1,17 +1,18 @@
 'use strict'
 
-const { Schema } = require('src')
-const { expect } = require('chai')
+const { Schema }       = require('src')
+const { expect }       = require('chai')
+const { safeLoad }     = require('js-yaml')
+const { readFileSync } = require('fs')
+
+const loadSync = (yamlPath) => {
+  const id     = yamlPath.split('.')[0].split('/').reverse()[0]
+  const source = safeLoad(readFileSync(yamlPath))
+
+  return new Schema(source, id)
+}
 
 describe('Schema', () => {
-  describe('Schema.loadSync(yamlPath)', () => {
-    it('creates schema from YAML file', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
-
-      expect(profileSchema.id).to.eql('Profile')
-    })
-  })
-
   describe('Schema.constructor(source = {}, id = UNDEFINED_SCHEMA_ID)', () => {
     it('creates empty schema with default id', () => {
       const schema = new Schema()
@@ -21,7 +22,7 @@ describe('Schema', () => {
     })
 
     it('extends schema properties with types', () => {
-      const schema = Schema.loadSync('test/schemas/Profile.yaml')
+      const schema = loadSync('examples/Profile.yaml')
 
       expect(schema.source.name.type).to.eql('string')
       expect(schema.source.gender.type).to.eql('string')
@@ -59,7 +60,7 @@ describe('Schema', () => {
 
   describe('.pure(id)', () => {
     it('returns schema without required and default attributes', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
       const updateProfileSchema = profileSchema.pure('UpdateProfile')
 
       expect(updateProfileSchema.id).to.eql('UpdateProfile')
@@ -83,7 +84,7 @@ describe('Schema', () => {
 
   describe('.clone(id)', () => {
     it('returns schema clone', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
 
       const schema = profileSchema.clone('ProfileClone')
       expect(schema.id).to.eql('ProfileClone')
@@ -92,7 +93,7 @@ describe('Schema', () => {
 
   describe('.only(propertyNames, id)', () => {
     it('returns schema with only requested properties', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
 
       const schema = profileSchema.only([ 'name', 'gender' ], 'ProfileClone')
       expect(schema.id).to.eql('ProfileClone')
@@ -101,7 +102,7 @@ describe('Schema', () => {
 
   describe('.extend(properties, id)', () => {
     it('returns schema extended with specified properties', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
 
       const documentSource = {
         createdAt: {
@@ -120,7 +121,7 @@ describe('Schema', () => {
 
   describe('.wrap(propertyName, options = { required: true }, id)', () => {
     it('returns schema that wraps source schema with object property', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
 
       const dataSchema = profileSchema.wrap('data')
       expect(dataSchema.id).to.eql('UNDEFINED_SCHEMA_ID')
@@ -150,7 +151,7 @@ describe('Schema', () => {
     })
 
     it('returns json schema with normalized required attributes', () => {
-      const profileSchema = Schema.loadSync('test/schemas/Profile.yaml')
+      const profileSchema = loadSync('examples/Profile.yaml')
 
       const { jsonSchema } = profileSchema
 

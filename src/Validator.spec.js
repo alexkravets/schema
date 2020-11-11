@@ -1,14 +1,23 @@
 'use strict'
 
-const { expect } = require('chai')
+const { expect }       = require('chai')
+const { safeLoad }     = require('js-yaml')
+const { readFileSync } = require('fs')
 const { Schema, Validator } = require('src')
 
+const loadSync = (yamlPath) => {
+  const id     = yamlPath.split('.')[0].split('/').reverse()[0]
+  const source = safeLoad(readFileSync(yamlPath))
+
+  return new Schema(source, id)
+}
+
 const SCHEMAS = [
-  'test/schemas/Status.yaml',
-  'test/schemas/Profile.yaml',
-  'test/schemas/Preferences.yaml',
-  'test/schemas/FavoriteItem.yaml'
-].map(path => Schema.loadSync(path))
+  'examples/Status.yaml',
+  'examples/Profile.yaml',
+  'examples/Preferences.yaml',
+  'examples/FavoriteItem.yaml'
+].map(path => loadSync(path))
 
 describe('Validator', () => {
   describe('Validator.constructor(schemas)', () => {
@@ -185,6 +194,14 @@ describe('Validator', () => {
       expect(
         () => validator.normalize({}, 'Account')
       ).to.throw('Schema "Account" not found')
+    })
+  })
+
+  describe('.schemasMap', () => {
+    it('returns schemas map', () => {
+      const validator = new Validator(SCHEMAS)
+
+      expect(validator.schemasMap).to.exist
     })
   })
 })

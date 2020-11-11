@@ -13,6 +13,7 @@ class Validator {
     }
 
     this._engine = new ZSchema({ ignoreUnknownFormats: true })
+    this._schemasMap = keyBy(schemas, 'id')
 
     const jsonSchemas = schemas.map(({ jsonSchema }) => jsonSchema)
     const isValid     = this._engine.validateSchema(jsonSchemas)
@@ -57,6 +58,10 @@ class Validator {
     normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
 
     return result
+  }
+
+  get schemasMap() {
+    return this._schemasMap
   }
 }
 
