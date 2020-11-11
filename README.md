@@ -5,7 +5,7 @@ Advanced JSON schema manipulation and validation library based on
 
 ## Get Started
 
-Install:
+Install npm dependency:
 
 ```sh
 npm i --save @kravc/schema
@@ -47,11 +47,11 @@ Other `Schema` and `Validator` usage examples:
 
 ## Verifiable Credentials
 
-`CredentialFactory` class allows to build verifiable credential with embeded
-linked data context. Common JSON schema types are mapped to types provided by
-[schema.org](https://schema.org).
+Class `CredentialFactory` allows to build a verifiable credential with embeded
+linked data context. Common json schema types and formats (`integer`,
+`date-time`, etc.) are mapped to [schema.org](https://schema.org) types.
 
-Defined credential context types:
+Define schema for a credential subject:
 
 ```js
 const { Schema } = require('@kravc/schema')
@@ -64,7 +64,8 @@ const accountSchema = new Schema({
 }, 'Account')
 ```
 
-Initialize credential factory by providing credential URI and context types:
+Initialize credential factory by providing credential URI and credential subject
+schemas:
 
 ```js
 const { CredentialFactory } = require('@kravc/schema')
@@ -72,7 +73,8 @@ const { CredentialFactory } = require('@kravc/schema')
 const factory = new CredentialFactory('https://example.com/schema/AccountV1', [ accountSchema ])
 ```
 
-Create credential for subject:
+Create a credential for a specific subject, `createCredential` method validates
+the input and populates any defaults defined by schema:
 
 ```js
 const holder    = 'did:HOLDER_ID'
@@ -90,8 +92,7 @@ const credential = factory.createCredential(credentialId, holder, subject)
 console.log(JSON.stringify(credential, null, 2))
 ```
 
-Expected JSON-LD output (could be verified via
-[JSON-LD Playground](https://json-ld.org/playground/)):
+Expected JSON-LD output (could be verified using [JSON-LD Playground](https://json-ld.org/playground/)):
 
 ```js
 {
@@ -138,9 +139,8 @@ Expected JSON-LD output (could be verified via
 }
 ```
 
-Attributes `issuer`, `issuanceDate` and `proof` are intentially skipped to be
-added by issuing function (e.g
-[@kravc/identity](http://github.com/alexkravets/identity)).
+Attributes `issuer`, `issuanceDate` and `proof` are intentionally skipped and
+to be set by issuing function (e.g [@kravc/identity](http://github.com/alexkravets/identity)).
 
 Other `CredentialFactory` examples:
 
