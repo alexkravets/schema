@@ -174,6 +174,19 @@ describe('Validator', () => {
         () => validator.validate({}, 'Account')
       ).to.throw('Schema "Account" not found')
     })
+
+    it('throws error if multiple schemas with same id', async () => {
+      const exampleSchema1 = new Schema({
+        number: { required: true }
+      }, 'Example')
+
+      const exampleSchema2 = new Schema({
+        id: {}
+      }, 'Example')
+
+      expect(() => new Validator([ exampleSchema1, exampleSchema2 ]))
+        .to.throw('Multiple "Example" schemas provided')
+    })
   })
 
   describe('.normalize(object, schemaId)', () => {
@@ -202,6 +215,15 @@ describe('Validator', () => {
       const validator = new Validator(SCHEMAS)
 
       expect(validator.schemasMap).to.exist
+    })
+  })
+
+  describe('.getReferenceIds(schemaId)', () => {
+    it('returns ids of referenced schemas', () => {
+      const validator    = new Validator(SCHEMAS)
+      const referenceIds = validator.getReferenceIds('Profile')
+
+      expect(referenceIds).to.eql([ 'Status', 'FavoriteItem', 'Preferences' ])
     })
   })
 })

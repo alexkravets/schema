@@ -5,15 +5,9 @@ const Schema      = require('../Schema')
 const isUndefined = require('lodash.isundefined')
 
 const getReferenceIds = (schema, schemasMap) => {
+  const getSchema = id => schemasMap[id]
+
   let referenceIds = []
-
-  const getSchema = (id, referrerPath) => {
-    if (!schemasMap[id]) {
-      throw new Error(`Schema "${id}" not found, referenced by "${referrerPath}"`)
-    }
-
-    return schemasMap[id]
-  }
 
   const { jsonSchema } = schema
   const { id, enum: isEnum } = jsonSchema
@@ -67,7 +61,7 @@ const getReferenceIds = (schema, schemasMap) => {
       const itemSchema = new Schema(itemProperties, `${id}.${propertyName}.items.properties`)
       const itemReferenceIds = getReferenceIds(itemSchema, schemasMap)
 
-      referenceIds = [ ...referenceIds, itemReferenceIds ]
+      referenceIds = [ ...referenceIds, ...itemReferenceIds ]
       continue
     }
   }

@@ -1,9 +1,10 @@
 'use strict'
 
 const keyBy               = require('lodash.keyby')
+const groupBy             = require('lodash.groupby')
 const ZSchema             = require('z-schema')
+const getReferenceIds     = require('./helpers/getReferenceIds')
 const ValidationError     = require('./ValidationError')
-const verifyReferences    = require('./helpers/verifyReferences')
 const cleanupAttributes   = require('./helpers/cleanupAttributes')
 const normalizeAttributes = require('./helpers/normalizeAttributes')
 
@@ -11,6 +12,17 @@ class Validator {
   constructor(schemas = []) {
     if (schemas.length === 0) {
       throw new Error('No schemas provided')
+    }
+
+    const groupsById = groupBy(schemas, 'id')
+
+    for (const id in groupsById) {
+      const schemas       = groupsById[id]
+      const hasDuplicates = schemas.length > 1
+
+      if (hasDuplicates) {
+        throw new Error(`Multiple "${id}" schemas provided`)
+      }
     }
 
     this._engine = new ZSchema({ ignoreUnknownFormats: true })
@@ -22,8 +34,6 @@ class Validator {
       const json = JSON.stringify(this._engine.lastReport.errors, null, 2)
       throw new Error(`Schemas validation failed:\n${json}`)
     }
-
-    verifyReferences(schemas)
 
     this._schemasMap     = keyBy(schemas, 'id')
     this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
@@ -65,6 +75,11 @@ class Validator {
 
   get schemasMap() {
     return this._schemasMap
+  }
+
+  getReferenceIds(schemaId) {
+    const schema = this._schemasMap[schemaId]
+    return getReferenceIds(schema, this._schemasMap)
   }
 }
 
