@@ -3,6 +3,7 @@
 const keyBy               = require('lodash.keyby')
 const ZSchema             = require('z-schema')
 const ValidationError     = require('./ValidationError')
+const verifyReferences    = require('./helpers/verifyReferences')
 const cleanupAttributes   = require('./helpers/cleanupAttributes')
 const normalizeAttributes = require('./helpers/normalizeAttributes')
 
@@ -13,7 +14,6 @@ class Validator {
     }
 
     this._engine = new ZSchema({ ignoreUnknownFormats: true })
-    this._schemasMap = keyBy(schemas, 'id')
 
     const jsonSchemas = schemas.map(({ jsonSchema }) => jsonSchema)
     const isValid     = this._engine.validateSchema(jsonSchemas)
@@ -23,6 +23,9 @@ class Validator {
       throw new Error(`Schemas validation failed:\n${json}`)
     }
 
+    verifyReferences(schemas)
+
+    this._schemasMap     = keyBy(schemas, 'id')
     this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
   }
 

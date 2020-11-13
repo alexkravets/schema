@@ -1,7 +1,7 @@
 {
   "name": "@kravc/schema",
-  "version": "2.0.0",
-  "description": "Advanced JSON schema manipulation and validation library",
+  "version": "2.1.0",
+  "description": "Advanced JSON schema manipulation and validation library.",
   "keywords": [
     "JSON",
     "JSON-LD",
@@ -28,9 +28,11 @@
   "dependencies": {
     "credentials-context": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
+    "lodash.groupby": "^4.6.0",
     "lodash.isundefined": "^3.0.1",
     "lodash.keyby": "^4.6.0",
     "lodash.pick": "^4.4.0",
+    "lodash.uniq": "^4.5.0",
     "security-context": "^4.0.0",
     "validator": "^12.2.0",
     "z-schema": "^5.0.0"
