@@ -29,13 +29,24 @@ class CredentialFactory {
     }
   }
 
+  get credentialType() {
+    const [ credentialType ] = this._uri.split('/').reverse()
+
+    return credentialType
+  }
+
+  get context() {
+    return {
+      [this.credentialType]: { '@id': this._uri },
+      ...this._context
+    }
+  }
+
   createCredential(id, holder, subject = {}) {
     validateId('id', id)
     validateId('holder', holder)
 
-    const [ credentialType ] = this._uri.split('/').reverse()
-
-    const type = [ 'VerifiableCredential', credentialType ]
+    const type = [ 'VerifiableCredential', this.credentialType ]
 
     const [ rootType ]      = this._types
     const credentialSubject = this._validator.validate(subject, rootType.id)
@@ -43,10 +54,7 @@ class CredentialFactory {
     return {
       '@context': [
         CREDENTIALS_CONTEXT_V1_URL,
-        {
-          [credentialType]: { '@id': this._uri },
-          ...this._context
-        }
+        this.context
       ],
       id,
       type,
