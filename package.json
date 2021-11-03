@@ -34,7 +34,7 @@
     "lodash.pick": "^4.4.0",
     "lodash.uniq": "^4.5.0",
     "security-context": "^4.0.0",
-    "validator": "^12.2.0",
+    "validator": "^13.7.0",
     "z-schema": "^5.0.0"
   },
   "devDependencies": {
