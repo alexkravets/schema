@@ -1,13 +1,13 @@
 'use strict'
 
+const { load }         = require('js-yaml')
 const { expect }       = require('chai')
-const { safeLoad }     = require('js-yaml')
 const { readFileSync } = require('fs')
 const { Schema, Validator } = require('src')
 
 const loadSync = (yamlPath) => {
   const id     = yamlPath.split('.')[0].split('/').reverse()[0]
-  const source = safeLoad(readFileSync(yamlPath))
+  const source = load(readFileSync(yamlPath))
 
   return new Schema(source, id)
 }
