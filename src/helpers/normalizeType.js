@@ -11,17 +11,19 @@ const normalizeType = (type, value) => {
   }
 
   if (isBoolean) {
-    const isBoolean = typeof value === 'boolean'
-    const isNumber  = typeof value === 'number'
+    const isNumberValue  = typeof value === 'number'
+    const isStringValue  = typeof value === 'string'
 
-    if (!isBoolean) {
-      if (isNumber) {
+    const shouldConvertValue = isNumberValue || isStringValue
+
+    if (shouldConvertValue) {
+      if (isNumberValue) {
         normalizedValue = Boolean(value)
+      }
 
-      } else {
+      if (isStringValue) {
         const isTrue = value.toLowerCase() === 'true' || value === '1'
         normalizedValue = isTrue ? true : false
-
       }
     }
   }
