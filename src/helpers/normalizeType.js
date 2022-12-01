@@ -1,5 +1,8 @@
 'use strict'
 
+const BOOLEAN_STRING_TRUE_VALUES = ['yes', 'true', '1']
+const BOOLEAN_STRING_FALSE_VALUES = ['no', 'false', '0']
+
 const normalizeType = (type, value) => {
   let normalizedValue = value
 
@@ -22,8 +25,12 @@ const normalizeType = (type, value) => {
       }
 
       if (isStringValue) {
-        const isTrue = value.toLowerCase() === 'true' || value === '1'
-        normalizedValue = isTrue ? true : false
+        const isTrue = BOOLEAN_STRING_TRUE_VALUES.includes(value.toLowerCase())
+        const isFalse = BOOLEAN_STRING_FALSE_VALUES.includes(value.toLowerCase())
+
+        if (isTrue || isFalse) {
+          normalizedValue = isTrue ? true : false
+        }
       }
     }
   }

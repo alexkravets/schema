@@ -137,6 +137,13 @@ describe('Validator', () => {
       expect(validInput.preferences.isNotificationEnabled).to.eql(false)
 
       expect(() => {
+        input.preferences.isNotificationEnabled = 'NaN'
+        validInput = validator.validate(input, 'Profile')
+        expect(validInput.preferences.isNotificationEnabled).to.eql('NaN')
+      }).to.throw('"Profile" validation failed')
+
+      expect(() => {
+        input.preferences.isNotificationEnabled = 0
         input.preferences.height = 'NaN'
         validInput = validator.validate(input, 'Profile')
         expect(validInput.preferences.height).to.eql('NaN')
