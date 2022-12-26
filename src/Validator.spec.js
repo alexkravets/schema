@@ -150,6 +150,37 @@ describe('Validator', () => {
       }).to.throw('"Profile" validation failed')
     })
 
+    it('throws validation error if cleanup or normalize method failed', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {
+        name: 'Oleksandr',
+        contactDetails: {
+          email: 'a@kra.vc'
+        },
+        favoriteItems: 'NOT_ARRAY_BUT_STRING'
+      }
+
+      try {
+        validator.validate(input, 'Profile')
+
+      } catch (validationError) {
+        const error = validationError.toJSON()
+
+        expect(error.object).to.exist
+        expect(error.code).to.eql('ValidationError')
+        expect(error.message).to.eql('"Profile" validation failed')
+        expect(error.schemaId).to.eql('Profile')
+
+        const errorMessage = error.validationErrors[0].message
+        expect(errorMessage).to.eql('Expected type array but found type string')
+
+        return
+      }
+
+      throw new Error('Validation error is not thrown')
+    })
+
     it('throws error if validation failed', () => {
       const validator = new Validator(SCHEMAS)
 
