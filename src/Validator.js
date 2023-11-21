@@ -43,7 +43,7 @@ class Validator {
     this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
   }
 
-  validate(object, schemaId, shouldCleanupNullValues = false) {
+  validate(object, schemaId, shouldNullifyEmptyValues = false) {
     const jsonSchema = this._jsonSchemasMap[schemaId]
 
     if (!jsonSchema) {
@@ -82,7 +82,7 @@ class Validator {
 
     let validationErrors = this._engine.getLastErrors()
 
-    if (!shouldCleanupNullValues) {
+    if (!shouldNullifyEmptyValues) {
       throw new ValidationError(schemaId, result, validationErrors)
     }
 

@@ -40,7 +40,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object, schemaId, shouldCleanupNullValues = false)', () => {
+  describe('.validate(object, schemaId, shouldNullifyEmptyValues = false)', () => {
     it('returns validated, cleaned and normalized object', () => {
       const validator = new Validator(SCHEMAS)
 
@@ -227,7 +227,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object, schemaId, shouldCleanupNullValues = false)', () => {
+  describe('.validate(object, schemaId, shouldNullifyEmptyValues = false)', () => {
     it('throws validation error for attributes not matching format or pattern', () => {
       const validator = new Validator(SCHEMAS)
 
@@ -247,7 +247,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object, schemaId, shouldCleanupNullValues = true)', () => {
+  describe('.validate(object, schemaId, shouldNullifyEmptyValues = true)', () => {
     it('returns input with cleaned up null values for not required attributes', () => {
       const validator = new Validator(SCHEMAS)
 
