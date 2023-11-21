@@ -1,5 +1,6 @@
 name:
   required: true
+  minLength: 3
 
 # NOTE: Referenced enum:
 status:
@@ -20,12 +21,18 @@ contactDetails:
 
   properties:
     email:
-      type:     string
+      type:     'string'
+      format:   'email'
       required: true
+
+    secondaryEmail:
+      type:   'string'
+      format: 'email'
 
     mobileNumber:
       type:    string
-      default: '+380504112171'
+      pattern: '^[0-9]{1,20}$'
+      default: '380504112171'
 
 # NOTE: Array of nested objects:
 locations:

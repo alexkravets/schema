@@ -1,6 +1,6 @@
 {
   "name": "@kravc/schema",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Advanced JSON schema manipulation and validation library.",
   "keywords": [
     "JSON",
@@ -32,6 +32,7 @@
     "lodash.isundefined": "^3.0.1",
     "lodash.keyby": "^4.6.0",
     "lodash.pick": "^4.4.0",
+    "lodash.set": "^4.3.2",
     "lodash.uniq": "^4.5.0",
     "security-context": "^4.0.0",
     "validator": "^13.9.0",

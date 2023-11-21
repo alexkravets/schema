@@ -40,7 +40,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object, schemaId)', () => {
+  describe('.validate(object, schemaId, shouldCleanupNullValues = false)', () => {
     it('returns validated, cleaned and normalized object', () => {
       const validator = new Validator(SCHEMAS)
 
@@ -99,7 +99,7 @@ describe('Validator', () => {
       expect(validInput.favoriteItems[0].categories).to.deep.eql([ 'Education' ])
       expect(validInput.favoriteItems[0].status).to.eql('Pending')
       expect(validInput.contactDetails.email).to.eql('a@kra.vc')
-      expect(validInput.contactDetails.mobileNumber).to.eql('+380504112171')
+      expect(validInput.contactDetails.mobileNumber).to.eql('380504112171')
       expect(validInput.preferences.height).to.eql(180)
       expect(validInput.preferences.isNotificationEnabled).to.eql(true)
     })
@@ -224,6 +224,84 @@ describe('Validator', () => {
 
       expect(() => new Validator([ exampleSchema1, exampleSchema2 ]))
         .to.throw('Multiple "Example" schemas provided')
+    })
+  })
+
+  describe('.validate(object, schemaId, shouldCleanupNullValues = false)', () => {
+    it('throws validation error for attributes not matching format or pattern', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {
+        name: 'Oleksandr',
+        gender: '',
+        contactDetails: {
+          email: 'a@kra.vc',
+          secondaryEmail: '',
+          mobileNumber: '',
+        },
+      }
+
+      expect(
+        () => validator.validate(input, 'Profile')
+      ).to.throw('"Profile" validation failed')
+    })
+  })
+
+  describe('.validate(object, schemaId, shouldCleanupNullValues = true)', () => {
+    it('returns input with cleaned up null values for not required attributes', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {
+        name: 'Oleksandr',
+        gender: '', // ENUM
+        contactDetails: {
+          email: 'a@kra.vc',
+          mobileNumber: '', // PATTERN
+          secondaryEmail: '', // FORMAT
+        },
+      }
+
+      const validInput = validator.validate(input, 'Profile', true)
+
+      expect(validInput.gender).to.eql(null)
+      expect(validInput.contactDetails.mobileNumber).to.eql(null)
+      expect(validInput.contactDetails.secondaryEmail).to.eql(null)
+    })
+
+    it('throws validation errors for other attributes', () => {
+      const validator = new Validator(SCHEMAS)
+
+      const input = {
+        name: '', // code: MIN_LENGTH
+        gender: 'NONE', // code: ENUM_MISMATCH
+        contactDetails: {
+          email: 'a@kra.vc',
+          mobileNumber: 'abc', // code: PATTERN
+          secondaryEmail: '',
+        },
+        preferences: {
+          age: 'a' // code: INVALID_TYPE
+        },
+      }
+
+      try {
+        validator.validate(input, 'Profile', true)
+
+      } catch (validationError) {
+        const error = validationError.toJSON()
+
+        expect(error.message).to.eql('"Profile" validation failed')
+        expect(error.validationErrors).to.have.lengthOf(4)
+
+        expect(error.validationErrors[0].code).to.eql('INVALID_TYPE')
+        expect(error.validationErrors[1].code).to.eql('PATTERN')
+        expect(error.validationErrors[2].code).to.eql('ENUM_MISMATCH')
+        expect(error.validationErrors[3].code).to.eql('MIN_LENGTH')
+
+        return
+      }
+
+      throw new Error('Validation error is not thrown')
     })
   })
 

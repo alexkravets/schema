@@ -6,6 +6,7 @@ const ZSchema             = require('z-schema')
 const getReferenceIds     = require('./helpers/getReferenceIds')
 const ValidationError     = require('./ValidationError')
 const cleanupAttributes   = require('./helpers/cleanupAttributes')
+const nullifyEmptyValues  = require('./helpers/nullifyEmptyValues')
 const normalizeAttributes = require('./helpers/normalizeAttributes')
 
 class Validator {
@@ -25,7 +26,10 @@ class Validator {
       }
     }
 
-    this._engine = new ZSchema({ ignoreUnknownFormats: true })
+    this._engine = new ZSchema({
+      reportPathAsArray: true,
+      ignoreUnknownFormats: true,
+    })
 
     const jsonSchemas = schemas.map(({ jsonSchema }) => jsonSchema)
     const isValid     = this._engine.validateSchema(jsonSchemas)
@@ -39,7 +43,7 @@ class Validator {
     this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
   }
 
-  validate(object, schemaId) {
+  validate(object, schemaId, shouldCleanupNullValues = false) {
     const jsonSchema = this._jsonSchemasMap[schemaId]
 
     if (!jsonSchema) {
@@ -72,12 +76,25 @@ class Validator {
 
     const isValid = this._engine.validate(result, jsonSchema)
 
-    if (!isValid) {
-      const validationErrors = this._engine.getLastErrors()
+    if (isValid) {
+      return result
+    }
+
+    let validationErrors = this._engine.getLastErrors()
+
+    if (!shouldCleanupNullValues) {
       throw new ValidationError(schemaId, result, validationErrors)
     }
 
-    return result
+    const [ updatedResult, updatedValidationErrors ] = nullifyEmptyValues(result, validationErrors)
+
+    const hasValidationErrors = updatedValidationErrors.length > 0
+
+    if (hasValidationErrors) {
+      throw new ValidationError(schemaId, result, updatedValidationErrors)
+    }
+
+    return updatedResult
   }
 
   normalize(object, schemaId) {

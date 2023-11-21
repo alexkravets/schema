@@ -10,6 +10,7 @@ const normalizeRequired = jsonSchema => {
     const property = properties[name]
 
     if (property.required) {
+      property['x-required'] = true
       required.push(name)
     }
 
