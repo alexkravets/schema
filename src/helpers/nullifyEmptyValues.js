@@ -21,7 +21,7 @@ const nullifyEmptyValues = (object, validationErrors) => {
   const otherValidationErrors = []
 
   for (const error of validationErrors) {
-    const { code, path } = error
+    const { code } = error
 
     const isAttributeRequired = error[schemaSymbol]['x-required'] === true
     const isFormatError = FORMAT_ERROR_CODES.includes(code)
@@ -35,6 +35,9 @@ const nullifyEmptyValues = (object, validationErrors) => {
       otherValidationErrors.push(error)
       continue
     }
+
+    const { path: pathString } = error
+    const path = pathString.replace('#/', '').split('/')
 
     const json = error[jsonSymbol]
     const value = get(json, path)

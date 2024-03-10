@@ -27,7 +27,7 @@ class Validator {
     }
 
     this._engine = new ZSchema({
-      reportPathAsArray: true,
+      reportPathAsArray: false,
       ignoreUnknownFormats: true,
     })
 

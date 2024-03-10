@@ -291,6 +291,7 @@ describe('Validator', () => {
         const error = validationError.toJSON()
 
         expect(error.message).to.eql('"Profile" validation failed')
+
         expect(error.validationErrors).to.have.lengthOf(4)
 
         expect(error.validationErrors[0].code).to.eql('INVALID_TYPE')
