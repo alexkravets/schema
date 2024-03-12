@@ -3,6 +3,7 @@
 const keyBy               = require('lodash.keyby')
 const groupBy             = require('lodash.groupby')
 const ZSchema             = require('z-schema')
+const cleanupNulls        = require('./helpers/cleanupNulls')
 const getReferenceIds     = require('./helpers/getReferenceIds')
 const ValidationError     = require('./ValidationError')
 const cleanupAttributes   = require('./helpers/cleanupAttributes')
@@ -43,7 +44,7 @@ class Validator {
     this._jsonSchemasMap = keyBy(jsonSchemas, 'id')
   }
 
-  validate(object, schemaId, shouldNullifyEmptyValues = false) {
+  validate(object, schemaId, shouldNullifyEmptyValues = false, shouldCleanupNulls = false) {
     const jsonSchema = this._jsonSchemasMap[schemaId]
 
     if (!jsonSchema) {
@@ -51,7 +52,11 @@ class Validator {
     }
 
     const objectJson = JSON.stringify(object)
-    const result = JSON.parse(objectJson)
+    let result = JSON.parse(objectJson)
+
+    if (shouldCleanupNulls) {
+      result = cleanupNulls(result)
+    }
 
     try {
       // NOTE: Drop attributes from objects that are not defined in schema.

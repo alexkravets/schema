@@ -40,7 +40,7 @@ describe('Validator', () => {
     })
   })
 
-  describe('.validate(object, schemaId, shouldNullifyEmptyValues = false)', () => {
+  describe('.validate(object, schemaId, shouldNullifyEmptyValues = false, shouldCleanupNulls = true)', () => {
     it('returns validated, cleaned and normalized object', () => {
       const validator = new Validator(SCHEMAS)
 
@@ -48,15 +48,20 @@ describe('Validator', () => {
 
       const input = {
         name: 'Oleksandr',
+        toBeRemoved: null,
         contactDetails: {
-          email: 'a@kra.vc'
+          email: 'a@kra.vc',
+          toBeRemoved: null,
         },
-        favoriteItems: [{
-          id:         '1',
-          name:       'Student Book',
-          categories: [ 'Education' ],
-          _createdAt
-        }],
+        favoriteItems: [
+          {
+            id:         '1',
+            name:       'Student Book',
+            categories: [ 'Education' ],
+            toBeRemoved: null,
+            _createdAt
+          },
+        ],
         locations: [{
           name: 'Home',
           address: {
@@ -77,7 +82,11 @@ describe('Validator', () => {
         _createdAt
       }
 
-      const validInput = validator.validate(input, 'Profile')
+      const validInput = validator.validate(input, 'Profile', false, true)
+
+      expect(validInput.toBeRemoved).to.not.exist
+      expect(validInput.contactDetails.toBeRemoved).to.not.exist
+      expect(validInput.favoriteItems[0].toBeRemoved).to.not.exist
 
       expect(validInput._createdAt).to.not.exist
       expect(validInput.preferences._createdAt).to.not.exist
