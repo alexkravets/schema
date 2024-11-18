@@ -1,8 +1,7 @@
 'use strict'
 
-const uniq        = require('lodash.uniq')
-const Schema      = require('../Schema')
-const isUndefined = require('lodash.isundefined')
+const { isUndefined, uniq } = require('lodash')
+const Schema = require('../Schema')
 
 const getReferenceIds = (schema, schemasMap) => {
   const getSchema = id => schemasMap[id]

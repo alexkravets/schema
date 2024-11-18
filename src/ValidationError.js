@@ -1,6 +1,6 @@
 'use strict'
 
-const pick = require('lodash.pick')
+const { pick } = require('lodash')
 
 class ValidationError extends Error {
   constructor(schemaId, invalidObject, validationErrors) {

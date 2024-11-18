@@ -1,8 +1,7 @@
 'use strict'
 
-const isObject    = require('lodash.isobject')
-const cloneDeep   = require('lodash.clonedeep')
 const { isArray } = Array
+const { isObject, cloneDeep } = require('lodash')
 
 const cleanupNulls = object => {
   if (!isObject(object)) {

@@ -1,7 +1,6 @@
 'use strict'
 
-const keyBy               = require('lodash.keyby')
-const groupBy             = require('lodash.groupby')
+const { keyBy, groupBy }  = require('lodash')
 const ZSchema             = require('z-schema')
 const cleanupNulls        = require('./helpers/cleanupNulls')
 const getReferenceIds     = require('./helpers/getReferenceIds')
@@ -73,6 +72,7 @@ class Validator {
       //       or numbers are '1', '2'... strings.
       normalizeAttributes(result, jsonSchema, this._jsonSchemasMap)
 
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       // NOTE: Skip errors in cleanup and normalize attributes methods,
       //       validation fails for objects with invalid value types.

@@ -1,8 +1,8 @@
 'use strict'
 
 const mapObject     = require('./mapObject')
-const isUndefined   = require('lodash.isundefined')
 const normalizeType = require('./normalizeType')
+const { isUndefined } = require('lodash')
 
 const normalizeAttributes = (object, jsonSchema, jsonSchemasMap) => {
   const callback = (propertyName, propertySchema, object) => {

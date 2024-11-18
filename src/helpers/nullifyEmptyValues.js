@@ -1,7 +1,6 @@
 'use strict'
 
-const get = require('lodash.get')
-const set = require('lodash.set')
+const { get, set } = require('lodash')
 const { schemaSymbol, jsonSymbol } = require('z-schema')
 
 const FORMAT_ERROR_CODES = [

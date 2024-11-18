@@ -1,7 +1,6 @@
 'use strict'
 
-const pick                 = require('lodash.pick')
-const cloneDeep            = require('lodash.clonedeep')
+const { pick, cloneDeep }  = require('lodash')
 const validateId           = require('./helpers/validateId')
 const normalizeRequired    = require('./helpers/normalizeRequired')
 const normalizeProperties  = require('./helpers/normalizeProperties')

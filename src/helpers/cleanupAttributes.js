@@ -1,6 +1,6 @@
 'use strict'
 
-const isUndefined = require('lodash.isundefined')
+const { isUndefined } = require('lodash')
 
 const cleanupAttributes = (object, jsonSchema, schemasMap) => {
   const { id, enum: isEnum } = jsonSchema

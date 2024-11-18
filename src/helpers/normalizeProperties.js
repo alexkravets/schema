@@ -1,6 +1,6 @@
 'use strict'
 
-const isUndefined = require('lodash.isundefined')
+const { isUndefined } = require('lodash')
 
 const normalizeProperties = properties => {
   const { enum: isEnum } = properties
