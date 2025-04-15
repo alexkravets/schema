@@ -10,7 +10,7 @@ export declare class Schema {
     url?: string
   )
 
-  static get id(): string;
+  get id(): string;
 
   only(propertyNames: string[], id?: string): Schema;
   wrap(propertyName: string, options?: Record<string, any>, id?: string): Schema;
