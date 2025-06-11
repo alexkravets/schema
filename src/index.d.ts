@@ -11,6 +11,7 @@ export declare class Schema {
   )
 
   get id(): string;
+  get source(): Source;
 
   only(propertyNames: string[], id?: string): Schema;
   wrap(propertyName: string, options?: Record<string, any>, id?: string): Schema;
