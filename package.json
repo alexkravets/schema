@@ -1,5 +1,5 @@
 {
-  "name": "@kravc/schema",
+  "name": "@chghealthcare/chg-snp-schema-library",
   "version": "2.7.6",
   "description": "Advanced JSON schema manipulation and validation library.",
   "keywords": [
@@ -16,7 +16,7 @@
   "types": "src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "http://github.com/alexkravets/schema.git"
+    "url": "http://github.com/CHGHealthcare/chg-snp-schema-library.git"
   },
   "directories": {
     "src": "src"
@@ -24,7 +24,6 @@
   "scripts": {
     "test": "eslint src/ examples/ && NODE_PATH=./ nyc mocha \"./src/**/*.spec.js\""
   },
-  "author": "Alexander Kravets <a@kra.vc>",
   "license": "ISC",
   "dependencies": {
     "credentials-context": "^2.0.0",

@@ -1,4 +1,4 @@
-# @kravc/schema
+# @chghealthcare/chg-snp-schema-library
 
 Advanced JSON schema manipulation and validation library based on
 [z-schema](https://github.com/zaggino/z-schema).
@@ -8,11 +8,11 @@ Advanced JSON schema manipulation and validation library based on
 Install npm dependency:
 
 ```sh
-npm i --save @kravc/schema
+npm i --save @chghealthcare/chg-snp-schema-library
 ```
 
 ```js
-const { Schema, Validator } = require('@kravc/schema')
+const { Schema, Validator } = require('@chghealthcare/chg-snp-schema-library')
 
 const userSchema = new Schema({
   firstName: { required: true },
@@ -54,7 +54,7 @@ linked data context. Common json schema types and formats (`integer`,
 Define schema for a credential subject:
 
 ```js
-const { Schema } = require('@kravc/schema')
+const { Schema } = require('@chghealthcare/chg-snp-schema-library')
 
 const accountSchema = new Schema({
   id:          { required: true },
@@ -68,7 +68,7 @@ Initialize credential factory by providing credential URI and credential subject
 schemas:
 
 ```js
-const { CredentialFactory } = require('@kravc/schema')
+const { CredentialFactory } = require('@chghealthcare/chg-snp-schema-library')
 
 const factory = new CredentialFactory('https://example.com/schema/AccountV1', [ accountSchema ])
 ```
@@ -140,7 +140,7 @@ Expected JSON-LD output (could be verified using [JSON-LD Playground](https://js
 ```
 
 Attributes `issuer`, `issuanceDate` and `proof` are intentionally skipped and
-to be set by issuing function (e.g [@kravc/identity](http://github.com/alexkravets/identity)).
+to be set by issuing function (e.g [@chghealthcare/identity](http://github.com/CHGHealthcare/identity)).
 
 Other `CredentialFactory` examples:
 
