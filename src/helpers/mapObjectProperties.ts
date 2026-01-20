@@ -3,21 +3,23 @@ import got from './got';
 import type {
   JsonSchema,
   EnumSchema,
-  TargetObject,
   ObjectSchema,
+  TargetObject,
+  PropertySchema,
   JsonSchemasMap,
   ArrayPropertySchema,
   ObjectPropertySchema,
-  ReferencePropertySchema
+  ReferencePropertySchema,
 } from './JsonSchema';
 
-/** Ensure target project properties are defined in schema, drops those that are not defined */
-const cleanupAttributes = (
+/** Applies callback method to each object property including nexted objects and arrays */
+const mapObjectProperties = (
   object: TargetObject,
   jsonSchema: JsonSchema,
-  schemasMap: JsonSchemasMap = {}
+  schemasMap: JsonSchemasMap,
+  callback: (propertyName: string, propertySchema: PropertySchema, object: TargetObject) => void
 ) => {
-  const { enum: enumItems } = (jsonSchema as EnumSchema);
+  const { enum: enumItems } = jsonSchema as EnumSchema;
 
   const isEnum = !!enumItems;
 
@@ -26,26 +28,28 @@ const cleanupAttributes = (
   }
 
   const objectSchema = (jsonSchema as ObjectSchema);
+  const { properties: objectProperties } = objectSchema;
 
-  for (const fieldName in object) {
-    const property = objectSchema.properties[fieldName];
+  for (const propertyName in objectProperties) {
+    const property = objectProperties[propertyName];
 
-    const isPropertyUndefined = isUndefined(property);
+    callback(propertyName, property, object);
 
-    if (isPropertyUndefined) {
-      // NOTE: Delete object property if it's not defined in the object schema:
-      delete object[fieldName];
+    const value = object[propertyName];
+    const isValueUndefined = isUndefined(value);
+
+    if (isValueUndefined) {
       continue;
     }
 
-    const { $ref: refSchemaId } = (property as ReferencePropertySchema);
+    const { $ref: refSchemaId } = property as ReferencePropertySchema;
 
     const isReference = !isUndefined(refSchemaId);
 
     if (isReference) {
       const referenceSchema = got(schemasMap, refSchemaId);
 
-      cleanupAttributes(object[fieldName] as TargetObject, referenceSchema, schemasMap);
+      mapObjectProperties(value as TargetObject, referenceSchema, schemasMap, callback);
       continue;
     }
 
@@ -57,11 +61,11 @@ const cleanupAttributes = (
       const { properties } = (property as ObjectPropertySchema);
 
       const nestedJsonSchema = {
-        id: `${objectSchema.id}.${fieldName}.properties`,
+        id: `${objectSchema.id}.${propertyName}.properties`,
         properties
       };
 
-      cleanupAttributes(object[fieldName] as TargetObject, nestedJsonSchema, schemasMap);
+      mapObjectProperties(value as TargetObject, nestedJsonSchema, schemasMap, callback);
       continue;
     }
 
@@ -79,15 +83,15 @@ const cleanupAttributes = (
       const itemSchema = isItemReference
         ? got(schemasMap, itemRefSchemaId)
         : {
-          id: `${objectSchema.id}.${fieldName}.items.properties`,
+          id: `${objectSchema.id}.${propertyName}.items.properties`,
           properties: itemObjectProperties
         };
 
-      for (const item of object[fieldName] as TargetObject[]) {
-        cleanupAttributes(item, itemSchema, schemasMap);
+      for (const valueItem of value as TargetObject[]) {
+        mapObjectProperties(valueItem, itemSchema, schemasMap, callback);
       }
     }
   }
 };
 
-export default cleanupAttributes;
+export default mapObjectProperties;

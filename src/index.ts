@@ -1,8 +1,9 @@
+import Schema from './Schema';
 import documentLoader from './ld/documentLoader';
 
 export {
-  // Schema:            require('./Schema'),
+  Schema,
+  documentLoader,
   // Validator:         require('./Validator'),
   // CredentialFactory: require('./CredentialFactory')
-  documentLoader,
 };

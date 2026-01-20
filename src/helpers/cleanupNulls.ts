@@ -1,9 +1,10 @@
+import { type TargetObject } from './JsonSchema';
 import { isObject, cloneDeep } from 'lodash';
 
 const { isArray } = Array;
 
 /** Drops null object properties */
-const cleanupNulls = (target: Record<string, unknown>) => {
+const cleanupNulls = (target: TargetObject) => {
   const shouldSkip = !isObject(target);
 
   if (shouldSkip) {

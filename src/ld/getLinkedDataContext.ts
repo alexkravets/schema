@@ -22,7 +22,7 @@ type ContextHeader = {
   schema?: string;
 };
 
-type LinkedDataContext = ContextHeader & {
+export type LinkedDataContext = ContextHeader & {
   [key: string]: ContextProperty | string | number | boolean | undefined;
 };
 
