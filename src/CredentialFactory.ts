@@ -56,7 +56,10 @@ class CredentialFactory {
     validateId('id', id);
     validateId('holder', holder);
 
-    const type = [ 'VerifiableCredential', this.credentialType ];
+    const type = [
+      'VerifiableCredential',
+      this.credentialType
+    ];
 
     const [ rootType ] = this._types;
     const credentialSubject = this._validator.validate(subject, rootType.id);

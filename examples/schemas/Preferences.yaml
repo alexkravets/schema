@@ -1,5 +1,7 @@
 age:
   type: number
+  min: 0
+  max: 199
 
 height:
   type: number

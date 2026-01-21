@@ -51,7 +51,7 @@ const getReferenceIds = (schema: Schema, schemasMap: Record<string, Schema>): st
     const isObject = type === 'object';
 
     if (isObject) {
-      const { properties } = (property as ObjectPropertySchema);
+      const { properties = {} } = (property as ObjectPropertySchema);
 
       const nestedSchema = new Schema(properties, `${objectSchema.id}.${propertyName}.properties`);
       const nestedReferenceIds = getReferenceIds(nestedSchema, schemasMap);

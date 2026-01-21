@@ -1,11 +1,12 @@
 import type {
+  EnumSchema,
   PropertySchema,
   ArrayPropertySchema,
-  ObjectPropertySchema
+  ObjectPropertySchema,
 } from './JsonSchema';
 
 /** Removes required and default attributes of a JSON schema */
-const removeRequiredAndDefault = (jsonSchema: PropertySchema) => {
+const removeRequiredAndDefault = (jsonSchema: PropertySchema | EnumSchema) => {
   const { properties } = (jsonSchema as ObjectPropertySchema);
 
   if (!properties) {
@@ -30,7 +31,7 @@ const removeRequiredAndDefault = (jsonSchema: PropertySchema) => {
     const isArray = type === 'array';
 
     if (isArray) {
-      const { items } = (property as ArrayPropertySchema);
+      const { items = {} } = (property as ArrayPropertySchema);
       removeRequiredAndDefault(items);
     }
   }

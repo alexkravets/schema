@@ -1,26 +1,35 @@
 export type EnumSchema = {
-  id: string;
+  id?: string;
   enum: string[];
   type?: 'string' | 'number';
+  default?: string | number;
+  required?: boolean;
+  'x-required'?: boolean;
 };
 
 export type ReferencePropertySchema = {
   $ref: string;
-  default?: number;
+  default?: string | number | Record<string, unknown>;
   required?: boolean;
   'x-required'?: boolean;
 };
 
 export type StringPropertySchema = {
-  type: 'string';
+  '@type'?: string;
+  type?: 'string';
   format?: 'date' | 'date-time' | 'url' | 'email',
   default?: string;
+  pattern?: string;
   required?: boolean;
+  minLength?: number;
+  maxLength?: number;
   'x-required'?: boolean;
 };
 
 export type NumberPropertySchema = {
   type: 'number';
+  min?: number;
+  max?: number;
   default?: number;
   required?: boolean;
   'x-required'?: boolean;
@@ -41,22 +50,23 @@ export type BooleanPropertySchema = {
 };
 
 export type ObjectPropertySchema = {
-  type: 'object';
+  type?: 'object';
   default?: Record<string, unknown>;
   required?: boolean;
-  properties: PropertiesSchema;
+  properties?: PropertiesSchema;
   'x-required'?: boolean;
 }
 
 export type ArrayPropertySchema = {
-  type: 'array';
-  items: ReferencePropertySchema | ObjectPropertySchema | StringPropertySchema;
+  type?: 'array';
+  items?: ReferencePropertySchema | ObjectPropertySchema | StringPropertySchema | EnumSchema;
   default?: unknown[];
   required?: boolean;
   'x-required'?: boolean;
 };
 
 export type PropertySchema =
+  EnumSchema |
   ReferencePropertySchema |
   ObjectPropertySchema |
   ArrayPropertySchema |

@@ -59,7 +59,7 @@ const mapObjectProperties = (
     const isObject = type === 'object';
 
     if (isObject) {
-      const { properties } = (property as ObjectPropertySchema);
+      const { properties = {} } = (property as ObjectPropertySchema);
 
       const nestedJsonSchema = {
         id: `${objectSchema.id}.${propertyName}.properties`,
@@ -77,7 +77,7 @@ const mapObjectProperties = (
 
       const { $ref: itemRefSchemaId } = (items as ReferencePropertySchema);
 
-      const { properties: itemObjectProperties } = (items as ObjectPropertySchema);
+      const { properties: itemObjectProperties = {} } = (items as ObjectPropertySchema);
 
       const isItemReference = !!itemRefSchemaId;
 

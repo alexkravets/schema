@@ -56,21 +56,21 @@ const normalizeProperties = (schema: EnumSchema | PropertiesSchema) => {
         (property as ObjectPropertySchema).properties = {};
       }
 
-      normalizeProperties((property as ObjectPropertySchema).properties);
+      normalizeProperties((property as ObjectPropertySchema).properties || {});
     }
 
     const isArray = type === 'array';
 
     if (isArray) {
       if (hasItems) {
-        const { items } = (property as ArrayPropertySchema);
+        const { items = {} } = (property as ArrayPropertySchema);
 
         const isItemObject = !isUndefined((items as ObjectPropertySchema).properties);
 
         if (isItemObject) {
           set(items, 'type', 'object');
 
-          normalizeProperties((items as ObjectPropertySchema).properties);
+          normalizeProperties((items as ObjectPropertySchema).properties || {});
         }
 
       } else {
