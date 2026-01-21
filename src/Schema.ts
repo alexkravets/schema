@@ -1,4 +1,5 @@
 import { pick, cloneDeep } from 'lodash';
+
 import validateId from './helpers/validateId';
 import normalizeRequired from './helpers/normalizeRequired';
 import normalizeProperties from './helpers/normalizeProperties';
@@ -13,7 +14,7 @@ import type {
 
 const UNDEFINED_SCHEMA_ID = 'UNDEFINED_SCHEMA_ID';
 
-type LinkedDataType = {
+export type LinkedDataType = {
   '@id': string;
   '@context': LinkedDataContext;
 }

@@ -1,6 +1,7 @@
 import { get, set } from 'lodash';
-import type { TargetObject } from './JsonSchema';
 import { schemaSymbol, jsonSymbol, type SchemaErrorDetail } from 'z-schema';
+
+import type { TargetObject } from './JsonSchema';
 
 const FORMAT_ERROR_CODES = [
   'PATTERN',

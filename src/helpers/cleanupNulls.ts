@@ -1,5 +1,6 @@
-import { type TargetObject } from './JsonSchema';
 import { isObject, cloneDeep } from 'lodash';
+
+import { type TargetObject } from './JsonSchema';
 
 const { isArray } = Array;
 

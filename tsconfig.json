@@ -17,10 +17,13 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["src", "types"],
+  "include": [
+    "src",
+    "types"
+  ],
   "exclude": [
-    "node_modules", 
+    "node_modules",
     "dist",
-    "**/*.test.ts" 
+    "**/*.test.ts"
   ]
 }

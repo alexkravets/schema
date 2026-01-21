@@ -1,6 +1,7 @@
+import { get, isUndefined } from 'lodash';
+
 import normalizeType from './normalizeType';
 import mapObjectProperties from './mapObjectProperties';
-import { get, isUndefined } from 'lodash';
 import type { TargetObject, JsonSchema, JsonSchemasMap, PropertySchema } from './JsonSchema';
 
 /** Normalize object attributes values based on it's schema */

@@ -1,6 +1,6 @@
 import getLinkedDataType, { type PropertySchema } from '../getLinkedDataType';
 
-describe('getLinkedDataType(propertySchema)', () => {
+describe('getLinkedDataAttributeType(propertySchema)', () => {
   describe('when @type is defined', () => {
     it('should return the @type value when it is a string', () => {
       const propertySchema: PropertySchema = {

@@ -7,8 +7,8 @@ export type PropertySchema = {
   format?: string;
 };
 
-/** Returns linked data type for a property schema, unless @type is defined */
-const getLinkedDataType = (propertySchema: PropertySchema): string | undefined => {
+/** Returns linked data attribute type for a property schema, unless @type is defined */
+const getLinkedDataAttributeType = (propertySchema: PropertySchema): string | undefined => {
   const isOverriden = !!get(propertySchema, '@type');
 
   if (isOverriden) {
@@ -43,4 +43,4 @@ const getLinkedDataType = (propertySchema: PropertySchema): string | undefined =
   return;
 };
 
-export default getLinkedDataType;
+export default getLinkedDataAttributeType;

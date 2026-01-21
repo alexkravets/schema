@@ -1,4 +1,4 @@
-import getLinkedDataType, { type PropertySchema } from './getLinkedDataType';
+import getLinkedDataAttributeType, { type PropertySchema } from './getLinkedDataAttributeType';
 
 export type { PropertySchema };
 
@@ -50,7 +50,7 @@ const getLinkedDataContext = (properties: Record<string, PropertySchema>, vocabU
       continue;
     }
 
-    const linkedDataType = getLinkedDataType(propertySchema);
+    const linkedDataType = getLinkedDataAttributeType(propertySchema);
 
     if (linkedDataType) {
       context[key]['@type'] = linkedDataType;
