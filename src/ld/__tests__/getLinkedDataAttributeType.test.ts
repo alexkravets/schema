@@ -1,4 +1,4 @@
-import getLinkedDataType, { type PropertySchema } from '../getLinkedDataType';
+import getLinkedDataAttributeType, { type PropertySchema } from '../getLinkedDataAttributeType';
 
 describe('getLinkedDataAttributeType(propertySchema)', () => {
   describe('when @type is defined', () => {
@@ -7,7 +7,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         '@type': 'schema:Text',
         type: 'string',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Text');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Text');
     });
 
     it('should return the @type value even when type and format are present', () => {
@@ -16,7 +16,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'number',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:CustomType');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:CustomType');
     });
 
     it('should return the @type value for integer type', () => {
@@ -24,7 +24,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         '@type': 'schema:CustomInteger',
         type: 'integer',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:CustomInteger');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:CustomInteger');
     });
   });
 
@@ -33,7 +33,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
       const propertySchema: PropertySchema = {
         type: 'integer',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Integer');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Integer');
     });
 
     it('should return schema:Integer even when format is present', () => {
@@ -41,7 +41,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'integer',
         format: 'int32',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Integer');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Integer');
     });
   });
 
@@ -50,7 +50,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
       const propertySchema: PropertySchema = {
         type: 'number',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Number');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Number');
     });
 
     it('should return schema:Number even when format is present', () => {
@@ -58,7 +58,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'number',
         format: 'float',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Number');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Number');
     });
   });
 
@@ -68,7 +68,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'string',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Date');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Date');
     });
 
     it('should return schema:Date regardless of type when format is date', () => {
@@ -76,7 +76,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'object',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Date');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Date');
     });
   });
 
@@ -86,7 +86,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'string',
         format: 'date-time',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:DateTime');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:DateTime');
     });
 
     it('should return schema:DateTime when format is date-time and type is string', () => {
@@ -94,7 +94,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'string',
         format: 'date-time',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:DateTime');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:DateTime');
     });
 
     it('should prioritize type over format (number type wins over date-time format)', () => {
@@ -103,7 +103,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         format: 'date-time',
       };
       // The function checks type before format, so number type takes priority
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Number');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Number');
     });
   });
 
@@ -112,28 +112,28 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
       const propertySchema: PropertySchema = {
         type: 'string',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined for boolean type', () => {
       const propertySchema: PropertySchema = {
         type: 'boolean',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined for array type', () => {
       const propertySchema: PropertySchema = {
         type: 'array',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined for object type', () => {
       const propertySchema: PropertySchema = {
         type: 'object',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined for other formats', () => {
@@ -141,19 +141,19 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'string',
         format: 'email',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined for empty object', () => {
       const propertySchema: PropertySchema = {} as PropertySchema;
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
 
     it('should return undefined when only $ref is present', () => {
       const propertySchema: PropertySchema = {
         $ref: '#/definitions/SomeType',
       };
-      expect(getLinkedDataType(propertySchema)).toBeUndefined();
+      expect(getLinkedDataAttributeType(propertySchema)).toBeUndefined();
     });
   });
 
@@ -163,7 +163,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         '@type': 'schema:Custom',
         type: 'integer',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Custom');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Custom');
     });
 
     it('should prioritize @type over format date', () => {
@@ -171,7 +171,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         '@type': 'schema:Custom',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Custom');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Custom');
     });
 
     it('should prioritize integer type over number type', () => {
@@ -179,7 +179,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'integer',
         format: 'number',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Integer');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Integer');
     });
 
     it('should prioritize integer type over date format', () => {
@@ -187,7 +187,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'integer',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Integer');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Integer');
     });
 
     it('should prioritize number type over date format', () => {
@@ -195,7 +195,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'number',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Number');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Number');
     });
 
     it('should prioritize date format over date-time format when both are present (date checked first)', () => {
@@ -206,7 +206,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'string',
         format: 'date',
       };
-      expect(getLinkedDataType(propertySchema)).toBe('schema:Date');
+      expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Date');
     });
   });
 });

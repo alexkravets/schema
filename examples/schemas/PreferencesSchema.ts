@@ -3,8 +3,8 @@ import { Schema } from '../../src';
 const PreferencesSchema = new Schema({
   age:{
     type: 'number',
-    min: 0,
-    max: 199,
+    minimum: 0,
+    maximum: 199,
   },
   height: {
     type: 'number'
