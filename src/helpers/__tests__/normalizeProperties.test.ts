@@ -155,6 +155,71 @@ describe('normalizeProperties(schema)', () => {
 
         expect(schema.objectField.properties!.existing.type).toBe('number');
       });
+
+      it('should handle object with undefined properties', () => {
+        const schema = {
+          objectField: {
+            type: 'object' as const,
+            properties: undefined
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        expect(schema.objectField.properties).toEqual({});
+      });
+
+      it('should handle object with null properties', () => {
+        const schema = {
+          objectField: {
+            type: 'object' as const,
+            properties: null
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        // When properties is null, it gets normalized to {} and recursive call uses || {}
+        expect(schema.objectField.properties).toEqual({});
+      });
+
+      it('should handle object type with undefined properties (tests || {} fallback)', () => {
+        const schema = {
+          objectField: {
+            type: 'object' as const,
+            properties: undefined
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        // When properties is undefined, it gets set to {} on line 56, then || {} on line 59 uses the set value
+        expect(schema.objectField.properties).toEqual({});
+      });
+
+      it('should handle object with properties explicitly set to null after type is set (tests || {} fallback on line 59)', () => {
+        // Create an object where properties is null but type is already 'object'
+        // This tests the || {} fallback on line 59 when properties is falsy
+        const schema: PropertiesSchema = {
+          objectField: {
+            type: 'object',
+            // Manually set properties to null to test the || {} branch
+          }
+        };
+        // Manually set properties to null after schema creation to bypass type checking
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.objectField as any).properties = null;
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        // The || {} fallback should handle null properties
+        expect(schema.objectField.properties).toEqual({});
+      });
+
     });
 
     describe('array properties', () => {
@@ -187,7 +252,7 @@ describe('normalizeProperties(schema)', () => {
 
         expect(schema.arrayField.type).toBe('array');
         expect(schema.arrayField.items!.type).toBe('object');
-        expect((schema.arrayField.items as any).properties!.itemField.type).toBe('string');
+        expect((schema.arrayField.items as unknown as { properties?: { itemField: { type?: string } } }).properties!.itemField.type).toBe('string');
       });
 
       it('should recursively normalize nested properties in array items', () => {
@@ -212,7 +277,7 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(schema.arrayField.type).toBe('array');
-        const items = schema.arrayField.items as any;
+        const items = schema.arrayField.items as unknown as { type?: string; properties?: { nestedArray: { type?: string; items?: { type?: string; properties?: { deepField: { type?: string } } } } } };
         expect(items.type).toBe('object');
         expect(items.properties!.nestedArray.type).toBe('array');
         expect(items.properties!.nestedArray.items!.type).toBe('object');
@@ -230,6 +295,88 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(schema.arrayField.items!.type).toBe('number');
+      });
+
+      it('should handle array with undefined items', () => {
+        const schema = {
+          arrayField: {
+            type: 'array' as const,
+            items: undefined
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        expect(schema.arrayField.items).toEqual({ type: 'string' });
+      });
+
+      it('should handle array items without properties (should not set type to object)', () => {
+        const schema: PropertiesSchema = {
+          arrayField: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        expect(schema.arrayField.items!.type).toBe('string');
+        // Items without properties should not have type set to 'object'
+        expect((schema.arrayField.items as unknown as { properties?: unknown }).properties).toBeUndefined();
+      });
+
+      it('should handle array items with undefined properties', () => {
+        const schema = {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              properties: undefined
+            }
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        // Items with undefined properties should not have type set to 'object'
+        expect((schema.arrayField.items as unknown as { type?: string }).type).toBeUndefined();
+      });
+
+      it('should handle array items with null properties', () => {
+        const schema = {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              properties: null
+            }
+          }
+        } as PropertiesSchema;
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        // Items with null properties are treated as existing (not undefined), so type is set to 'object'
+        expect((schema.arrayField.items as unknown as { type?: string }).type).toBe('object');
+      });
+
+      it('should handle array items that is an empty object (tests destructuring with items existing)', () => {
+        // This ensures hasItems is true and we enter the block, testing the destructuring
+        const schema: PropertiesSchema = {
+          arrayField: {
+            type: 'array',
+            items: {} // Empty object, hasItems will be true
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        // Items exists but has no properties, so type should not be set to 'object'
+        expect((schema.arrayField.items as unknown as { type?: string }).type).toBeUndefined();
       });
     });
 
@@ -263,12 +410,12 @@ describe('normalizeProperties(schema)', () => {
         expect(schema.user.type).toBe('object');
         expect(schema.user.properties!.name.type).toBe('string');
         expect(schema.user.properties!.addresses.type).toBe('array');
-        expect((schema.user.properties!.addresses.items as any).type).toBe('object');
-        expect((schema.user.properties!.addresses.items as any).properties!.street.type).toBe('string');
-        expect((schema.user.properties!.addresses.items as any).properties!.city.type).toBe('string');
+        expect((schema.user.properties!.addresses.items as unknown as { type?: string; properties?: { street: { type?: string }; city: { type?: string } } }).type).toBe('object');
+        expect((schema.user.properties!.addresses.items as unknown as { type?: string; properties?: { street: { type?: string }; city: { type?: string } } }).properties!.street.type).toBe('string');
+        expect((schema.user.properties!.addresses.items as unknown as { type?: string; properties?: { street: { type?: string }; city: { type?: string } } }).properties!.city.type).toBe('string');
         expect(schema.user.properties!.metadata.type).toBe('object');
         // Array items without properties don't get a type set
-        expect((schema.user.properties!.metadata.properties!.tags.items as any).type).toBeUndefined();
+        expect((schema.user.properties!.metadata.properties!.tags.items as unknown as { type?: string }).type).toBeUndefined();
       });
 
       it('should handle mixed properties with refs, objects, arrays, and primitives', () => {

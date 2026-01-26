@@ -1,5 +1,6 @@
 import Schema from '../../Schema';
 import normalizeAttributes from '../normalizeAttributes';
+import type { TargetObject } from '../JsonSchema';
 
 describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
   describe('default values', () => {
@@ -10,7 +11,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {};
+      const object: TargetObject = {};
       const schemasMap = {};
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
@@ -44,7 +45,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {};
+      const object: TargetObject = {};
       const schemasMap = {};
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
@@ -368,7 +369,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         nestedObject: {
           numberField: '123'
         }
@@ -428,7 +429,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'referenced-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         refField: {
           numberField: '789'
         }
@@ -498,7 +499,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'item-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         arrayField: [
           { numberField: '111' },
           { numberField: '222' }
@@ -560,7 +561,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         numberField: '123',
         existingField: '456'
       };
@@ -588,7 +589,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         nested: {
           numberField: '789',
           booleanField: 'yes'
@@ -619,7 +620,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         arrayField: [
           { numberField: '111' },
           { numberField: '222' }
@@ -661,7 +662,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {
+      const object: TargetObject = {
         undefinedField: undefined
       };
       const schemasMap = {};
@@ -678,7 +679,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {};
+      const object: TargetObject = {};
       const schemasMap = {};
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
@@ -720,7 +721,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         },
         'test-schema'
       );
-      const object: any = {};
+      const object: TargetObject = {};
       const schemasMap = {};
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);

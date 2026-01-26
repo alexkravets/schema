@@ -1,4 +1,5 @@
 import cleanupAttributes from '../cleanupAttributes';
+import type { ObjectSchema } from '../JsonSchema';
 
 describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
   describe('enum schema', () => {
@@ -20,12 +21,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
         invalidField: 'value2',
         anotherInvalid: 'value3'
       };
-      const schema = {
+      const schema: ObjectSchema = {
         id: 'test-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
 
       cleanupAttributes(object, schema);
 
@@ -40,14 +41,14 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
         field2: 'value2',
         field3: 'value3'
       };
-      const schema = {
+      const schema: ObjectSchema = {
         id: 'test-schema',
         properties: {
           field1: { type: 'string' },
           field2: { type: 'string' },
           field3: { type: 'string' }
         }
-      } as any;
+      };
 
       cleanupAttributes(object, schema);
 
@@ -60,12 +61,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
     it('should handle empty object', () => {
       const object = {};
-      const schema = {
+      const schema: ObjectSchema = {
         id: 'test-schema',
         properties: {
           field1: { type: 'string' }
         }
-      } as any;
+      };
 
       cleanupAttributes(object, schema);
 
@@ -102,12 +103,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
           refField: { $ref: 'referenced-schema' }
         }
       };
-      const referencedSchema = {
+      const referencedSchema: ObjectSchema = {
         id: 'referenced-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'referenced-schema': referencedSchema
       };
@@ -139,12 +140,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
           nestedRef: { $ref: 'level2-schema' }
         }
       };
-      const level2Schema = {
+      const level2Schema: ObjectSchema = {
         id: 'level2-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'level1-schema': level1Schema,
         'level2-schema': level2Schema
@@ -172,7 +173,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       expect(() => {
         cleanupAttributes(object, schema, schemasMap);
-      }).toThrow('Value is undefined for "non-existent-schema"');
+      }).toThrow('Schema "non-existent-schema" not found');
     });
   });
 
@@ -194,7 +195,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
+      } as ObjectSchema;
       const schemasMap = {};
 
       cleanupAttributes(object, schema, schemasMap);
@@ -234,13 +235,38 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
+      } as ObjectSchema;
       const schemasMap = {};
 
       cleanupAttributes(object, schema, schemasMap);
 
       expect(object.level1.level2.level3).toEqual({ validField: 'value1' });
       expect(object.level1.level2.level3).not.toHaveProperty('invalidField');
+    });
+
+    it('should handle object type with undefined properties (tests destructuring default)', () => {
+      // Create a manually constructed schema with undefined properties to test the default destructuring
+      const object = {
+        nestedObject: {
+          someField: 'value'
+        }
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            // properties is intentionally undefined to test the default = {} on line 58
+            properties: undefined
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      // Should handle undefined properties by using default {}
+      expect(object.nestedObject).toEqual({});
     });
   });
 
@@ -260,13 +286,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             items: { $ref: 'item-schema' }
           }
         }
-      } as any;
-      const itemSchema = {
+      } as ObjectSchema;
+      const itemSchema: ObjectSchema = {
         id: 'item-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'item-schema': itemSchema
       };
@@ -300,7 +326,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
+      } as ObjectSchema;
       const schemasMap = {};
 
       cleanupAttributes(object, schema, schemasMap);
@@ -324,13 +350,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             items: { $ref: 'item-schema' }
           }
         }
-      } as any;
-      const itemSchema = {
+      } as ObjectSchema;
+      const itemSchema: ObjectSchema = {
         id: 'item-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'item-schema': itemSchema
       };
@@ -361,7 +387,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
+      } as ObjectSchema;
       const schemasMap = {};
 
       cleanupAttributes(object, schema, schemasMap);
@@ -411,13 +437,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
-      const refSchema = {
+      } as ObjectSchema;
+      const refSchema: ObjectSchema = {
         id: 'ref-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'ref-schema': refSchema
       };
@@ -457,13 +483,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
             }
           }
         }
-      } as any;
-      const nestedRefSchema = {
+      } as ObjectSchema;
+      const nestedRefSchema: ObjectSchema = {
         id: 'nested-ref-schema',
         properties: {
           validField: { type: 'string' }
         }
-      } as any;
+      };
       const schemasMap = {
         'nested-ref-schema': nestedRefSchema
       };

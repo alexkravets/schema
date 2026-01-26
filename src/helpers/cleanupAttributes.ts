@@ -44,7 +44,7 @@ const cleanupAttributes = (
     const isReference = !isUndefined(refSchemaId);
 
     if (isReference) {
-      const referenceSchema = got(schemasMap, refSchemaId);
+      const referenceSchema = got(schemasMap, refSchemaId, 'Schema "$PATH" not found');
 
       cleanupAttributes(object[fieldName] as TargetObject, referenceSchema, schemasMap);
       continue;
@@ -78,7 +78,7 @@ const cleanupAttributes = (
       const isItemReference = !!itemRefSchemaId;
 
       const itemSchema = isItemReference
-        ? got(schemasMap, itemRefSchemaId)
+        ? got(schemasMap, itemRefSchemaId, 'Schema "$PATH" not found')
         : {
           id: `${objectSchema.id}.${fieldName}.items.properties`,
           properties: itemObjectProperties

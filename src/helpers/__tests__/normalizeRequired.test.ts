@@ -1,9 +1,11 @@
+import { get } from 'lodash';
 import normalizeRequired from '../normalizeRequired';
 import type {
   ObjectSchema,
   ObjectPropertySchema,
   ArrayPropertySchema,
   ReferencePropertySchema,
+  PropertySchema,
 } from '../JsonSchema';
 
 describe('normalizeRequired(schema)', () => {
@@ -285,7 +287,7 @@ describe('normalizeRequired(schema)', () => {
                 },
               },
             },
-          },
+          } as unknown as ArrayPropertySchema,
         },
       };
 
@@ -522,7 +524,7 @@ describe('normalizeRequired(schema)', () => {
         properties: {
           field: {
             required: true,
-          } as any,
+          } as PropertySchema,
         },
       };
 
@@ -549,7 +551,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.properties.field.type).toBe('string');
+      expect(get(schema, 'properties.field.type')).toBe('string');
       expect(schema.properties.field.default).toBe('default-value');
       expect(schema.properties.field.description).toBe('Test field');
       expect(schema.properties.field['x-title']).toBe('Field Title');

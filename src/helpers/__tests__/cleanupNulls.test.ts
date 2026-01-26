@@ -104,7 +104,7 @@ describe('cleanupNulls', () => {
           }
         }
       });
-      expect((result.level1 as any).level2.level3).not.toHaveProperty('field2');
+      expect((result.level1 as unknown as { level2: { level3: Record<string, unknown> } }).level2.level3).not.toHaveProperty('field2');
     });
 
     it('should remove nested object entirely if all its properties are null', () => {
@@ -184,7 +184,7 @@ describe('cleanupNulls', () => {
       const result = cleanupNulls(object);
 
       expect(result.arrayField[0].nested).toEqual({ field1: 'value1' });
-      expect((result.arrayField[0] as any).nested).not.toHaveProperty('field2');
+      expect((result.arrayField[0] as unknown as { nested: Record<string, unknown> }).nested).not.toHaveProperty('field2');
     });
 
     it('should handle empty arrays', () => {
@@ -243,7 +243,7 @@ describe('cleanupNulls', () => {
         }
       });
       expect(result).not.toHaveProperty('field2');
-      expect((result.nested as any)).not.toHaveProperty('field4');
+      expect((result.nested as unknown as Record<string, unknown>)).not.toHaveProperty('field4');
     });
 
     it('should handle deeply nested arrays of objects', () => {
@@ -264,8 +264,8 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect((result.level1 as any).level2.arrayField[0].nested).toEqual({ field1: 'value1' });
-      expect((result.level1 as any).level2.arrayField[0].nested).not.toHaveProperty('field2');
+      expect((result.level1 as unknown as { level2: { arrayField: Array<{ nested: Record<string, unknown> }> } }).level2.arrayField[0].nested).toEqual({ field1: 'value1' });
+      expect((result.level1 as unknown as { level2: { arrayField: Array<{ nested: Record<string, unknown> }> } }).level2.arrayField[0].nested).not.toHaveProperty('field2');
     });
 
     it('should handle multiple arrays with nested structures', () => {
@@ -282,7 +282,7 @@ describe('cleanupNulls', () => {
       const result = cleanupNulls(object);
 
       expect(result.array1[0]).toEqual({ field1: 'value1' });
-      expect((result.array1[1] as any).nested).toEqual({ field4: 'value4' });
+      expect((result.array1[1] as unknown as { nested: Record<string, unknown> }).nested).toEqual({ field4: 'value4' });
       expect(result.array2[0]).toEqual({ field6: 'value6' });
     });
   });
@@ -303,7 +303,7 @@ describe('cleanupNulls', () => {
 
       expect(object).toEqual(originalClone);
       expect(object).toHaveProperty('field2');
-      expect((object.nested as any)).toHaveProperty('field4');
+      expect((object.nested as unknown as Record<string, unknown>)).toHaveProperty('field4');
       expect(result).not.toHaveProperty('field2');
     });
 

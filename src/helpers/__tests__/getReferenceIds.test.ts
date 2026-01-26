@@ -512,6 +512,7 @@ describe('getReferenceIds(schema, schemasMap)', () => {
       expect(result).toEqual([]);
     });
 
+
     it('should handle array with items that have no properties', () => {
       const schema = new Schema(
         {

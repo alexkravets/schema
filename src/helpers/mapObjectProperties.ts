@@ -82,7 +82,7 @@ const mapObjectProperties = (
       const isItemReference = !!itemRefSchemaId;
 
       const itemSchema = isItemReference
-        ? got(schemasMap, itemRefSchemaId)
+        ? got(schemasMap, itemRefSchemaId, 'Schema "$PATH" not found')
         : {
           id: `${objectSchema.id}.${propertyName}.items.properties`,
           properties: itemObjectProperties

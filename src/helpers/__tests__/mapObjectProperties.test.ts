@@ -303,6 +303,31 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith('nestedObject', expect.objectContaining({ type: 'object' }), object);
     });
+
+    it('should handle object type with undefined properties (tests destructuring default)', () => {
+      // Create a schema object manually without normalization to test the default destructuring
+      const jsonSchema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            // properties is intentionally undefined to test the default = {} on line 62
+          }
+        }
+      };
+      const object = {
+        nestedObject: {
+          someField: 'value'
+        }
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('nestedObject', expect.objectContaining({ type: 'object' }), object);
+    });
   });
 
   describe('array properties', () => {

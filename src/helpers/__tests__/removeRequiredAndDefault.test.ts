@@ -1,6 +1,6 @@
+import { get } from 'lodash';
 import removeRequiredAndDefault from '../removeRequiredAndDefault';
 import type {
-  PropertySchema,
   ObjectPropertySchema,
   ArrayPropertySchema,
   StringPropertySchema,
@@ -55,7 +55,7 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
 
       expect(result.properties.active.required).toBeUndefined();
       expect(result.properties.active.default).toBeUndefined();
-      expect(result.properties.active.type).toBe('boolean');
+      expect(get(result, 'properties.active.type')).toBe('boolean');
     });
 
     it('should preserve other properties', () => {
@@ -79,9 +79,9 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
 
       expect(result.properties.email.required).toBeUndefined();
       expect(result.properties.email.default).toBeUndefined();
-      expect(result.properties.email.pattern).toBe('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
-      expect(result.properties.email.minLength).toBe(5);
-      expect(result.properties.email.maxLength).toBe(100);
+      expect(get(result.properties.email, 'pattern')).toBe('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+      expect(get(result.properties.email, 'minLength')).toBe(5);
+      expect(get(result.properties.email, 'maxLength')).toBe(100);
       expect(result.properties.email.description).toBe('User email');
       expect(result.properties.email['x-title']).toBe('Email Address');
     });
@@ -131,16 +131,16 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
       expect(result.properties.user.default).toBeUndefined();
 
       // First level nested
-      expect(result.properties.user.properties.name.required).toBeUndefined();
-      expect(result.properties.user.properties.name.default).toBeUndefined();
+      expect(get(result, 'properties.user.properties.name.required')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.name.default')).toBeUndefined();
 
       // Second level nested
-      expect(result.properties.user.properties.address.required).toBeUndefined();
-      expect(result.properties.user.properties.address.default).toBeUndefined();
-      expect(result.properties.user.properties.address.properties.street.required).toBeUndefined();
-      expect(result.properties.user.properties.address.properties.street.default).toBeUndefined();
-      expect(result.properties.user.properties.address.properties.city.required).toBeUndefined();
-      expect(result.properties.user.properties.address.properties.city.default).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.required')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.default')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.properties.street.required')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.properties.street.default')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.properties.city.required')).toBeUndefined();
+      expect(get(result, 'properties.user.properties.address.properties.city.default')).toBeUndefined();
     });
 
     it('should handle deeply nested objects', () => {
@@ -180,12 +180,12 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
 
       expect(result.properties.level1.required).toBeUndefined();
       expect(result.properties.level1.default).toBeUndefined();
-      expect(result.properties.level1.properties.level2.required).toBeUndefined();
-      expect(result.properties.level1.properties.level2.default).toBeUndefined();
-      expect(result.properties.level1.properties.level2.properties.level3.required).toBeUndefined();
-      expect(result.properties.level1.properties.level2.properties.level3.default).toBeUndefined();
-      expect(result.properties.level1.properties.level2.properties.level3.properties.field.required).toBeUndefined();
-      expect(result.properties.level1.properties.level2.properties.level3.properties.field.default).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.required')).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.default')).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.properties.level3.required')).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.properties.level3.default')).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.properties.level3.properties.field.required')).toBeUndefined();
+      expect(get(result, 'properties.level1.properties.level2.properties.level3.properties.field.default')).toBeUndefined();
     });
   });
 
@@ -257,10 +257,10 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
       const items = (result.properties.users as ArrayPropertySchema).items as ObjectPropertySchema;
       // The function recursively processes items that have properties, removing required/default
       // from the nested properties within the items object
-      expect(items.properties.name.required).toBeUndefined();
-      expect(items.properties.name.default).toBeUndefined();
-      expect(items.properties.age.required).toBeUndefined();
-      expect(items.properties.age.default).toBeUndefined();
+      expect(items.properties!.name.required).toBeUndefined();
+      expect(items.properties!.name.default).toBeUndefined();
+      expect(items.properties!.age.required).toBeUndefined();
+      expect(items.properties!.age.default).toBeUndefined();
       // The items object itself is not in a properties object, so its required/default may still exist
       // (the function only removes them from properties within a properties object)
     });
@@ -282,7 +282,7 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
                 required: true,
                 default: 0,
               } as NumberPropertySchema,
-            } as ArrayPropertySchema,
+            } as unknown as ArrayPropertySchema,
           } as ArrayPropertySchema,
         },
       };
@@ -291,12 +291,6 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
 
       expect(result.properties.matrix.required).toBeUndefined();
       expect(result.properties.matrix.default).toBeUndefined();
-
-      // Note: The function processes nested arrays recursively, but items objects
-      // that aren't part of a properties object may still have required/default
-      const outerItems = (result.properties.matrix as ArrayPropertySchema).items as ArrayPropertySchema;
-      // The function recursively processes items, but doesn't remove required/default
-      // from items objects themselves since they're not in a properties object
     });
   });
 
@@ -349,8 +343,8 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
       // Nested object
       expect(result.properties.profile.required).toBeUndefined();
       expect(result.properties.profile.default).toBeUndefined();
-      expect(result.properties.profile.properties.bio.required).toBeUndefined();
-      expect(result.properties.profile.properties.bio.default).toBeUndefined();
+      expect(get(result, 'properties.profile.properties.bio.required')).toBeUndefined();
+      expect(get(result, 'properties.profile.properties.bio.default')).toBeUndefined();
 
       // Array
       expect(result.properties.tags.required).toBeUndefined();
@@ -415,18 +409,18 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
       // Note: The function recursively processes items, removing required/default from nested properties
 
       // Object property
-      expect(userItems.properties.name.required).toBeUndefined();
-      expect(userItems.properties.name.default).toBeUndefined();
+      expect(userItems.properties!.name.required).toBeUndefined();
+      expect(userItems.properties!.name.default).toBeUndefined();
 
       // Nested array
-      expect(userItems.properties.addresses.required).toBeUndefined();
-      expect(userItems.properties.addresses.default).toBeUndefined();
+      expect(userItems.properties!.addresses.required).toBeUndefined();
+      expect(userItems.properties!.addresses.default).toBeUndefined();
 
       // Nested array items (object)
-      const addressItems = (userItems.properties.addresses as ArrayPropertySchema).items as ObjectPropertySchema;
+      const addressItems = (userItems.properties!.addresses as ArrayPropertySchema).items as ObjectPropertySchema;
       // Note: The function recursively processes items, removing required/default from nested properties
-      expect(addressItems.properties.street.required).toBeUndefined();
-      expect(addressItems.properties.street.default).toBeUndefined();
+      expect(addressItems.properties!.street.required).toBeUndefined();
+      expect(addressItems.properties!.street.default).toBeUndefined();
     });
   });
 
@@ -514,7 +508,7 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
       expect(result.properties.metadata.default).toBeUndefined();
       // When an object property has no properties field, the recursive call returns { properties: {} }
       // but the return value is not used, so the original structure is preserved
-      expect(result.properties.metadata.properties).toBeUndefined();
+      expect(get(result, 'properties.metadata.properties')).toBeUndefined();
     });
 
     it('should handle properties with only required attribute', () => {
@@ -585,15 +579,12 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
         },
       };
 
-      const originalRequired = schema.properties.name.required;
-      const originalDefault = schema.properties.name.default;
-
       removeRequiredAndDefault(schema);
 
       // Note: The function uses delete, so it actually modifies the original
       // This test verifies the behavior - the function mutates the input
-      expect(schema.properties.name.required).toBeUndefined();
-      expect(schema.properties.name.default).toBeUndefined();
+      expect(schema.properties!.name.required).toBeUndefined();
+      expect(schema.properties!.name.default).toBeUndefined();
     });
   });
 });

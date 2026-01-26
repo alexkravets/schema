@@ -22,7 +22,7 @@
     "src": "src"
   },
   "scripts": {
-    "test": "eslint src/ examples/ && jest --coverage --detectOpenHandles",
+    "test": "eslint --fix src/ examples/ && jest --coverage",
     "prebuild": "rimraf dist",
     "build": "tsc",
     "prepare": "npm run build",

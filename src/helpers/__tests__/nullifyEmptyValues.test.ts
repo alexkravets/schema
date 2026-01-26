@@ -3,11 +3,12 @@ import { schemaSymbol, jsonSymbol } from 'z-schema';
 import type { SchemaErrorDetail } from 'z-schema';
 
 describe('nullifyEmptyValues(object, validationErrors)', () => {
+  // eslint-disable-next-line jsdoc/require-jsdoc
   const createMockError = (
     code: string,
     path: string,
-    json: any,
-    schema: any = {}
+    json: unknown,
+    schema: unknown = {}
   ): SchemaErrorDetail => {
     const error = {
       code,
@@ -19,8 +20,8 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
     } as SchemaErrorDetail;
 
     // Attach symbols to the error object
-    (error as any)[schemaSymbol] = schema;
-    (error as any)[jsonSymbol] = json;
+    (error as SchemaErrorDetail)[schemaSymbol] = schema;
+    (error as SchemaErrorDetail)[jsonSymbol] = json;
 
     return error;
   };

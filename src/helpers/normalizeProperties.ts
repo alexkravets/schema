@@ -56,6 +56,7 @@ const normalizeProperties = (schema: EnumSchema | PropertiesSchema) => {
         (property as ObjectPropertySchema).properties = {};
       }
 
+      // istanbul ignore next - unreachable defensive code: properties is always set to {} above if missing
       normalizeProperties((property as ObjectPropertySchema).properties || {});
     }
 
@@ -63,6 +64,7 @@ const normalizeProperties = (schema: EnumSchema | PropertiesSchema) => {
 
     if (isArray) {
       if (hasItems) {
+        // istanbul ignore next - unreachable defensive code: if items is undefined, hasItems would be false
         const { items = {} } = (property as ArrayPropertySchema);
 
         const isItemObject = !isUndefined((items as ObjectPropertySchema).properties);

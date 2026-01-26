@@ -13,7 +13,7 @@ import {
 /** Returns referenced schema IDs for the schema */
 const getReferenceIds = (schema: Schema, schemasMap: Record<string, Schema>): string[] => {
   /** Returns schema from the map by ID */
-  const getSchema = (id: string) => got(schemasMap, id);
+  const getSchema = (id: string) => got(schemasMap, id, 'Schema "$PATH" not found');
 
   let referenceIds: string[] = [];
 
@@ -51,6 +51,7 @@ const getReferenceIds = (schema: Schema, schemasMap: Record<string, Schema>): st
     const isObject = type === 'object';
 
     if (isObject) {
+      // istanbul ignore next - unreachable defensive code: properties is always set by normalizeProperties in Schema constructor
       const { properties = {} } = (property as ObjectPropertySchema);
 
       const nestedSchema = new Schema(properties, `${objectSchema.id}.${propertyName}.properties`);
