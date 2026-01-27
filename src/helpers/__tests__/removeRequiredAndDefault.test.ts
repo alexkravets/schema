@@ -5,7 +5,10 @@ import type {
   ArrayPropertySchema,
   StringPropertySchema,
   NumberPropertySchema,
+  IntegerPropertySchema,
   BooleanPropertySchema,
+  EnumSchema,
+  ReferencePropertySchema,
 } from '../JsonSchema';
 
 describe('removeRequiredAndDefault(jsonSchema)', () => {
@@ -543,6 +546,147 @@ describe('removeRequiredAndDefault(jsonSchema)', () => {
 
       expect(result.properties.name.required).toBeUndefined();
       expect(result.properties.name.default).toBeUndefined();
+    });
+
+    it('should handle properties without type field', () => {
+      const schema: ObjectPropertySchema = {
+        type: 'object',
+        properties: {
+          name: {
+            required: true,
+            default: 'John',
+            description: 'User name',
+          } as StringPropertySchema,
+        },
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties.name.required).toBeUndefined();
+      expect(result.properties.name.default).toBeUndefined();
+      expect(result.properties.name.description).toBe('User name');
+    });
+
+    it('should preserve x-required attribute', () => {
+      const schema: ObjectPropertySchema = {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            required: true,
+            default: 'John',
+            'x-required': true,
+            description: 'User name',
+          } as StringPropertySchema,
+        },
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties.name.required).toBeUndefined();
+      expect(result.properties.name.default).toBeUndefined();
+      expect(result.properties.name['x-required']).toBe(true);
+      expect(result.properties.name.description).toBe('User name');
+    });
+  });
+
+  describe('integer properties', () => {
+    it('should remove required and default from integer properties', () => {
+      const schema: ObjectPropertySchema = {
+        type: 'object',
+        properties: {
+          count: {
+            type: 'integer',
+            required: true,
+            default: 0,
+            minimum: 0,
+            maximum: 100,
+          } as IntegerPropertySchema,
+        },
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties.count.required).toBeUndefined();
+      expect(result.properties.count.default).toBeUndefined();
+      expect(result.properties.count.type).toBe('integer');
+      expect(result.properties.count.minimum).toBe(0);
+      expect(result.properties.count.maximum).toBe(100);
+    });
+  });
+
+  describe('enum schema', () => {
+    it('should return empty properties when EnumSchema is passed', () => {
+      const schema: EnumSchema = {
+        enum: ['red', 'green', 'blue'],
+        type: 'string',
+        required: true,
+        default: 'red',
+        description: 'Color enum',
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties).toEqual({});
+    });
+  });
+
+  describe('reference property schema in arrays', () => {
+    it('should handle ReferencePropertySchema items in arrays', () => {
+      const schema: ObjectPropertySchema = {
+        type: 'object',
+        properties: {
+          items: {
+            type: 'array',
+            required: true,
+            default: [],
+            items: {
+              $ref: '#/definitions/Item',
+              required: true,
+              default: {},
+            } as ReferencePropertySchema,
+          } as ArrayPropertySchema,
+        },
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties.items.required).toBeUndefined();
+      expect(result.properties.items.default).toBeUndefined();
+      const items = (result.properties.items as ArrayPropertySchema).items as ReferencePropertySchema;
+      expect(items.$ref).toBe('#/definitions/Item');
+      // Note: required/default on ReferencePropertySchema items are not removed
+      // because they don't have a properties field
+    });
+  });
+
+  describe('enum schema in arrays', () => {
+    it('should handle EnumSchema items in arrays', () => {
+      const schema: ObjectPropertySchema = {
+        type: 'object',
+        properties: {
+          colors: {
+            type: 'array',
+            required: true,
+            default: [],
+            items: {
+              enum: ['red', 'green', 'blue'],
+              type: 'string',
+              required: true,
+              default: 'red',
+            } as EnumSchema,
+          } as ArrayPropertySchema,
+        },
+      };
+
+      const result = removeRequiredAndDefault(schema);
+
+      expect(result.properties.colors.required).toBeUndefined();
+      expect(result.properties.colors.default).toBeUndefined();
+      const items = (result.properties.colors as ArrayPropertySchema).items as EnumSchema;
+      expect(items.enum).toEqual(['red', 'green', 'blue']);
+      // Note: required/default on EnumSchema items are not removed
+      // because they don't have a properties field
     });
   });
 

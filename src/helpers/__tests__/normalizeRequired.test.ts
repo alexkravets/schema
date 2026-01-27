@@ -1,6 +1,7 @@
 import { get } from 'lodash';
 import normalizeRequired from '../normalizeRequired';
 import type {
+  EnumSchema,
   ObjectSchema,
   ObjectPropertySchema,
   ArrayPropertySchema,
@@ -269,6 +270,24 @@ describe('normalizeRequired(schema)', () => {
       expect(items.required).toBe(true); // Still present since function returns early for refs without properties
     });
 
+    it('should handle array property without items', () => {
+      const schema: ObjectSchema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array',
+            required: true,
+          } as ArrayPropertySchema,
+        },
+      };
+
+      normalizeRequired(schema);
+
+      expect(schema.required).toEqual(['arrayField']);
+      expect(schema.properties.arrayField['x-required']).toBe(true);
+      expect(schema.properties.arrayField.required).toBeUndefined();
+    });
+
     it('should handle nested arrays', () => {
       const schema: ObjectSchema = {
         id: 'test-schema',
@@ -462,6 +481,20 @@ describe('normalizeRequired(schema)', () => {
   });
 
   describe('edge cases', () => {
+    it('should handle EnumSchema input', () => {
+      const schema: EnumSchema = {
+        enum: ['value1', 'value2', 'value3'],
+        type: 'string',
+        required: true,
+      };
+
+      normalizeRequired(schema);
+
+      // EnumSchema returns early, so no changes should be made
+      expect(schema.required).toBe(true);
+      expect(schema['x-required']).toBeUndefined();
+    });
+
     it('should handle schema without properties', () => {
       const schema: ObjectSchema = {
         id: 'test-schema',
@@ -516,6 +549,33 @@ describe('normalizeRequired(schema)', () => {
       // The function only processes schemas with properties
       expect(schema.required).toBe(true); // Still present since function returns early
       expect(schema['x-required']).toBeUndefined();
+    });
+
+    it('should skip reference properties at top level', () => {
+      const schema: ObjectSchema = {
+        id: 'test-schema',
+        properties: {
+          refField: {
+            $ref: '#/definitions/SomeSchema',
+            required: true,
+          } as ReferencePropertySchema,
+          normalField: {
+            type: 'string',
+            required: true,
+          },
+        },
+      };
+
+      normalizeRequired(schema);
+
+      // Reference property should be skipped
+      expect(schema.required).toEqual(['normalField']);
+      expect(schema.properties.refField.required).toBe(true); // Still present, not processed
+      expect(schema.properties.refField['x-required']).toBeUndefined();
+      
+      // Normal field should be processed
+      expect(schema.properties.normalField['x-required']).toBe(true);
+      expect(schema.properties.normalField.required).toBeUndefined();
     });
 
     it('should handle property with required flag but no type', () => {

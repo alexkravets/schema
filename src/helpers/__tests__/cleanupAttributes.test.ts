@@ -175,6 +175,106 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
         cleanupAttributes(object, schema, schemasMap);
       }).toThrow('Schema "non-existent-schema" not found');
     });
+
+    it('should skip cleanup when reference property value is null', () => {
+      const object = {
+        refField: null
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          refField: { $ref: 'referenced-schema' }
+        }
+      };
+      const referencedSchema: ObjectSchema = {
+        id: 'referenced-schema',
+        properties: {
+          validField: { type: 'string' }
+        }
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema
+      };
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.refField).toBeNull();
+    });
+
+    it('should skip cleanup when reference property value is undefined', () => {
+      const object = {
+        refField: undefined
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          refField: { $ref: 'referenced-schema' }
+        }
+      };
+      const referencedSchema: ObjectSchema = {
+        id: 'referenced-schema',
+        properties: {
+          validField: { type: 'string' }
+        }
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema
+      };
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.refField).toBeUndefined();
+    });
+
+    it('should skip cleanup when reference property value is a primitive', () => {
+      const object = {
+        refField: 'string-value'
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          refField: { $ref: 'referenced-schema' }
+        }
+      };
+      const referencedSchema: ObjectSchema = {
+        id: 'referenced-schema',
+        properties: {
+          validField: { type: 'string' }
+        }
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema
+      };
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.refField).toBe('string-value');
+    });
+
+    it('should skip cleanup when reference property value is an array', () => {
+      const object = {
+        refField: ['item1', 'item2']
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          refField: { $ref: 'referenced-schema' }
+        }
+      };
+      const referencedSchema: ObjectSchema = {
+        id: 'referenced-schema',
+        properties: {
+          validField: { type: 'string' }
+        }
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema
+      };
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.refField).toEqual(['item1', 'item2']);
+    });
   });
 
   describe('object properties', () => {
@@ -267,6 +367,94 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       // Should handle undefined properties by using default {}
       expect(object.nestedObject).toEqual({});
+    });
+
+    it('should skip cleanup when object property value is null', () => {
+      const object = {
+        nestedObject: null
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            properties: {
+              validField: { type: 'string' }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.nestedObject).toBeNull();
+    });
+
+    it('should skip cleanup when object property value is undefined', () => {
+      const object = {
+        nestedObject: undefined
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            properties: {
+              validField: { type: 'string' }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.nestedObject).toBeUndefined();
+    });
+
+    it('should skip cleanup when object property value is a primitive', () => {
+      const object = {
+        nestedObject: 'string-value'
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            properties: {
+              validField: { type: 'string' }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.nestedObject).toBe('string-value');
+    });
+
+    it('should skip cleanup when object property value is an array', () => {
+      const object = {
+        nestedObject: ['item1', 'item2']
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          nestedObject: {
+            type: 'object' as const,
+            properties: {
+              validField: { type: 'string' }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.nestedObject).toEqual(['item1', 'item2']);
     });
   });
 
@@ -399,6 +587,213 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
       expect(object.arrayField[2]).toEqual({});
       expect(object.arrayField[2]).not.toHaveProperty('invalidField');
     });
+
+    it('should skip cleanup when array property value is not an array', () => {
+      const object = {
+        arrayField: 'not-an-array'
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toBe('not-an-array');
+    });
+
+    it('should skip cleanup when array property value is null', () => {
+      const object = {
+        arrayField: null
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toBeNull();
+    });
+
+    it('should skip cleanup when array property value is undefined', () => {
+      const object = {
+        arrayField: undefined
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toBeUndefined();
+    });
+
+    it('should skip cleanup for array items that are null', () => {
+      const object = {
+        arrayField: [
+          { validField: 'value1' },
+          null,
+          { validField: 'value2' }
+        ]
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toHaveLength(3);
+      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
+      expect(object.arrayField[1]).toBeNull();
+      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+    });
+
+    it('should skip cleanup for array items that are undefined', () => {
+      const object = {
+        arrayField: [
+          { validField: 'value1' },
+          undefined,
+          { validField: 'value2' }
+        ]
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toHaveLength(3);
+      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
+      expect(object.arrayField[1]).toBeUndefined();
+      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+    });
+
+    it('should skip cleanup for array items that are primitives', () => {
+      const object = {
+        arrayField: [
+          { validField: 'value1' },
+          'string-item',
+          123,
+          true,
+          { validField: 'value2' }
+        ]
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toHaveLength(5);
+      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
+      expect(object.arrayField[1]).toBe('string-item');
+      expect(object.arrayField[2]).toBe(123);
+      expect(object.arrayField[3]).toBe(true);
+      expect(object.arrayField[4]).toEqual({ validField: 'value2' });
+    });
+
+    it('should skip cleanup for array items that are arrays', () => {
+      const object = {
+        arrayField: [
+          { validField: 'value1' },
+          ['nested', 'array'],
+          { validField: 'value2' }
+        ]
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const,
+            items: {
+              type: 'object' as const,
+              properties: {
+                validField: { type: 'string' }
+              }
+            }
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      expect(object.arrayField).toHaveLength(3);
+      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
+      expect(object.arrayField[1]).toEqual(['nested', 'array']);
+      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+    });
   });
 
   describe('complex nested scenarios', () => {
@@ -498,6 +893,51 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       expect(object.arrayField[0].refField).toEqual({ validField: 'value1' });
       expect(object.arrayField[0].refField).not.toHaveProperty('invalidField');
+    });
+  });
+
+  describe('edge cases and error handling', () => {
+    it('should skip cleanup when array property has undefined items', () => {
+      const object = {
+        arrayField: [
+          { validField: 'value1', invalidField: 'value2' },
+          { validField: 'value3', invalidField: 'value4' }
+        ]
+      };
+      const schema = {
+        id: 'test-schema',
+        properties: {
+          arrayField: {
+            type: 'array' as const
+            // items is intentionally undefined
+          }
+        }
+      } as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      // Should not modify array items when items schema is undefined
+      expect(object.arrayField).toHaveLength(2);
+      expect(object.arrayField[0]).toEqual({ validField: 'value1', invalidField: 'value2' });
+      expect(object.arrayField[1]).toEqual({ validField: 'value3', invalidField: 'value4' });
+    });
+
+    it('should return early when objectSchema has undefined properties', () => {
+      const object = {
+        field1: 'value1',
+        field2: 'value2'
+      };
+      const schema = {
+        id: 'test-schema'
+        // properties is intentionally undefined (malformed schema)
+      } as unknown as ObjectSchema;
+      const schemasMap = {};
+
+      cleanupAttributes(object, schema, schemasMap);
+
+      // Should not modify object when properties is undefined
+      expect(object).toEqual({ field1: 'value1', field2: 'value2' });
     });
   });
 });
