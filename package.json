@@ -1,6 +1,6 @@
 {
   "name": "@kravc/schema",
-  "version": "2.8.0-alpha.0",
+  "version": "2.8.0-alpha.1",
   "description": "Advanced JSON schema manipulation and validation library.",
   "keywords": [
     "JSON",
