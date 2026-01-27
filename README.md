@@ -1,7 +1,7 @@
 # @kravc/schema
 
-Advanced JSON schema manipulation and validation library based on
-[z-schema](https://github.com/zaggino/z-schema).
+Advanced JSON schema manipulation and validation library written in TypeScript,
+based on [z-schema](https://github.com/zaggino/z-schema).
 
 ## Get Started
 
@@ -11,8 +11,8 @@ Install npm dependency:
 npm i --save @kravc/schema
 ```
 
-```js
-const { Schema, Validator } = require('@kravc/schema')
+```ts
+import { Schema, Validator } from '@kravc/schema'
 
 const userSchema = new Schema({
   firstName: { required: true },
@@ -41,8 +41,8 @@ Expected output:
 
 Other `Schema` and `Validator` usage examples:
 
-- [Schema](./src/Schema.spec.js)
-- [Validator](./src/Validator.spec.js)
+- [Schema](./src/__tests__/Schema.test.ts)
+- [Validator](./src/__tests__/Validator.test.ts)
 
 
 ## Verifiable Credentials
@@ -53,8 +53,8 @@ linked data context. Common json schema types and formats (`integer`,
 
 Define schema for a credential subject:
 
-```js
-const { Schema } = require('@kravc/schema')
+```ts
+import { Schema } from '@kravc/schema'
 
 const accountSchema = new Schema({
   id:          { required: true },
@@ -67,8 +67,8 @@ const accountSchema = new Schema({
 Initialize credential factory by providing credential URI and credential subject
 schemas:
 
-```js
-const { CredentialFactory } = require('@kravc/schema')
+```ts
+import { CredentialFactory } from '@kravc/schema'
 
 const factory = new CredentialFactory('https://example.com/schema/AccountV1', [ accountSchema ])
 ```
@@ -76,7 +76,7 @@ const factory = new CredentialFactory('https://example.com/schema/AccountV1', [ 
 Create a credential for a specific subject, `createCredential` method validates
 the input and populates any defaults defined by schema:
 
-```js
+```ts
 const holder    = 'did:HOLDER_ID'
 const username  = 'USER'
 const createdAt =  new Date().toISOString()
@@ -94,7 +94,7 @@ console.log(JSON.stringify(credential, null, 2))
 
 Expected JSON-LD output (could be verified using [JSON-LD Playground](https://json-ld.org/playground/)):
 
-```js
+```json
 {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
@@ -144,5 +144,10 @@ to be set by issuing function (e.g [@kravc/identity](http://github.com/alexkrave
 
 Other `CredentialFactory` examples:
 
-- [createAccountCredential](./examples/createAccountCredential.js)
-- [createMineSweeperScoreCredential](./examples/createMineSweeperScoreCredential.js)
+- [createAccountCredential](./examples/credentials/createAccountCredential.ts)
+- [createMineSweeperScoreCredential](./examples/credentials/createMineSweeperScoreCredential.ts)
+
+---
+
+Revision: January 27, 2026<br/>
+By: Alex Kravets (@alexkravets)
