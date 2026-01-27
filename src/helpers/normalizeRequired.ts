@@ -189,16 +189,19 @@ const normalizeRequired = (jsonSchema: JsonSchema | ObjectPropertySchema | Refer
 
     const isReference = !isUndefined(refSchemaId);
 
-    if (isReference) {
-      continue;
-    }
-
+    // Handle required flag for all properties (including references)
     if (property.required) {
       property['x-required'] = true;
       required.push(propertyName);
     }
 
+    // Delete required property for all properties (whether true or false)
     delete property.required;
+
+    // Skip recursive processing for reference properties
+    if (isReference) {
+      continue;
+    }
 
     const { type } = (property as ObjectPropertySchema | ArrayPropertySchema);
 

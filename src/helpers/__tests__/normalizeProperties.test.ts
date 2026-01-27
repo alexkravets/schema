@@ -24,6 +24,29 @@ describe('normalizeProperties(schema)', () => {
       expect(schema.type).toBe('number');
     });
 
+    it('should set type to "string" for enum with string values even when type is missing', () => {
+      const schema: EnumSchema = {
+        enum: ['red', 'green', 'blue']
+      };
+
+      normalizeProperties(schema);
+
+      expect(schema.type).toBe('string');
+      expect(schema.enum).toEqual(['red', 'green', 'blue']);
+    });
+
+    it('should preserve type "number" for enum with number values', () => {
+      const schema: EnumSchema = {
+        enum: [1, 2, 3],
+        type: 'number'
+      };
+
+      normalizeProperties(schema);
+
+      expect(schema.type).toBe('number');
+      expect(schema.enum).toEqual([1, 2, 3]);
+    });
+
     it('should not modify other enum schema properties', () => {
       const schema: EnumSchema = {
         enum: ['a', 'b', 'c'],
@@ -91,16 +114,107 @@ describe('normalizeProperties(schema)', () => {
         expect(schema.stringField.type).toBe('string');
       });
 
+      it('should prioritize properties over items when both exist and type is missing', () => {
+        const schema: PropertiesSchema = {
+          conflictingField: {
+            properties: {
+              nested: { type: 'string' }
+            },
+            items: { type: 'number' }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.conflictingField.type).toBe('object');
+        expect(schema.conflictingField.properties).toBeDefined();
+      });
+
       it('should not override existing type', () => {
         const schema: PropertiesSchema = {
           numberField: { type: 'number' },
-          booleanField: { type: 'boolean' }
+          booleanField: { type: 'boolean' },
+          integerField: { type: 'integer' }
         };
 
         normalizeProperties(schema);
 
         expect(schema.numberField.type).toBe('number');
         expect(schema.booleanField.type).toBe('boolean');
+        expect(schema.integerField.type).toBe('integer');
+      });
+
+      it('should preserve existing type even when conflicting structure exists (type: object with items)', () => {
+        const schema: PropertiesSchema = {
+          objectWithItems: {
+            type: 'object',
+            properties: {
+              nested: { type: 'string' }
+            }
+          }
+        };
+        // Manually set items to test conflicting structure (object shouldn't have items)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.objectWithItems as any).items = { type: 'number' };
+
+        normalizeProperties(schema);
+
+        expect(schema.objectWithItems.type).toBe('object');
+        expect(schema.objectWithItems.properties).toBeDefined();
+        // Object type should be normalized, items should be ignored
+        expect(schema.objectWithItems.properties!.nested.type).toBe('string');
+      });
+
+      it('should preserve existing type even when conflicting structure exists (type: array with properties)', () => {
+        const schema: PropertiesSchema = {
+          arrayWithProperties: {
+            type: 'array',
+            items: { type: 'string' }
+          }
+        };
+        // Manually set properties to test conflicting structure (array shouldn't have properties)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.arrayWithProperties as any).properties = {
+          nested: { type: 'number' }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayWithProperties.type).toBe('array');
+        expect(schema.arrayWithProperties.items).toBeDefined();
+        expect(schema.arrayWithProperties.items!.type).toBe('string');
+      });
+
+      it('should preserve existing type even when conflicting structure exists (type: string with properties)', () => {
+        const schema: PropertiesSchema = {
+          stringWithProperties: {
+            type: 'string'
+          }
+        };
+        // Manually set properties to test conflicting structure (string shouldn't have properties)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.stringWithProperties as any).properties = {
+          nested: { type: 'number' }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.stringWithProperties.type).toBe('string');
+      });
+
+      it('should preserve existing type even when conflicting structure exists (type: string with items)', () => {
+        const schema: PropertiesSchema = {
+          stringWithItems: {
+            type: 'string'
+          }
+        };
+        // Manually set items to test conflicting structure (string shouldn't have items)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.stringWithItems as any).items = { type: 'number' };
+
+        normalizeProperties(schema);
+
+        expect(schema.stringWithItems.type).toBe('string');
       });
     });
 
@@ -378,6 +492,67 @@ describe('normalizeProperties(schema)', () => {
         // Items exists but has no properties, so type should not be set to 'object'
         expect((schema.arrayField.items as unknown as { type?: string }).type).toBeUndefined();
       });
+
+      it('should skip array items that are references ($ref)', () => {
+        const schema: PropertiesSchema = {
+          arrayField: {
+            type: 'array',
+            items: { $ref: '#/definitions/SomeSchema' }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        expect(schema.arrayField.items).toEqual({ $ref: '#/definitions/SomeSchema' });
+      });
+
+      it('should handle array items that are enum schemas (enum normalization only applies to top-level)', () => {
+        const schema: PropertiesSchema = {
+          arrayField: {
+            type: 'array',
+            items: {
+              enum: ['value1', 'value2', 'value3']
+            } as EnumSchema
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        const items = schema.arrayField.items as unknown as EnumSchema;
+        // Enum normalization only applies to top-level EnumSchema, not nested items
+        // So items enum schema won't get type set automatically
+        expect(items.type).toBeUndefined();
+        expect(items.enum).toEqual(['value1', 'value2', 'value3']);
+      });
+
+      it('should set type to object when items has properties even if items already has a type', () => {
+        const schema: PropertiesSchema = {
+          arrayField: {
+            type: 'array',
+            items: {
+              type: 'number'
+            }
+          }
+        };
+        // Manually set properties to test items with both type and properties
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (schema.arrayField.items as any).properties = {
+          nested: { type: 'string' }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.arrayField.type).toBe('array');
+        // When items has properties, type is set to 'object' (line 236), overriding existing type
+        const items = schema.arrayField.items as unknown as { type?: string; properties?: { nested: { type?: string } } };
+        expect(items.type).toBe('object');
+        // Properties should still be normalized
+        if (items.properties) {
+          expect(items.properties.nested.type).toBe('string');
+        }
+      });
     });
 
     describe('complex nested structures', () => {
@@ -479,6 +654,73 @@ describe('normalizeProperties(schema)', () => {
 
         expect(schema.emptyObject.type).toBe('object');
         expect(schema.emptyObject.properties).toEqual({});
+      });
+
+      it('should handle object properties containing $ref properties', () => {
+        const schema: PropertiesSchema = {
+          objectField: {
+            type: 'object',
+            properties: {
+              refField: { $ref: '#/definitions/SomeSchema' },
+              normalField: {}
+            }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        expect(schema.objectField.properties!.refField).toEqual({ $ref: '#/definitions/SomeSchema' });
+        expect(schema.objectField.properties!.normalField.type).toBe('string');
+      });
+
+      it('should handle object properties containing enum properties', () => {
+        const schema: PropertiesSchema = {
+          objectField: {
+            type: 'object',
+            properties: {
+              enumField: {
+                enum: ['option1', 'option2']
+              } as EnumSchema,
+              normalField: {}
+            }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        const enumField = schema.objectField.properties!.enumField as unknown as EnumSchema;
+        expect(enumField.type).toBe('string');
+        expect(schema.objectField.properties!.normalField.type).toBe('string');
+      });
+
+      it('should handle deeply nested arrays within objects', () => {
+        const schema: PropertiesSchema = {
+          objectField: {
+            type: 'object',
+            properties: {
+              nestedArray: {
+                type: 'array',
+                items: {
+                  type: 'array',
+                  items: {}
+                }
+              }
+            }
+          }
+        };
+
+        normalizeProperties(schema);
+
+        expect(schema.objectField.type).toBe('object');
+        const nestedArray = schema.objectField.properties!.nestedArray;
+        expect(nestedArray.type).toBe('array');
+        const nestedItems = (nestedArray.items as unknown as { type?: string; items?: { type?: string } });
+        expect(nestedItems.type).toBe('array');
+        // Nested array items are not recursively normalized (only items with properties are normalized)
+        // So the nested items remain as {} without type being set
+        expect(nestedItems.items).toEqual({});
       });
     });
   });

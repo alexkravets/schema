@@ -5,8 +5,6 @@
     "target": "esnext",
     "module": "nodenext",
     "isolatedModules": true,
-    // "allowJs": true,
-    // "checkJs": true,
     "strict": true,
     "esModuleInterop": true,
     "strictNullChecks": true,

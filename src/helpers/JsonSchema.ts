@@ -1,6 +1,6 @@
 export type EnumSchema = {
   id?: string;
-  enum: string[];
+  enum: string[] | number[];
   type?: 'string' | 'number';
   default?: string | number;
   example?: string | number;

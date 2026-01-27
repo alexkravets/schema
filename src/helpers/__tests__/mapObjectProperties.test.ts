@@ -1,5 +1,6 @@
 import Schema from '../../Schema';
 import mapObjectProperties from '../mapObjectProperties';
+import type { JsonSchema } from '../JsonSchema';
 
 describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => {
   describe('enum schema', () => {
@@ -167,7 +168,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledWith('deepField', expect.objectContaining({ type: 'string' }), object.refField.nestedRef);
     });
 
-    it('should skip undefined reference values', () => {
+    it('should call callback but skip recursion when reference value is undefined', () => {
       const schema = new Schema(
         {
           refField: { $ref: 'referenced-schema' }
@@ -192,6 +193,107 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith('refField', expect.objectContaining({ $ref: 'referenced-schema' }), object);
+    });
+
+    it('should call callback but skip recursion when reference value is null', () => {
+      const schema = new Schema(
+        {
+          refField: { $ref: 'referenced-schema' }
+        },
+        'test-schema'
+      );
+      const referencedSchema = new Schema(
+        {
+          nestedField: { type: 'string' }
+        },
+        'referenced-schema'
+      );
+      const object = {
+        refField: null
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('refField', expect.objectContaining({ $ref: 'referenced-schema' }), object);
+    });
+
+    it('should call callback but skip recursion when reference value is a primitive', () => {
+      const schema = new Schema(
+        {
+          refField: { $ref: 'referenced-schema' }
+        },
+        'test-schema'
+      );
+      const referencedSchema = new Schema(
+        {
+          nestedField: { type: 'string' }
+        },
+        'referenced-schema'
+      );
+      const object = {
+        refField: 'primitive-value'
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('refField', expect.objectContaining({ $ref: 'referenced-schema' }), object);
+    });
+
+    it('should call callback but skip recursion when reference value is an array', () => {
+      const schema = new Schema(
+        {
+          refField: { $ref: 'referenced-schema' }
+        },
+        'test-schema'
+      );
+      const referencedSchema = new Schema(
+        {
+          nestedField: { type: 'string' }
+        },
+        'referenced-schema'
+      );
+      const object = {
+        refField: ['item1', 'item2']
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('refField', expect.objectContaining({ $ref: 'referenced-schema' }), object);
+    });
+
+    it('should throw error when referenced schema is not found in schemasMap', () => {
+      const schema = new Schema(
+        {
+          refField: { $ref: 'non-existent-schema' }
+        },
+        'test-schema'
+      );
+      const object = {
+        refField: {
+          nestedField: 'value'
+        }
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      expect(() => {
+        mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+      }).toThrow('Schema "non-existent-schema" not found');
     });
   });
 
@@ -258,7 +360,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledWith('deepField', expect.objectContaining({ type: 'string' }), object.level1.level2);
     });
 
-    it('should skip undefined nested object values', () => {
+    it('should call callback but skip recursion when nested object value is undefined', () => {
       const schema = new Schema(
         {
           nestedObject: {
@@ -272,6 +374,78 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       );
       const object = {
         nestedObject: undefined
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('nestedObject', expect.objectContaining({ type: 'object' }), object);
+    });
+
+    it('should call callback but skip recursion when nested object value is null', () => {
+      const schema = new Schema(
+        {
+          nestedObject: {
+            type: 'object',
+            properties: {
+              nestedField: { type: 'string' }
+            }
+          }
+        },
+        'test-schema'
+      );
+      const object = {
+        nestedObject: null
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('nestedObject', expect.objectContaining({ type: 'object' }), object);
+    });
+
+    it('should call callback but skip recursion when nested object value is a primitive', () => {
+      const schema = new Schema(
+        {
+          nestedObject: {
+            type: 'object',
+            properties: {
+              nestedField: { type: 'string' }
+            }
+          }
+        },
+        'test-schema'
+      );
+      const object = {
+        nestedObject: 'primitive-value'
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('nestedObject', expect.objectContaining({ type: 'object' }), object);
+    });
+
+    it('should call callback but skip recursion when nested object value is an array', () => {
+      const schema = new Schema(
+        {
+          nestedObject: {
+            type: 'object',
+            properties: {
+              nestedField: { type: 'string' }
+            }
+          }
+        },
+        'test-schema'
+      );
+      const object = {
+        nestedObject: ['item1', 'item2']
       };
       const schemasMap = {};
       const callback = jest.fn();
@@ -428,7 +602,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
     });
 
-    it('should skip undefined array values', () => {
+    it('should call callback but skip recursion when array value is undefined', () => {
       const schema = new Schema(
         {
           arrayField: {
@@ -456,6 +630,166 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+    });
+
+    it('should call callback but skip recursion when array value is null', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: { $ref: 'item-schema' }
+          }
+        },
+        'test-schema'
+      );
+      const itemSchema = new Schema(
+        {
+          itemField: { type: 'string' }
+        },
+        'item-schema'
+      );
+      const object = {
+        arrayField: null
+      };
+      const schemasMap = {
+        'item-schema': itemSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+    });
+
+    it('should call callback but skip recursion when array property has undefined items schema', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array'
+            // items is intentionally undefined
+          }
+        },
+        'test-schema'
+      );
+      const object = {
+        arrayField: [
+          { itemField: 'value1' },
+          { itemField: 'value2' }
+        ]
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+    });
+
+    it('should call callback but skip recursion for array items that are null', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: { $ref: 'item-schema' }
+          }
+        },
+        'test-schema'
+      );
+      const itemSchema = new Schema(
+        {
+          itemField: { type: 'string' }
+        },
+        'item-schema'
+      );
+      const object = {
+        arrayField: [
+          null,
+          { itemField: 'value2' },
+          null
+        ]
+      };
+      const schemasMap = {
+        'item-schema': itemSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+      expect(callback).toHaveBeenCalledWith('itemField', expect.objectContaining({ type: 'string' }), object.arrayField[1]);
+    });
+
+    it('should call callback but skip recursion for array items that are primitives', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: { $ref: 'item-schema' }
+          }
+        },
+        'test-schema'
+      );
+      const itemSchema = new Schema(
+        {
+          itemField: { type: 'string' }
+        },
+        'item-schema'
+      );
+      const object = {
+        arrayField: [
+          'primitive1',
+          { itemField: 'value2' },
+          'primitive3'
+        ]
+      };
+      const schemasMap = {
+        'item-schema': itemSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+      expect(callback).toHaveBeenCalledWith('itemField', expect.objectContaining({ type: 'string' }), object.arrayField[1]);
+    });
+
+    it('should call callback but skip recursion for array items that are arrays', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: { $ref: 'item-schema' }
+          }
+        },
+        'test-schema'
+      );
+      const itemSchema = new Schema(
+        {
+          itemField: { type: 'string' }
+        },
+        'item-schema'
+      );
+      const object = {
+        arrayField: [
+          ['nested', 'array'],
+          { itemField: 'value2' },
+          ['another', 'array']
+        ]
+      };
+      const schemasMap = {
+        'item-schema': itemSchema.jsonSchema
+      };
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
+      expect(callback).toHaveBeenCalledWith('itemField', expect.objectContaining({ type: 'string' }), object.arrayField[1]);
     });
 
     it('should handle nested references in array items', () => {
@@ -680,6 +1014,28 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledWith('field2', expect.any(Object), object);
     });
 
+    it('should handle object with only null values', () => {
+      const schema = new Schema(
+        {
+          field1: { type: 'string' },
+          field2: { type: 'number' }
+        },
+        'test-schema'
+      );
+      const object = {
+        field1: null,
+        field2: null
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+
+      expect(callback).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledWith('field1', expect.any(Object), object);
+      expect(callback).toHaveBeenCalledWith('field2', expect.any(Object), object);
+    });
+
     it('should handle array with items that have no properties', () => {
       const schema = new Schema(
         {
@@ -707,6 +1063,23 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
       expect(callback).toHaveBeenCalledWith('arrayField', expect.objectContaining({ type: 'array' }), object);
     });
 
+    it('should handle schema with undefined properties (malformed schema)', () => {
+      const jsonSchema = {
+        id: 'test-schema'
+        // properties is intentionally undefined (malformed schema)
+      } as unknown as JsonSchema;
+      const object = {
+        field1: 'value1',
+        field2: 'value2'
+      };
+      const schemasMap = {};
+      const callback = jest.fn();
+
+      mapObjectProperties(object, jsonSchema, schemasMap, callback);
+
+      expect(callback).not.toHaveBeenCalled();
+    });
+
     it('should handle callback that modifies the object', () => {
       const schema = new Schema(
         {
@@ -728,6 +1101,26 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
 
       expect(callback).toHaveBeenCalledTimes(1);
       expect(object.field).toBe('modified');
+    });
+
+    it('should handle callback that throws an error', () => {
+      const schema = new Schema(
+        {
+          field: { type: 'string' }
+        },
+        'test-schema'
+      );
+      const object = {
+        field: 'value'
+      };
+      const schemasMap = {};
+      const callback = jest.fn(() => {
+        throw new Error('Callback error');
+      });
+
+      expect(() => {
+        mapObjectProperties(object, schema.jsonSchema, schemasMap, callback);
+      }).toThrow('Callback error');
     });
   });
 });

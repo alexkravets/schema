@@ -551,7 +551,7 @@ describe('normalizeRequired(schema)', () => {
       expect(schema['x-required']).toBeUndefined();
     });
 
-    it('should skip reference properties at top level', () => {
+    it('should normalize required flag on reference properties', () => {
       const schema: ObjectSchema = {
         id: 'test-schema',
         properties: {
@@ -568,10 +568,10 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      // Reference property should be skipped
-      expect(schema.required).toEqual(['normalField']);
-      expect(schema.properties.refField.required).toBe(true); // Still present, not processed
-      expect(schema.properties.refField['x-required']).toBeUndefined();
+      // Reference property required flag should be normalized (added to required array and removed from property)
+      expect(schema.required).toEqual(['refField', 'normalField']);
+      expect(schema.properties.refField.required).toBeUndefined(); // Removed after normalization
+      expect(schema.properties.refField['x-required']).toBe(true); // x-required flag set
       
       // Normal field should be processed
       expect(schema.properties.normalField['x-required']).toBe(true);

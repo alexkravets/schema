@@ -36,6 +36,23 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
       expect(object.field).toBe('existing-value');
     });
 
+    it('should not set default value when property is null', () => {
+      const schema = new Schema(
+        {
+          field: { type: 'string', default: 'default-value' }
+        },
+        'test-schema'
+      );
+      const object = {
+        field: null
+      };
+      const schemasMap = {};
+
+      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+      expect(object.field).toBeNull();
+    });
+
     it('should set default value for multiple properties', () => {
       const schema = new Schema(
         {
@@ -55,21 +72,166 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
       expect(object.field3).toBe(true);
     });
 
-    it('should not set default value when property is null', () => {
-      const schema = new Schema(
-        {
-          field: { type: 'string', default: 'default-value' }
-        },
-        'test-schema'
-      );
-      const object = {
-        field: null
-      };
-      const schemasMap = {};
+    describe('default value normalization', () => {
+      it('should normalize default string to number when type is number', () => {
+        const schema = new Schema(
+          {
+             
+            count: { type: 'number', default: '42'           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
 
-      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBeNull();
+        expect(object.count).toBe(42);
+      });
+
+      it('should normalize default string to number when type is integer', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            count: { type: 'integer', default: '123' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.count).toBe(123);
+      });
+
+      it('should normalize default string to boolean when type is boolean', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 'true' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.enabled).toBe(true);
+      });
+
+      it('should normalize default string "yes" to boolean true', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            verified: { type: 'boolean', default: 'yes' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.verified).toBe(true);
+      });
+
+      it('should normalize default string "false" to boolean false', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 'false' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.enabled).toBe(false);
+      });
+
+      it('should normalize default number to boolean when type is boolean', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 1 } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.enabled).toBe(true);
+      });
+
+      it('should normalize default number 0 to boolean false', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 0 } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.enabled).toBe(false);
+      });
+
+      it('should preserve default string when type is string', () => {
+        const schema = new Schema(
+          {
+            name: { type: 'string', default: 'default-name' }
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.name).toBe('default-name');
+      });
+
+      it('should preserve invalid default string when type is number', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            count: { type: 'number', default: 'invalid' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.count).toBe('invalid');
+      });
+
+      it('should preserve invalid default string when type is boolean', () => {
+        const schema = new Schema(
+          {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 'maybe' } as any
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.enabled).toBe('maybe');
+      });
     });
   });
 
@@ -92,6 +254,57 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         expect(object.field).toBe(123);
       });
 
+      it('should normalize decimal string to number', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: '45.67'
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(45.67);
+      });
+
+      it('should normalize negative string to number', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: '-123'
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(-123);
+      });
+
+      it('should normalize zero string to number', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: '0'
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(0);
+      });
+
       it('should keep number as number', () => {
         const schema = new Schema(
           {
@@ -107,6 +320,91 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
         expect(object.field).toBe(456);
+      });
+
+      it('should normalize boolean true to number 1', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: true
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(1);
+      });
+
+      it('should normalize boolean false to number 0', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: false
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(0);
+      });
+
+      it('should preserve empty string for number type', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: ''
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe('');
+      });
+
+      it('should preserve whitespace string for number type', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: '   '
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe('   ');
+      });
+
+      it('should keep invalid number string as original value', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'number' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: 'invalid'
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe('invalid');
       });
 
       it('should handle integer type', () => {
@@ -126,21 +424,22 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         expect(object.field).toBe(789);
       });
 
-      it('should keep invalid number string as original value', () => {
+      it('should normalize decimal string to number for integer type', () => {
         const schema = new Schema(
           {
-            field: { type: 'number' }
+            field: { type: 'integer' }
           },
           'test-schema'
         );
         const object = {
-          field: 'invalid'
+          field: '45.67'
         };
         const schemasMap = {};
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('invalid');
+        // Note: normalizeType converts string to number, doesn't truncate decimals
+        expect(object.field).toBe(45.67);
       });
     });
 
@@ -247,6 +546,32 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         expect(object.field).toBe(false);
       });
 
+      it('should normalize case-insensitive boolean strings', () => {
+        const schema = new Schema(
+          {
+            field1: { type: 'boolean' },
+            field2: { type: 'boolean' },
+            field3: { type: 'boolean' },
+            field4: { type: 'boolean' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field1: 'TRUE',
+          field2: 'FALSE',
+          field3: 'YES',
+          field4: 'NO'
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field1).toBe(true);
+        expect(object.field2).toBe(false);
+        expect(object.field3).toBe(true);
+        expect(object.field4).toBe(false);
+      });
+
       it('should normalize number 1 to boolean true', () => {
         const schema = new Schema(
           {
@@ -279,6 +604,40 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
         expect(object.field).toBe(false);
+      });
+
+      it('should normalize positive number to boolean true', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'boolean' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: 42
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(true);
+      });
+
+      it('should normalize negative number to boolean true', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'boolean' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: -1
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(true);
       });
 
       it('should keep boolean as boolean', () => {
@@ -333,6 +692,78 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         expect(object.field).toBe('test-value');
       });
+
+      it('should preserve number as number when type is string', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'string' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: 123
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(123);
+      });
+
+      it('should preserve boolean as boolean when type is string', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'string' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: true
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe(true);
+      });
+    });
+
+    describe('object type', () => {
+      it('should preserve object as object', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'object' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: { a: 1, b: 2 }
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toEqual({ a: 1, b: 2 });
+      });
+    });
+
+    describe('array type', () => {
+      it('should preserve array as array', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'array' }
+          },
+          'test-schema'
+        );
+        const object = {
+          field: [1, 2, 3]
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toEqual([1, 2, 3]);
+      });
     });
 
     describe('no type', () => {
@@ -378,8 +809,34 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.nestedObject.numberField).toBe(123);
-      expect(object.nestedObject.booleanField).toBe(true);
+      expect((object.nestedObject as unknown as { numberField: number; booleanField: boolean }).numberField).toBe(123);
+      expect((object.nestedObject as unknown as { numberField: number; booleanField: boolean }).booleanField).toBe(true);
+    });
+
+    it('should normalize nested object default values', () => {
+      const schema = new Schema(
+        {
+          nestedObject: {
+            type: 'object',
+            properties: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            count: { type: 'number', default: '42' } as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            enabled: { type: 'boolean', default: 'true' } as any
+            }
+          }
+        },
+        'test-schema'
+      );
+      const object: TargetObject = {
+        nestedObject: {}
+      };
+      const schemasMap = {};
+
+      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+      expect((object.nestedObject as unknown as { count: number; enabled: boolean }).count).toBe(42);
+      expect((object.nestedObject as unknown as { count: number; enabled: boolean }).enabled).toBe(true);
     });
 
     it('should handle deeply nested objects', () => {
@@ -440,8 +897,37 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.refField.numberField).toBe(789);
-      expect(object.refField.booleanField).toBe(false);
+      expect((object.refField as unknown as { numberField: number; booleanField: boolean }).numberField).toBe(789);
+      expect((object.refField as unknown as { numberField: number; booleanField: boolean }).booleanField).toBe(false);
+    });
+
+    it('should normalize referenced schema default values', () => {
+      const schema = new Schema(
+        {
+          refField: { $ref: 'referenced-schema' }
+        },
+        'test-schema'
+      );
+      const referencedSchema = new Schema(
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          count: { type: 'number', default: '100' } as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          enabled: { type: 'boolean', default: 'yes' } as any
+        },
+        'referenced-schema'
+      );
+      const object: TargetObject = {
+        refField: {}
+      };
+      const schemasMap = {
+        'referenced-schema': referencedSchema.jsonSchema
+      };
+
+      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+      expect((object.refField as unknown as { count: number; enabled: boolean }).count).toBe(100);
+      expect((object.refField as unknown as { count: number; enabled: boolean }).enabled).toBe(true);
     });
 
     it('should handle nested references', () => {
@@ -477,7 +963,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.refField.nestedRef.numberField).toBe(999);
+      expect((object.refField as unknown as { nestedRef: { numberField: number } }).nestedRef.numberField).toBe(999);
     });
   });
 
@@ -511,10 +997,46 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.arrayField[0].numberField).toBe(111);
-      expect(object.arrayField[0].booleanField).toBe(true);
-      expect(object.arrayField[1].numberField).toBe(222);
-      expect(object.arrayField[1].booleanField).toBe(true);
+      const arrayField = object.arrayField as unknown as Array<{ numberField: number; booleanField: boolean }>;
+      expect(arrayField[0].numberField).toBe(111);
+      expect(arrayField[0].booleanField).toBe(true);
+      expect(arrayField[1].numberField).toBe(222);
+      expect(arrayField[1].booleanField).toBe(true);
+    });
+
+    it('should normalize array items default values with reference schema', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: { $ref: 'item-schema' }
+          }
+        },
+        'test-schema'
+      );
+      const itemSchema = new Schema(
+        {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          count: { type: 'number', default: '50' } as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          enabled: { type: 'boolean', default: 'false' } as any
+        },
+        'item-schema'
+      );
+      const object: TargetObject = {
+        arrayField: [{}, {}]
+      };
+      const schemasMap = {
+        'item-schema': itemSchema.jsonSchema
+      };
+
+      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+      const arrayField = object.arrayField as unknown as Array<{ count: number; enabled: boolean }>;
+      expect(arrayField[0].count).toBe(50);
+      expect(arrayField[0].enabled).toBe(false);
+      expect(arrayField[1].count).toBe(50);
+      expect(arrayField[1].enabled).toBe(false);
     });
 
     it('should normalize array items with object schema', () => {
@@ -543,10 +1065,43 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.arrayField[0].numberField).toBe(333);
-      expect(object.arrayField[0].booleanField).toBe(true);
-      expect(object.arrayField[1].numberField).toBe(444);
-      expect(object.arrayField[1].booleanField).toBe(false);
+      const arrayField = object.arrayField as unknown as Array<{ numberField: number; booleanField: boolean }>;
+      expect(arrayField[0].numberField).toBe(333);
+      expect(arrayField[0].booleanField).toBe(true);
+      expect(arrayField[1].numberField).toBe(444);
+      expect(arrayField[1].booleanField).toBe(false);
+    });
+
+    it('should normalize array items default values with object schema', () => {
+      const schema = new Schema(
+        {
+          arrayField: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                count: { type: 'number', default: '10' } as any,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                enabled: { type: 'boolean', default: 'yes' } as any
+              }
+            }
+          }
+        },
+        'test-schema'
+      );
+      const object: TargetObject = {
+        arrayField: [{}, {}]
+      };
+      const schemasMap = {};
+
+      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+      const arrayField = object.arrayField as unknown as Array<{ count: number; enabled: boolean }>;
+      expect(arrayField[0].count).toBe(10);
+      expect(arrayField[0].enabled).toBe(true);
+      expect(arrayField[1].count).toBe(10);
+      expect(arrayField[1].enabled).toBe(true);
     });
   });
 
@@ -599,9 +1154,9 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.nested.defaultField).toBe('nested-default');
-      expect(object.nested.numberField).toBe(789);
-      expect(object.nested.booleanField).toBe(true);
+      expect((object.nested as unknown as { defaultField: string; numberField: number; booleanField: boolean }).defaultField).toBe('nested-default');
+      expect((object.nested as unknown as { defaultField: string; numberField: number; booleanField: boolean }).numberField).toBe(789);
+      expect((object.nested as unknown as { defaultField: string; numberField: number; booleanField: boolean }).booleanField).toBe(true);
     });
 
     it('should handle array with defaults and normalization', () => {
@@ -630,103 +1185,251 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.arrayField[0].defaultField).toBe('item-default');
-      expect(object.arrayField[0].numberField).toBe(111);
-      expect(object.arrayField[1].defaultField).toBe('item-default');
-      expect(object.arrayField[1].numberField).toBe(222);
-    });
-  });
-
-  describe('edge cases', () => {
-    it('should handle null values', () => {
-      const schema = new Schema(
-        {
-          nullField: { type: 'string' }
-        },
-        'test-schema'
-      );
-      const object = {
-        nullField: null
-      };
-      const schemasMap = {};
-
-      normalizeAttributes(object, schema.jsonSchema, schemasMap);
-
-      expect(object.nullField).toBeNull();
+      const arrayField = object.arrayField as unknown as Array<{ defaultField: string; numberField: number }>;
+      expect(arrayField[0].defaultField).toBe('item-default');
+      expect(arrayField[0].numberField).toBe(111);
+      expect(arrayField[1].defaultField).toBe('item-default');
+      expect(arrayField[1].numberField).toBe(222);
     });
 
-    it('should handle undefined values', () => {
+    it('should handle complex nested structure with defaults and normalization', () => {
       const schema = new Schema(
         {
-          undefinedField: { type: 'string', default: 'default' }
+          users: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', default: 'Anonymous' },
+                profile: {
+                  type: 'object',
+                  properties: {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    age: { type: 'number', default: '18' } as any,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    verified: { type: 'boolean', default: 'false' } as any
+                  }
+                }
+              }
+            }
+          }
         },
         'test-schema'
       );
       const object: TargetObject = {
-        undefinedField: undefined
+        users: [
+          { profile: { age: '25' } },
+          { name: 'John', profile: { verified: 'yes' } }
+        ]
       };
       const schemasMap = {};
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.undefinedField).toBe('default');
+      const users = object.users as unknown as Array<{ name: string; profile: { age: number; verified: boolean } }>;
+      expect(users[0].name).toBe('Anonymous');
+      expect(users[0].profile.age).toBe(25);
+      expect(users[0].profile.verified).toBe(false);
+      expect(users[1].name).toBe('John');
+      expect(users[1].profile.age).toBe(18);
+      expect(users[1].profile.verified).toBe(true);
+    });
+  });
+
+  describe('edge cases', () => {
+    describe('null and undefined handling', () => {
+      it('should handle null values', () => {
+        const schema = new Schema(
+          {
+            nullField: { type: 'string' }
+          },
+          'test-schema'
+        );
+        const object = {
+          nullField: null
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.nullField).toBeNull();
+      });
+
+      it('should handle null values with default', () => {
+        const schema = new Schema(
+          {
+            nullField: { type: 'string', default: 'default-value' }
+          },
+          'test-schema'
+        );
+        const object = {
+          nullField: null
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.nullField).toBeNull();
+      });
+
+      it('should handle undefined values', () => {
+        const schema = new Schema(
+          {
+            undefinedField: { type: 'string', default: 'default' }
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {
+          undefinedField: undefined
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.undefinedField).toBe('default');
+      });
+
+      it('should handle empty object', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'string', default: 'default' }
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe('default');
+      });
     });
 
-    it('should handle empty object', () => {
-      const schema = new Schema(
-        {
-          field: { type: 'string', default: 'default' }
-        },
-        'test-schema'
-      );
-      const object: TargetObject = {};
-      const schemasMap = {};
+    describe('special values', () => {
+      it('should preserve null for all types', () => {
+        const schema = new Schema(
+          {
+            numberField: { type: 'number' },
+            booleanField: { type: 'boolean' },
+            stringField: { type: 'string' },
+            objectField: { type: 'object' }
+          },
+          'test-schema'
+        );
+        const object = {
+          numberField: null,
+          booleanField: null,
+          stringField: null,
+          objectField: null
+        };
+        const schemasMap = {};
 
-      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBe('default');
+        expect(object.numberField).toBeNull();
+        expect(object.booleanField).toBeNull();
+        expect(object.stringField).toBeNull();
+        expect(object.objectField).toBeNull();
+      });
+
+      it('should handle NaN values', () => {
+        const schema = new Schema(
+          {
+            numberField: { type: 'number' },
+            booleanField: { type: 'boolean' }
+          },
+          'test-schema'
+        );
+        const object = {
+          numberField: NaN,
+          booleanField: NaN
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.numberField).toBeNaN();
+        expect(object.booleanField).toBe(false);
+      });
+
+      it('should handle Infinity values', () => {
+        const schema = new Schema(
+          {
+            numberField: { type: 'number' },
+            booleanField: { type: 'boolean' }
+          },
+          'test-schema'
+        );
+        const object = {
+          numberField: Infinity,
+          booleanField: Infinity
+        };
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.numberField).toBe(Infinity);
+        expect(object.booleanField).toBe(true);
+      });
     });
 
-    it('should handle enum schema', () => {
-      const enumSchema = new Schema({ enum: ['value1', 'value2', 'value3'] }, 'enum-schema');
-      const object = { value: 'value1' };
-      const schemasMap = {};
+    describe('schema edge cases', () => {
+      it('should handle enum schema', () => {
+        const enumSchema = new Schema({ enum: ['value1', 'value2', 'value3'] }, 'enum-schema');
+        const object = { value: 'value1' };
+        const schemasMap = {};
 
-      normalizeAttributes(object, enumSchema.jsonSchema, schemasMap);
+        normalizeAttributes(object, enumSchema.jsonSchema, schemasMap);
 
-      expect(object).toEqual({ value: 'value1' });
-    });
+        expect(object).toEqual({ value: 'value1' });
+      });
 
-    it('should handle property with no type and no default', () => {
-      const schema = new Schema(
-        {
-          field: {}
-        },
-        'test-schema'
-      );
-      const object = {
-        field: 'some-value'
-      };
-      const schemasMap = {};
+      it('should handle property with no type and no default', () => {
+        const schema = new Schema(
+          {
+            field: {}
+          },
+          'test-schema'
+        );
+        const object = {
+          field: 'some-value'
+        };
+        const schemasMap = {};
 
-      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBe('some-value');
-    });
+        expect(object.field).toBe('some-value');
+      });
 
-    it('should handle property with type but no value and no default', () => {
-      const schema = new Schema(
-        {
-          field: { type: 'string' }
-        },
-        'test-schema'
-      );
-      const object: TargetObject = {};
-      const schemasMap = {};
+      it('should handle property with type but no value and no default', () => {
+        const schema = new Schema(
+          {
+            field: { type: 'string' }
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
 
-      normalizeAttributes(object, schema.jsonSchema, schemasMap);
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBeUndefined();
+        expect(object.field).toBeUndefined();
+      });
+
+      it('should handle property with default but no type', () => {
+        const schema = new Schema(
+          {
+            field: { default: 'default-value' }
+          },
+          'test-schema'
+        );
+        const object: TargetObject = {};
+        const schemasMap = {};
+
+        normalizeAttributes(object, schema.jsonSchema, schemasMap);
+
+        expect(object.field).toBe('default-value');
+      });
     });
   });
 });
