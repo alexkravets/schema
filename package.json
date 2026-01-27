@@ -16,7 +16,7 @@
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "http://github.com/alexkravets/schema.git"
+    "url": "git+ssh://git@github.com/alexkravets/schema.git"
   },
   "directories": {
     "src": "src"
