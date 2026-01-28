@@ -3,12 +3,13 @@ import Schema from './Schema';
 import Validator from './Validator';
 import documentLoader from './ld/documentLoader';
 import ValidationError from './ValidationError';
-import createSchemasMap from './helpers/createSchemasMap';
 import CredentialFactory from './CredentialFactory';
+import createSchemasMap, { loadSync } from './helpers/createSchemasMap';
 
 export {
   got,
   Schema,
+  loadSync,
   Validator,
   documentLoader,
   ValidationError,

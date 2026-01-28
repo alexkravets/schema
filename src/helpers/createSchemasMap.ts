@@ -35,7 +35,7 @@ import { readFileSync, readdirSync, statSync } from 'fs';
  * // statusSchema.isEnum === true
  * ```
  */
-const loadSync = (yamlPath: string) => {
+export const loadSync = (yamlPath: string) => {
   const schemaId = yamlPath
     .split('/')
     .reverse()[0]
