@@ -2,6 +2,13 @@ import type { SchemaErrorDetail } from 'z-schema';
 
 import { TargetObject } from './helpers/JsonSchema';
 
+export type ValidationErrorOutput = {
+  path: string;
+  code: string;
+  params: string[];
+  message: string;
+}
+
 /**
  * Normalized validation error thrown when object validation fails against a schema.
  *
@@ -26,12 +33,7 @@ import { TargetObject } from './helpers/JsonSchema';
 class ValidationError extends Error {
   private _object: TargetObject;
   private _schemaId: string;
-  private _validationErrors: {
-    path: string;
-    code: string;
-    params: string[];
-    message: string;
-  }[];
+  private _validationErrors: ValidationErrorOutput[];
 
   /**
    * Creates a validation error instance.
