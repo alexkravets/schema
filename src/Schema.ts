@@ -55,6 +55,8 @@ export type LinkedDataType = {
   '@context': LinkedDataContext;
 }
 
+export type SchemaSource = EnumSchema | PropertiesSchema;
+
 /**
  * Schema class for defining and manipulating JSON schemas for object validation.
  *
@@ -143,7 +145,7 @@ class Schema {
    * // Automatically creates linkedDataType with @id and @context
    * ```
    */
-  constructor(propertiesOrSchema: EnumSchema | PropertiesSchema | Schema, id?: string, url?: string) {
+  constructor(propertiesOrSchema: Schema | SchemaSource, id?: string, url?: string) {
     this._id = id || UNDEFINED_SCHEMA_ID;
 
     this._url = url;
@@ -394,7 +396,7 @@ class Schema {
    * // Both schemas have identical properties but different IDs
    * ```
    */
-  clone(id: string) {
+  clone(id?: string) {
     return new Schema(this.source, id);
   }
 
@@ -426,7 +428,7 @@ class Schema {
    * // All fields are optional for updates
    * ```
    */
-  pure(id: string) {
+  pure(id?: string) {
     if (this.isEnum) {
       throw new Error('The "pure" method is not supported for enum schemas.');
     }
@@ -470,7 +472,7 @@ class Schema {
    * // publicSchema only contains name and email, hiding sensitive fields
    * ```
    */
-  only(propertyNames: string[], id: string) {
+  only(propertyNames: string[], id?: string) {
     if (this.isEnum) {
       throw new Error('The "only" method is not supported for enum schemas.');
     }
@@ -512,7 +514,7 @@ class Schema {
    * // userSchema contains id, createdAt, name, and email
    * ```
    */
-  extend(properties: PropertiesSchema, id: string) {
+  extend(properties: PropertiesSchema, id?: string) {
     if (this.isEnum) {
       throw new Error('The "extend" method is not supported for enum schemas.');
     }
@@ -563,7 +565,7 @@ class Schema {
    * // The 'data' property has a default value and is not required
    * ```
    */
-  wrap(propertyName: string, attributes: { default?: string; required?: boolean; }, id: string) {
+  wrap(propertyName: string, attributes: { default?: string; required?: boolean; }, id?: string) {
     if (this.isEnum) {
       throw new Error('The "wrap" method is not supported for enum schemas.');
     }
