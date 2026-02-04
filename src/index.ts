@@ -2,9 +2,9 @@ import got from './helpers/got';
 import Validator from './Validator';
 import documentLoader from './ld/documentLoader';
 import CredentialFactory from './CredentialFactory';
-import Schema, { type SchemaSource } from './Schema';
 import createSchemasMap, { loadSync } from './helpers/createSchemasMap';
 import ValidationError, { type ValidationErrorOutput } from './ValidationError';
+import Schema, { type SchemaSource, type PropertiesSchemaSource } from './Schema';
 
 export {
   got,
@@ -20,4 +20,5 @@ export {
 export type {
   SchemaSource,
   ValidationErrorOutput,
+  PropertiesSchemaSource,
 };

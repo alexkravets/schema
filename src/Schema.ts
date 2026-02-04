@@ -57,6 +57,8 @@ export type LinkedDataType = {
 
 export type SchemaSource = EnumSchema | PropertiesSchema;
 
+export type PropertiesSchemaSource = PropertiesSchema;
+
 /**
  * Schema class for defining and manipulating JSON schemas for object validation.
  *
