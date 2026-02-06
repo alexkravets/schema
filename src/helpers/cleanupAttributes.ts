@@ -14,12 +14,12 @@ import type {
 
 /**
  * Removes properties from an object that are not defined in the JSON schema.
- * 
+ *
  * **Intent:**
  * This function ensures that objects conform to their schema definition by removing
  * any properties that are not explicitly defined in the schema. It performs a deep
  * cleanup, recursively processing nested objects, arrays, and schema references.
- * 
+ *
  * **Use Cases:**
  * - **Third-party API integrations**: When integrating with external services (e.g., Telegram)
  *   that may send additional fields you don't want to process, this function allows you
@@ -30,14 +30,14 @@ import type {
  *   that don't match the defined schema structure.
  * - **Pre-validation cleanup**: Remove extraneous properties before schema validation to
  *   prevent validation errors from unexpected fields.
- * 
+ *
  * **Behavior:**
  * - Mutates the input object in-place (does not return a new object)
  * - Recursively processes nested objects, arrays, and schema references ($ref)
  * - Skips enum schemas (returns early without modification)
  * - Only processes object values (skips null, undefined, and primitive values)
  * - Handles array items by cleaning each object item according to the array's item schema
- * 
+ *
  * @param object - The target object to clean up (mutated in-place)
  * @param jsonSchema - The JSON schema defining allowed properties
  * @param schemasMap - Optional map of schema IDs to schema definitions for resolving $ref references

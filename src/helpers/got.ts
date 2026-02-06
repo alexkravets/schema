@@ -59,8 +59,8 @@ const DEFAULT_ERROR_TEMPLATE = 'Value is undefined for "$PATH"';
  * got({ name: 'Jane' }, 'age');
  * // throws Error('Value is undefined for "age"')
  */
-function got<T>(object: Record<string, T>, path: string, errorTemplate: string = DEFAULT_ERROR_TEMPLATE): T {
-  const value = get(object, path);
+function got<T>(object: T, path: string, errorTemplate: string = DEFAULT_ERROR_TEMPLATE): T[keyof T]{
+  const value = get(object, path) as T[keyof T];
   const shouldThrow = isUndefined(value);
 
   if (!shouldThrow) {
