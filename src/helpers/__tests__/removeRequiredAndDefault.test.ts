@@ -1,15 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../types.d.ts" />
+
 import { get } from 'lodash';
 import removeRequiredAndDefault from '../removeRequiredAndDefault';
-import type {
-  ObjectPropertySchema,
-  ArrayPropertySchema,
-  StringPropertySchema,
-  NumberPropertySchema,
-  IntegerPropertySchema,
-  BooleanPropertySchema,
-  EnumSchema,
-  ReferencePropertySchema,
-} from '../JsonSchema';
 
 describe('removeRequiredAndDefault(jsonSchema)', () => {
   describe('basic property removal', () => {

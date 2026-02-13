@@ -1,6 +1,7 @@
+import { type JsonSchema } from 'z-schema';
+
 import Schema from '../../Schema';
 import mapObjectProperties from '../mapObjectProperties';
-import type { JsonSchema } from '../JsonSchema';
 
 describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => {
   describe('enum schema', () => {

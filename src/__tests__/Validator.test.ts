@@ -1,10 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../types.d.ts" />
+
 import { load } from 'js-yaml';
 import { readFileSync } from 'fs';
 import { Schema, Validator, ValidationError } from '../../src';
-import type {
-  PropertiesSchema,
-  EnumSchema
-} from '../../src/helpers/JsonSchema';
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 const loadSync = (yamlPath: string): Schema => {
@@ -385,6 +384,24 @@ describe('Validator', () => {
 
         expect(() => validator.validate(input, 'Profile', false))
           .toThrow('"Profile" validation failed');
+      });
+
+      it('handles validation error without details (falls back to empty array)', () => {
+        const validator = new Validator(SCHEMAS);
+        const validateSafeSpy = jest.spyOn(
+          (validator as { _engine: { validateSafe: (a: unknown, b: unknown) => { valid: boolean; err?: { details?: unknown[] } } } })._engine,
+          'validateSafe'
+        ).mockReturnValueOnce({ valid: false, err: {} } as { valid: boolean; err?: { details?: unknown[] } });
+
+        try {
+          validator.validate({ name: 'Test' }, 'Profile', false);
+          throw new Error('Expected ValidationError');
+        } catch (error) {
+          expect(error).toBeInstanceOf(ValidationError);
+          expect((error as ValidationError).toJSON().validationErrors).toEqual([]);
+        }
+
+        validateSafeSpy.mockRestore();
       });
 
       it('still throws validation errors for invalid values even when nullifying empty values', () => {

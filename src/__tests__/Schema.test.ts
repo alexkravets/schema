@@ -1,14 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../types.d.ts" />
+
 import { load } from 'js-yaml';
 import { readFileSync } from 'fs';
 import { Schema } from '../../src';
-import type {
-  PropertiesSchema,
-  EnumSchema,
-  StringPropertySchema,
-  ArrayPropertySchema,
-  ObjectPropertySchema,
-  ObjectSchema
-} from '../../src/helpers/JsonSchema';
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 const loadSync = (yamlPath: string): Schema => {

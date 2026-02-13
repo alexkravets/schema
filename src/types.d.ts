@@ -1,4 +1,4 @@
-export type EnumSchema = {
+type EnumSchema = {
   id?: string;
   enum: string[] | number[];
   type?: 'string' | 'number';
@@ -10,7 +10,7 @@ export type EnumSchema = {
   'x-required'?: boolean;
 };
 
-export type ReferencePropertySchema = {
+type ReferencePropertySchema = {
   $ref: string;
   default?: string | number | Record<string, unknown>;
   example?: string | number | Record<string, unknown>;
@@ -20,7 +20,7 @@ export type ReferencePropertySchema = {
   'x-required'?: boolean;
 };
 
-export type StringPropertySchema = {
+type StringPropertySchema = {
   '@type'?: string;
   type?: 'string';
   format?: 'date' | 'date-time' | 'url' | 'email',
@@ -35,7 +35,7 @@ export type StringPropertySchema = {
   'x-required'?: boolean;
 };
 
-export type NumberPropertySchema = {
+type NumberPropertySchema = {
   type: 'number';
   minimum?: number;
   maximum?: number;
@@ -47,7 +47,7 @@ export type NumberPropertySchema = {
   'x-required'?: boolean;
 };
 
-export type IntegerPropertySchema = {
+type IntegerPropertySchema = {
   type: 'integer';
   minimum?: number;
   maximum?: number;
@@ -59,7 +59,7 @@ export type IntegerPropertySchema = {
   'x-required'?: boolean;
 };
 
-export type BooleanPropertySchema = {
+type BooleanPropertySchema = {
   type: 'boolean';
   default?: boolean;
   example?: boolean;
@@ -69,7 +69,7 @@ export type BooleanPropertySchema = {
   'x-required'?: boolean;
 };
 
-export type ObjectPropertySchema = {
+type ObjectPropertySchema = {
   type?: 'object';
   default?: Record<string, unknown>;
   example?: unknown;
@@ -80,7 +80,7 @@ export type ObjectPropertySchema = {
   'x-required'?: boolean;
 }
 
-export type ArrayPropertySchema = {
+type ArrayPropertySchema = {
   type?: 'array';
   items?: (ReferencePropertySchema | ObjectPropertySchema | StringPropertySchema | EnumSchema) & {
     minItems?: number;
@@ -94,7 +94,7 @@ export type ArrayPropertySchema = {
   'x-required'?: boolean;
 };
 
-export type PropertySchema =
+type PropertySchema =
   EnumSchema |
   ReferencePropertySchema |
   ObjectPropertySchema |
@@ -104,16 +104,12 @@ export type PropertySchema =
   IntegerPropertySchema |
   BooleanPropertySchema;
 
-export type PropertiesSchema = Record<string, PropertySchema>;
+type PropertiesSchema = Record<string, PropertySchema>;
 
-export type ObjectSchema = {
+type ObjectSchema = {
   id: string;
   required?: string[];
   properties: PropertiesSchema;
 };
 
-export type JsonSchema = EnumSchema | ObjectSchema;
-
-export type JsonSchemasMap = Record<string, JsonSchema>;
-
-export type TargetObject = Record<string, unknown>;
+type TargetObject = Record<string, unknown>;

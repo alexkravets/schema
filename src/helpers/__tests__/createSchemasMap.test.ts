@@ -1,6 +1,6 @@
 import path from 'path';
-import createSchemasMap from '../createSchemasMap';
 import Schema from '../../Schema';
+import createSchemasMap from '../createSchemasMap';
 
 describe('createSchemasMap', () => {
   const examplesSchemasPath = path.join(__dirname, '../../../examples/schemas');

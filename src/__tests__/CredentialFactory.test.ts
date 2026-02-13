@@ -281,7 +281,7 @@ describe('CredentialFactory', () => {
         bestRoundTime: 10000
       };
 
-      const credential = await createMineSweeperScoreCredential(
+      const credential = createMineSweeperScoreCredential(
         'did:GAME_ID',
         'did:PLAYER_ID',
         playerScore

@@ -1,6 +1,5 @@
 import nullifyEmptyValues from '../nullifyEmptyValues';
-import { schemaSymbol, jsonSymbol } from 'z-schema';
-import type { SchemaErrorDetail } from 'z-schema';
+import ZSchema, { type SchemaErrorDetail } from 'z-schema';
 
 describe('nullifyEmptyValues(object, validationErrors)', () => {
   // eslint-disable-next-line jsdoc/require-jsdoc
@@ -19,9 +18,9 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
       inner: [],
     } as SchemaErrorDetail;
 
-    // Attach symbols to the error object
-    (error as SchemaErrorDetail)[schemaSymbol] = schema;
-    (error as SchemaErrorDetail)[jsonSymbol] = json;
+    // Attach symbols to the error object (z-schema v9: symbols are on ZSchema class)
+    (error as SchemaErrorDetail)[ZSchema.schemaSymbol] = schema;
+    (error as SchemaErrorDetail)[ZSchema.jsonSymbol] = json;
 
     return error;
   };
@@ -355,6 +354,38 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
       expect(remainingErrors).toHaveLength(0);
     });
 
+    it('should handle path as array (z-schema reportPathAsArray format)', () => {
+      const object = { field: '', items: ['', 'value'] };
+      const error1 = {
+        code: 'PATTERN',
+        path: ['field'],
+        message: 'Error at field',
+        params: [],
+        inner: [],
+      } as SchemaErrorDetail;
+      (error1 as SchemaErrorDetail)[ZSchema.schemaSymbol] = {};
+      (error1 as SchemaErrorDetail)[ZSchema.jsonSymbol] = object;
+
+      const error2 = {
+        code: 'ENUM_MISMATCH',
+        path: ['items', 0],
+        message: 'Error at items/0',
+        params: [],
+        inner: [],
+      } as SchemaErrorDetail;
+      (error2 as SchemaErrorDetail)[ZSchema.schemaSymbol] = {};
+      (error2 as SchemaErrorDetail)[ZSchema.jsonSymbol] = object;
+
+      const validationErrors = [error1, error2];
+
+      const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
+
+      expect(result.field).toBeNull();
+      expect(result.items[0]).toBeNull();
+      expect(result.items[1]).toBe('value');
+      expect(remainingErrors).toHaveLength(0);
+    });
+
     it('should preserve other object properties', () => {
       const object = {
         emptyField: '',
@@ -527,7 +558,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
       } as SchemaErrorDetail;
 
       // Don't attach schemaSymbol
-      (error as SchemaErrorDetail)[jsonSymbol] = object;
+      (error as SchemaErrorDetail)[ZSchema.jsonSymbol] = object;
       const validationErrors = [error];
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
@@ -548,15 +579,15 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
         inner: [],
       } as SchemaErrorDetail;
 
-      // Don't attach jsonSymbol
-      (error as SchemaErrorDetail)[schemaSymbol] = {};
+      // Don't attach jsonSymbol - falls back to object for value lookup
+      (error as SchemaErrorDetail)[ZSchema.schemaSymbol] = {};
       const validationErrors = [error];
 
-      const [, remainingErrors] = nullifyEmptyValues(object, validationErrors);
+      const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Missing json symbol means value is undefined, should not nullify
-      expect(remainingErrors).toHaveLength(1);
-      expect(remainingErrors[0]).toBe(error);
+      // When json is missing, falls back to object; empty string is nullified
+      expect(result.field).toBeNull();
+      expect(remainingErrors).toHaveLength(0);
     });
 
     it('should handle all format error codes together', () => {

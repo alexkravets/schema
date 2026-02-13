@@ -1,6 +1,8 @@
-import ValidationError from '../ValidationError';
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../types.d.ts" />
+
 import type { SchemaErrorDetail } from 'z-schema';
-import type { TargetObject } from '../helpers/JsonSchema';
+import ValidationError from '../ValidationError';
 
 describe('ValidationError', () => {
   // eslint-disable-next-line jsdoc/require-jsdoc

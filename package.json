@@ -1,6 +1,6 @@
 {
   "name": "@kravc/schema",
-  "version": "2.8.0-alpha.7",
+  "version": "2.8.0-alpha.8",
   "description": "Advanced JSON schema manipulation and validation library.",
   "keywords": [
     "JSON",
@@ -35,7 +35,7 @@
     "lodash": "^4.17.23",
     "security-context": "^4.0.0",
     "validator": "^13.15.26",
-    "z-schema": "^6.0.2"
+    "z-schema": "^9.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

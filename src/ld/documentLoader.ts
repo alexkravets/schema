@@ -6,7 +6,7 @@ const CONTEXTS = new Map([
   ...credentialsContextsMap
 ]);
 
-/** Returns document from the context via url */
+/** Returns document from the context via url. */
 const documentLoader = (documentUrl: string) => {
   const contextUrl = null;
 

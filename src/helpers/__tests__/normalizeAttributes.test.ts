@@ -1,6 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../types.d.ts" />
+
 import Schema from '../../Schema';
 import normalizeAttributes from '../normalizeAttributes';
-import type { TargetObject } from '../JsonSchema';
 
 describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
   describe('default values', () => {
@@ -76,7 +78,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
       it('should normalize default string to number when type is number', () => {
         const schema = new Schema(
           {
-             
+
             count: { type: 'number', default: '42'           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any
           },

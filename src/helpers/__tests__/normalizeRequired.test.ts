@@ -1,13 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../types.d.ts" />
+
 import { get } from 'lodash';
 import normalizeRequired from '../normalizeRequired';
-import type {
-  EnumSchema,
-  ObjectSchema,
-  ObjectPropertySchema,
-  ArrayPropertySchema,
-  ReferencePropertySchema,
-  PropertySchema,
-} from '../JsonSchema';
 
 describe('normalizeRequired(schema)', () => {
   describe('basic functionality', () => {
@@ -572,7 +567,7 @@ describe('normalizeRequired(schema)', () => {
       expect(schema.required).toEqual(['refField', 'normalField']);
       expect(schema.properties.refField.required).toBeUndefined(); // Removed after normalization
       expect(schema.properties.refField['x-required']).toBe(true); // x-required flag set
-      
+
       // Normal field should be processed
       expect(schema.properties.normalField['x-required']).toBe(true);
       expect(schema.properties.normalField.required).toBeUndefined();

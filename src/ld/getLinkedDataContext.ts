@@ -26,7 +26,7 @@ export type LinkedDataContext = ContextHeader & {
   [key: string]: ContextProperty | string | number | boolean | undefined;
 };
 
-/** Returns linked data context for a properties object */
+/** Returns linked data context for a properties object. */
 const getLinkedDataContext = (properties: Record<string, PropertySchema>, vocabUri: string): LinkedDataContext => {
   const context = {} as Record<string, ContextProperty>;
 
