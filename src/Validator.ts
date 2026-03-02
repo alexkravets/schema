@@ -45,7 +45,7 @@ class Validator {
     } catch (error) {
       const details = error instanceof ValidateError && error.details ? error.details : [];
       const errorsJson = JSON.stringify(details, null, 2);
-      throw new Error(`Schemas validation failed, errors: ${errorsJson}`);
+      throw new Error(`Schemas validation failed, errors: ${errorsJson}`, { cause: error });
     }
 
     this._schemasMap = keyBy(schemas, 'id');
