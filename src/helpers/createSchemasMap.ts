@@ -37,9 +37,10 @@ const readSchemasSync = (servicePath: string) =>
 
 /** Creates a map of schemas by ID, loading from YAML files and merging with programmatic schemas. */
 const createSchemasMap = (servicePath: string, modules: unknown[]): Record<string, Schema> => {
-  if (!existsSync(servicePath)) return {};
+  const yamlSchemas = existsSync(servicePath)
+    ? readSchemasSync(servicePath)
+    : [];
 
-  const yamlSchemas = readSchemasSync(servicePath);
   const schemasMap = keyBy(yamlSchemas, 'id');
 
   const schemas = modules
