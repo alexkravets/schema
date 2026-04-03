@@ -150,6 +150,13 @@ describe('createSchemasMap', () => {
   });
 
   describe('edge cases', () => {
+    it('should return empty map if servicePath does not exist', () => {
+      const nonExistentPath = path.join(__dirname, '../../../non-existent-src');
+      const schemasMap = createSchemasMap(nonExistentPath, []);
+
+      expect(schemasMap).toEqual({});
+    });
+
     it('should handle empty directory gracefully', () => {
       const emptyDir = path.join(__dirname, '../../../examples');
       // This directory might have subdirectories but no YAML files directly

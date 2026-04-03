@@ -2,7 +2,7 @@ import path from 'path';
 import Schema from '../Schema';
 import { load } from 'js-yaml';
 import { keyBy } from 'lodash';
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
 
 /** Reads schema source from YAML file and returns a Schema instance. */
 export const loadSync = (yamlPath: string) => {
@@ -37,6 +37,8 @@ const readSchemasSync = (servicePath: string) =>
 
 /** Creates a map of schemas by ID, loading from YAML files and merging with programmatic schemas. */
 const createSchemasMap = (servicePath: string, modules: unknown[]): Record<string, Schema> => {
+  if (!existsSync(servicePath)) return {};
+
   const yamlSchemas = readSchemasSync(servicePath);
   const schemasMap = keyBy(yamlSchemas, 'id');
 
