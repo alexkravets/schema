@@ -15,7 +15,7 @@ const ProfileSchema = new Schema({
   // NOTE: Referenced enum:
   status: {
     $ref: 'Status',
-    default: 'Pending',
+    default: 'PENDING',
   },
   // NOTE: Nested enum:
   gender: {

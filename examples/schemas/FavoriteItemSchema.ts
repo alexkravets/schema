@@ -10,7 +10,7 @@ const FavoriteItemSchema = new Schema({
   description: {},
   status: {
     $ref: 'Status',
-    default: 'Pending',
+    default: 'PENDING',
   },
   categories: {
     items: {

@@ -101,6 +101,22 @@ describe('Validator', () => {
         expect(result.contactDetails.mobileNumber).toEqual('380504112171');
       });
 
+      it('validates an object that relies on default values', () => {
+        const validator = new Validator(SCHEMAS);
+
+        const input = {
+          name: 'Oleksandr',
+          contactDetails: {
+            email: 'a@kra.vc'
+          }
+        };
+
+        const result = validator.validate(input, 'Profile');
+
+        expect(result.status).toEqual('PENDING');
+        expect(result.gender).toEqual('Other');
+      });
+
       it('throws ValidationError when required fields are missing', () => {
         const validator = new Validator(SCHEMAS);
 
@@ -613,7 +629,7 @@ describe('Validator', () => {
       const result = validator.normalize(input, 'Profile');
 
       expect(result.gender).toEqual('Other');
-      expect(result.status).toEqual('Pending');
+      expect(result.status).toEqual('PENDING');
     });
 
     it('does not validate required fields', () => {
