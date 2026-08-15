@@ -2,12 +2,12 @@ name:
   required: true
   minLength: 3
 
-# NOTE: Referenced enum:
+# Referenced enum.
 status:
   $ref: 'Status'
   default: 'PENDING'
 
-# NOTE: Nested enum:
+# Nested enum.
 gender:
   enum:
     - 'Male'
@@ -15,7 +15,7 @@ gender:
     - 'Other'
   default: 'Other'
 
-# NOTE: Nested object:
+# Nested object.
 contactDetails:
   required: true
 
@@ -34,7 +34,7 @@ contactDetails:
       pattern: '^[0-9]{1,20}$'
       default: '380504112171'
 
-# NOTE: Array of nested objects:
+# Array of nested objects.
 locations:
   items:
     properties:
@@ -64,19 +64,19 @@ locations:
               - 'Secondary'
             default: 'Secondary'
 
-# NOTE: Array of strings:
+# Array of strings.
 tags:
   type: array
 
-# NOTE: Array of referenced objects:
+# Array of referenced objects.
 favoriteItems:
   items:
     $ref: 'FavoriteItem'
 
-# NOTE: Referenced object:
+# Referenced object.
 preferences:
   $ref: 'Preferences'
 
-# NOTE: Nested object without properties:
+# Nested object without properties.
 hash:
   type: object

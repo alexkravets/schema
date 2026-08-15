@@ -70,24 +70,30 @@ class Validator {
     }
 
     try {
-      // NOTE: Drop attributes from objects that are not defined in schema.
-      //       This is bad for FE developers, as they continue to send some
-      //       trash to endpoints, but good for integrations with third party
-      //       services, e.g. Telegram, when you do not want to define schema
-      //       for the full payload. This method currently fails for cases when
-      //       attribute is defined as object or array in schema, but value is
-      //       a string. In this case validation method below would catch that.
+      /*
+       * Drop attributes from objects that are not defined in schema. This is
+       * bad for FE developers, as they continue to send some trash to
+       * endpoints, but good for integrations with third party services, e.g.
+       * Telegram, when you do not want to define schema for the full payload.
+       * This method currently fails for cases when attribute is defined as
+       * object or array in schema, but value is a string. In this case
+       * validation method below would catch that.
+       */
       cleanupAttributes(result, jsonSchema, this._jsonSchemasMap);
 
-      // NOTE: Normalize method helps to integrate objects built from URLs,
-      //       where types are not defined, e.g. booleans are '1', 'yes' string
-      //       or numbers are '1', '2'... strings.
+      /*
+       * Normalize method helps to integrate objects built from URLs, where
+       * types are not defined, e.g. booleans are '1', 'yes' string or numbers
+       * are '1', '2'... strings.
+       */
       normalizeAttributes(result, jsonSchema, this._jsonSchemasMap);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      // NOTE: Skip errors in cleanup and normalize attributes methods.
-      //       Validation would fail below for objects with invalid value types.
+      /*
+       * Skip errors in cleanup and normalize attributes methods. Validation
+       * would fail below for objects with invalid value types.
+       */
 
     }
 

@@ -38,7 +38,7 @@ const cleanupAttributes = (
     const isPropertyUndefined = isUndefined(property);
 
     if (isPropertyUndefined) {
-      // NOTE: Delete object property if it's not defined in the object schema:
+      /* Delete object property if it's not defined in the object schema. */
       delete object[fieldName];
       continue;
     }

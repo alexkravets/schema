@@ -1,7 +1,9 @@
 import { Schema, type Infer, type InferOutput } from '../../src';
 
-// NOTE: Importing the referenced schemas registers them, so that a `$ref` in
-//       this schema resolves to the type each of them describes.
+/*
+ * Importing the referenced schemas registers them, so that a `$ref` in this
+ * schema resolves to the type each of them describes.
+ */
 import './StatusSchema';
 import './PreferencesSchema';
 import './FavoriteItemSchema';
@@ -12,17 +14,17 @@ const ProfileSchema = new Schema({
     minLength: 3,
     maxLength: 128,
   },
-  // NOTE: Referenced enum:
+  /* Referenced enum. */
   status: {
     $ref: 'Status',
     default: 'PENDING',
   },
-  // NOTE: Nested enum:
+  /* Nested enum. */
   gender: {
     enum: [ 'Male', 'Female', 'Other' ],
     default: 'Other'
   },
-  // NOTE: Nested object:
+  /* Nested object. */
   contactDetails: {
     required: true,
     properties: {
@@ -42,7 +44,7 @@ const ProfileSchema = new Schema({
       }
     }
   },
-  // NOTE: Array of nested objects:
+  /* Array of nested objects. */
   locations: {
     items: {
       properties: {
@@ -74,21 +76,21 @@ const ProfileSchema = new Schema({
       }
     }
   },
-  // NOTE: Array of strings:
+  /* Array of strings. */
   tags: {
     type: 'array',
   },
-  // NOTE: Array of referenced objects:
+  /* Array of referenced objects. */
   favoriteItems: {
     items: {
       $ref: 'FavoriteItem',
     }
   },
-  // NOTE: Referenced object:
+  /* Referenced object. */
   preferences: {
     $ref: 'Preferences',
   },
-  // NOTE: Nested object without properties:
+  /* Nested object without properties. */
   hash: {
     type: 'object',
   }

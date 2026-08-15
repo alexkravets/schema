@@ -199,9 +199,12 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
     });
 
     it('should prioritize date format over date-time format when both are present (date checked first)', () => {
-      // NOTE: This tests the actual implementation order.
-      //       The function checks date before date-time, so date would win if both were somehow set.
-      //       But in practice, format can only be one value, so this is more of an edge case test.
+      /*
+       * This tests the actual implementation order. The function checks date
+       * before date-time, so date would win if both were somehow set. But in
+       * practice, format can only be one value, so this is more of an edge
+       * case test.
+       */
       const propertySchema: PropertySchema = {
         type: 'string',
         format: 'date',
