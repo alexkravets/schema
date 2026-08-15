@@ -23,6 +23,37 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SchemaRegistry {}
 
+/**
+ * Format a string value is validated against.
+ *
+ * Lists the formats JSON Schema defines, and accepts any other string, since
+ * a service is able to register formats of its own.
+ */
+export type StringFormat =
+  | 'date'
+  | 'date-time'
+  | 'duration'
+  | 'email'
+  | 'host-name'
+  | 'hostname'
+  | 'idn-email'
+  | 'idn-hostname'
+  | 'ipv4'
+  | 'ipv6'
+  | 'iri'
+  | 'iri-reference'
+  | 'json-pointer'
+  | 'regex'
+  | 'relative-json-pointer'
+  | 'time'
+  | 'uri'
+  | 'uri-reference'
+  | 'uri-template'
+  | 'url'
+  | 'uuid'
+   
+  | (string & {});
+
 export type EnumSchema = {
   id?: string;
   enum: readonly string[] | readonly number[];
@@ -48,7 +79,7 @@ export type ReferencePropertySchema = {
 export type StringPropertySchema = {
   '@type'?: string;
   type?: 'string';
-  format?: 'date' | 'date-time' | 'url' | 'email',
+  format?: StringFormat,
   default?: string;
   example?: string;
   pattern?: string;

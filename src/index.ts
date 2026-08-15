@@ -30,6 +30,7 @@ export type {
 export type {
   EnumSchema,
   ObjectSchema,
+  StringFormat,
   TargetObject,
   SchemaRegistry,
   PropertySchema,

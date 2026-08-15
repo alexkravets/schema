@@ -208,4 +208,18 @@ export {
   pureSchema,
   outputSchema,
   propertiesSchema,
+  formatSchema,
 };
+
+/* A format is a known one or a format the service defines */
+const formatSchema = new Schema({
+  createdAt: { type: 'string', format: 'date-time' },
+  id: { type: 'string', format: 'uuid' },
+  activityId: { type: 'string', format: 'activity-id' },
+}, 'Formats');
+
+assertType<Equals<Infer<typeof formatSchema>, {
+  createdAt?: string;
+  id?: string;
+  activityId?: string;
+}>>();
