@@ -45,6 +45,65 @@ Other `Schema` and `Validator` usage examples:
 - [Validator](./src/__tests__/Validator.test.ts)
 
 
+## Types
+
+A schema is the source of a type, so a type does not have to be written out
+alongside the schema that already describes it:
+
+```ts
+import { Schema, type Infer, type InferOutput } from '@kravc/schema'
+
+type Profile = Infer<typeof profileSchema>
+// { firstName: string, lastName: string, status?: 'Pending' | 'Active' }
+```
+
+`Infer` describes an object as it is accepted on input. `InferOutput` describes
+it as `validate` returns it, where every property carrying a default is present:
+
+```ts
+type ValidatedProfile = InferOutput<typeof profileSchema>
+// { firstName: string, lastName: string, status: 'Pending' | 'Active' }
+```
+
+Types follow `clone`, `only`, `extend`, `pure` and `wrap`, so a schema built
+from another one describes what it builds.
+
+A `$ref` is a schema ID the validator resolves at runtime, which a type cannot
+follow on its own. Register a schema from the module that defines it, and a
+reference to it resolves everywhere:
+
+```ts
+export const statusSchema = new Schema({
+  enum: [ 'Pending', 'Active' ]
+}, 'Status')
+
+export type Status = Infer<typeof statusSchema>
+
+declare module '@kravc/schema' {
+  interface SchemaRegistry {
+    Status: Status
+  }
+}
+```
+
+```ts
+const profileSchema = new Schema({
+  status: { $ref: 'Status', required: true }
+}, 'Profile')
+
+type Profile = Infer<typeof profileSchema>
+// { status: 'Pending' | 'Active' }
+```
+
+A reference to an ID that is not registered resolves to `unknown`, so schemas
+built from IDs composed at runtime keep working.
+
+Type usage examples:
+
+- [Schemas with references, nested objects and arrays](./examples/schemas)
+- [Inferred types](./src/__tests__/types.test-d.ts)
+
+
 ## Verifiable Credentials
 
 Class `CredentialFactory` allows to build a verifiable credential with embeded

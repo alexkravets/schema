@@ -1,4 +1,10 @@
-import { Schema } from '../../src';
+import { Schema, type Infer, type InferOutput } from '../../src';
+
+// NOTE: Importing the referenced schemas registers them, so that a `$ref` in
+//       this schema resolves to the type each of them describes.
+import './StatusSchema';
+import './PreferencesSchema';
+import './FavoriteItemSchema';
 
 const ProfileSchema = new Schema({
   name: {
@@ -87,5 +93,23 @@ const ProfileSchema = new Schema({
     type: 'object',
   }
 }, 'ProfileSchema');
+
+/**
+ * The type of a profile as it is accepted on input, where a property is
+ * optional unless it is flagged as required.
+ */
+export type Profile = Infer<typeof ProfileSchema>;
+
+/**
+ * The type of a profile as it is returned once validated, where a property
+ * carrying a default is always present.
+ */
+export type ValidatedProfile = InferOutput<typeof ProfileSchema>;
+
+declare module '../../src' {
+  interface SchemaRegistry {
+    ProfileSchema: Profile;
+  }
+}
 
 export default ProfileSchema;

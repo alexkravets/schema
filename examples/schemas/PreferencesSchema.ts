@@ -1,4 +1,4 @@
-import { Schema } from '../../src';
+import { Schema, type Infer } from '../../src';
 
 const PreferencesSchema = new Schema({
   age:{
@@ -24,6 +24,14 @@ const PreferencesSchema = new Schema({
   hasPositiveBalance: {
     type: 'boolean'
   }
-}, 'PreferencesSchema');
+}, 'Preferences');
+
+export type Preferences = Infer<typeof PreferencesSchema>;
+
+declare module '../../src' {
+  interface SchemaRegistry {
+    Preferences: Preferences;
+  }
+}
 
 export default PreferencesSchema;

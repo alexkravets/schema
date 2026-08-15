@@ -1,4 +1,4 @@
-import { Schema } from '../../src';
+import { Schema, type Infer } from '../../src';
 
 const FavoriteItemSchema = new Schema({
   id: {
@@ -22,6 +22,14 @@ const FavoriteItemSchema = new Schema({
       ]
     }
   }
-}, 'FavoriteItemSchema');
+}, 'FavoriteItem');
+
+export type FavoriteItem = Infer<typeof FavoriteItemSchema>;
+
+declare module '../../src' {
+  interface SchemaRegistry {
+    FavoriteItem: FavoriteItem;
+  }
+}
 
 export default FavoriteItemSchema;

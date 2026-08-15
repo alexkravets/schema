@@ -102,7 +102,7 @@ assertType<Equals<Infer<typeof propertiesSchema>, {
 
 const statusSchema = new Schema({
   enum: [ 'Pending', 'Active' ],
-}, 'Status');
+}, 'TestStatus');
 
 assertType<Equals<Infer<typeof statusSchema>, 'Pending' | 'Active'>>();
 
@@ -113,20 +113,20 @@ assertType<Equals<Infer<typeof statusSchema>, 'Pending' | 'Active'>>();
 const identitySchema = new Schema({
   sub: { type: 'string', required: true },
   roles: { items: { type: 'string' }, required: true },
-}, 'Identity');
+}, 'TestIdentity');
 
 declare module '../../src' {
   interface SchemaRegistry {
-    Identity: Infer<typeof identitySchema>;
-    Status: Infer<typeof statusSchema>;
+    TestIdentity: Infer<typeof identitySchema>;
+    TestStatus: Infer<typeof statusSchema>;
   }
 }
 
 const activitySchema = new Schema({
-  type: { $ref: 'Status', required: true },
-  identity: { $ref: 'Identity' },
-  unregistered: { $ref: 'NotRegistered' },
-}, 'Activity');
+  type: { $ref: 'TestStatus', required: true },
+  identity: { $ref: 'TestIdentity' },
+  unregistered: { $ref: 'TestNotRegistered' },
+}, 'TestActivity');
 
 assertType<Equals<Infer<typeof activitySchema>, {
   type: 'Pending' | 'Active';
@@ -141,12 +141,12 @@ const badReference: Infer<typeof activitySchema> = { type: 'Active', identity: {
 // A schema is able to reference itself.
 const nodeSchema = new Schema({
   name: { type: 'string', required: true },
-  children: { items: { $ref: 'Node' } },
-}, 'Node');
+  children: { items: { $ref: 'TestNode' } },
+}, 'TestNode');
 
 declare module '../../src' {
   interface SchemaRegistry {
-    Node: Infer<typeof nodeSchema>;
+    TestNode: Infer<typeof nodeSchema>;
   }
 }
 
@@ -160,7 +160,7 @@ const nestedName: string = node.children![0].children![0].name;
 
 const mutationSchema = activitySchema
   .only([ 'type' ])
-  .extend({ identity: { $ref: 'Identity', required: true } }, 'Mutation');
+  .extend({ identity: { $ref: 'TestIdentity', required: true } }, 'Mutation');
 
 assertType<Equals<Infer<typeof mutationSchema>, {
   type: 'Pending' | 'Active';
