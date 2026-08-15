@@ -1,23 +1,15 @@
-import { load } from 'js-yaml';
-import { readFileSync } from 'fs';
 import { Schema, Validator, ValidationError } from '../../src';
-import type { EnumSchema, PropertiesSchema } from '../types';
-
-// eslint-disable-next-line jsdoc/require-jsdoc
-const loadSync = (yamlPath: string): Schema => {
-  const id = yamlPath.split('.')[0].split('/').reverse()[0];
-  const fullPath = yamlPath.startsWith('/') ? yamlPath : `${process.cwd()}/${yamlPath}`;
-  const source = load(readFileSync(fullPath, 'utf8')) as PropertiesSchema | EnumSchema;
-
-  return new Schema(source, id);
-};
+import ProfileSchema from '../../examples/schemas/ProfileSchema';
+import StatusSchema from '../../examples/schemas/StatusSchema';
+import PreferencesSchema from '../../examples/schemas/PreferencesSchema';
+import FavoriteItemSchema from '../../examples/schemas/FavoriteItemSchema';
 
 const SCHEMAS = [
-  'examples/schemas/Status.yaml',
-  'examples/schemas/Profile.yaml',
-  'examples/schemas/Preferences.yaml',
-  'examples/schemas/FavoriteItem.yaml'
-].map(path => loadSync(path));
+  StatusSchema,
+  ProfileSchema,
+  PreferencesSchema,
+  FavoriteItemSchema
+];
 
 describe('Validator', () => {
   describe('constructor', () => {

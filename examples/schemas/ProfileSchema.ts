@@ -94,7 +94,7 @@ const ProfileSchema = new Schema({
   hash: {
     type: 'object',
   }
-}, 'ProfileSchema');
+}, 'Profile');
 
 /**
  * The type of a profile as it is accepted on input, where a property is
@@ -110,7 +110,7 @@ export type ValidatedProfile = InferOutput<typeof ProfileSchema>;
 
 declare module '../../src' {
   interface SchemaRegistry {
-    ProfileSchema: Profile;
+    Profile: Profile;
   }
 }
 

@@ -1,6 +1,5 @@
-import { load } from 'js-yaml';
-import { readFileSync } from 'fs';
 import { Schema } from '../../src';
+import ProfileSchema from '../../examples/schemas/ProfileSchema';
 import type {
   EnumSchema,
   ObjectSchema,
@@ -10,16 +9,6 @@ import type {
   StringPropertySchema,
 } from '../types';
 import { at } from './support';
-
-// eslint-disable-next-line jsdoc/require-jsdoc
-const loadSync = (yamlPath: string): Schema => {
-  const id = yamlPath.split('.')[0].split('/').reverse()[0];
-  /* Path is relative to project root */
-  const fullPath = yamlPath.startsWith('/') ? yamlPath : `${process.cwd()}/${yamlPath}`;
-  const source = load(readFileSync(fullPath, 'utf8')) as PropertiesSchema | EnumSchema;
-
-  return new Schema(source, id);
-};
 
 describe('Schema', () => {
   describe('Schema.constructor(source = {}, id = UNDEFINED_SCHEMA_ID)', () => {
@@ -31,7 +20,7 @@ describe('Schema', () => {
     });
 
     it('extends schema properties with types', () => {
-      const schema = loadSync('examples/schemas/Profile.yaml');
+      const schema = ProfileSchema;
       const source = schema.source as PropertiesSchema;
 
       expect((source.name as StringPropertySchema).type).toEqual('string');
@@ -106,7 +95,7 @@ describe('Schema', () => {
 
   describe('.pure(id)', () => {
     it('returns schema without required and default attributes', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
       const updateProfileSchema = profileSchema.pure('UpdateProfile');
 
       expect(updateProfileSchema.id).toEqual('UpdateProfile');
@@ -136,7 +125,7 @@ describe('Schema', () => {
 
   describe('.clone(id)', () => {
     it('returns schema clone', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       const schema = profileSchema.clone('ProfileClone');
       expect(schema.id).toEqual('ProfileClone');
@@ -145,7 +134,7 @@ describe('Schema', () => {
 
   describe('.only(propertyNames, id)', () => {
     it('returns schema with only requested properties', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       const schema = profileSchema.only(['name', 'gender'], 'ProfileClone');
       expect(schema.id).toEqual('ProfileClone');
@@ -154,7 +143,7 @@ describe('Schema', () => {
 
   describe('.extend(properties, id)', () => {
     it('returns schema extended with specified properties', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       const documentSource: PropertiesSchema = {
         createdAt: {
@@ -173,7 +162,7 @@ describe('Schema', () => {
 
   describe('.wrap(propertyName, options = { required: true }, id)', () => {
     it('returns schema that wraps source schema with object property', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       /*
        * Test default behavior when id is undefined (should default to UNDEFINED_SCHEMA_ID)
@@ -213,7 +202,7 @@ describe('Schema', () => {
     });
 
     it('returns json schema with normalized required attributes', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       const { jsonSchema } = profileSchema;
       const objectSchema = jsonSchema as ObjectSchema;
@@ -377,7 +366,7 @@ describe('Schema', () => {
 
   describe('.wrap() with default attributes', () => {
     it('uses default required: true when attributes is falsy', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       /*
        * Test the attributes || { required: true } branch by passing null
@@ -391,7 +380,7 @@ describe('Schema', () => {
     });
 
     it('spreads attributes when provided', () => {
-      const profileSchema = loadSync('examples/schemas/Profile.yaml');
+      const profileSchema = ProfileSchema;
 
       const dataSchema = profileSchema.wrap('data', { default: 'test' }, 'WrappedData');
       const dataSource = dataSchema.source;
