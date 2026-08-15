@@ -208,5 +208,5 @@ Other `CredentialFactory` examples:
 
 ---
 
-Revision: June 21, 2026<br/>
+Revision: August 15, 2026<br/>
 By: Oleksandr Kravets (@alexkravets)
