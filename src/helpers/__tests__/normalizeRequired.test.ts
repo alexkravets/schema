@@ -136,7 +136,7 @@ describe('normalizeRequired(schema)', () => {
       expect(schema.properties.nestedObject['x-required']).toBe(true);
 
       const nested = schema.properties.nestedObject as ObjectPropertySchema;
-      // The function sets required on the nested object schema itself
+      /* The function sets required on the nested object schema itself */
       expect(at(nested, 'required')).toEqual(['nestedRequired']);
       expect(nested.properties!.nestedRequired['x-required']).toBe(true);
       expect(nested.properties!.nestedRequired.required).toBeUndefined();
@@ -266,9 +266,11 @@ describe('normalizeRequired(schema)', () => {
 
       const arrayField = schema.properties.arrayField as ArrayPropertySchema;
       const items = arrayField.items as ReferencePropertySchema;
-      // ReferencePropertySchema without properties returns early, so required flag is not processed
-      // The function only processes schemas with properties
-      expect(at(items, 'required')).toBe(true); // Still present since function returns early for refs without properties
+      /*
+       * ReferencePropertySchema without properties returns early, so required flag is not processed
+       * The function only processes schemas with properties
+       */
+      expect(at(items, 'required')).toBe(true); /* Still present since function returns early for refs without properties */
     });
 
     it('should handle array property without items', () => {
@@ -316,14 +318,16 @@ describe('normalizeRequired(schema)', () => {
       const outerArray = schema.properties.outerArray as ArrayPropertySchema;
       const innerArray = outerArray.items as ArrayPropertySchema;
       const items = innerArray.items as ObjectPropertySchema;
-      // When normalizeRequired is called on the inner ArrayPropertySchema (innerArray),
-      // it returns early because ArrayPropertySchema doesn't have properties.
-      // The function only processes ObjectSchema/ObjectPropertySchema with properties.
-      // So nested arrays are not fully processed - this is a limitation of the current implementation.
-      // The items of the inner array are not processed because normalizeRequired returns early
-      // when called on the innerArray (which is an ArrayPropertySchema without properties).
+      /*
+       * When normalizeRequired is called on the inner ArrayPropertySchema (innerArray),
+       * it returns early because ArrayPropertySchema doesn't have properties.
+       * The function only processes ObjectSchema/ObjectPropertySchema with properties.
+       * So nested arrays are not fully processed - this is a limitation of the current implementation.
+       * The items of the inner array are not processed because normalizeRequired returns early
+       * when called on the innerArray (which is an ArrayPropertySchema without properties).
+       */
       expect(at(items, 'required')).toBeUndefined();
-      expect(items.properties!.deepField.required).toBe(true); // Still present, not processed
+      expect(items.properties!.deepField.required).toBe(true); /* Still present, not processed */
     });
 
     it('should handle array with object items containing nested arrays', () => {
@@ -491,7 +495,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      // EnumSchema returns early, so no changes should be made
+      /* EnumSchema returns early, so no changes should be made */
       expect(at(schema, 'required')).toBe(true);
       expect(schema['x-required']).toBeUndefined();
     });
@@ -546,9 +550,11 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      // ReferencePropertySchema without properties returns early, so required flag is not processed
-      // The function only processes schemas with properties
-      expect(at(schema, 'required')).toBe(true); // Still present since function returns early
+      /*
+       * ReferencePropertySchema without properties returns early, so required flag is not processed
+       * The function only processes schemas with properties
+       */
+      expect(at(schema, 'required')).toBe(true); /* Still present since function returns early */
       expect(schema['x-required']).toBeUndefined();
     });
 
@@ -569,12 +575,12 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      // Reference property required flag should be normalized (added to required array and removed from property)
+      /* Reference property required flag should be normalized (added to required array and removed from property) */
       expect(at(schema, 'required')).toEqual(['refField', 'normalField']);
-      expect(schema.properties.refField.required).toBeUndefined(); // Removed after normalization
-      expect(schema.properties.refField['x-required']).toBe(true); // x-required flag set
+      expect(schema.properties.refField.required).toBeUndefined(); /* Removed after normalization */
+      expect(schema.properties.refField['x-required']).toBe(true); /* x-required flag set */
 
-      // Normal field should be processed
+      /* Normal field should be processed */
       expect(schema.properties.normalField['x-required']).toBe(true);
       expect(schema.properties.normalField.required).toBeUndefined();
     });

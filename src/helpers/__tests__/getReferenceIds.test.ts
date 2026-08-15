@@ -420,9 +420,11 @@ describe('getReferenceIds(schema, schemasMap)', () => {
     });
 
     it('should handle circular references (causes infinite recursion - limitation)', () => {
-      // Note: This test demonstrates that circular references cause infinite recursion.
-      // The current implementation does not handle circular references.
-      // This would need cycle detection to be properly handled.
+      /*
+       * Note: This test demonstrates that circular references cause infinite recursion.
+       * The current implementation does not handle circular references.
+       * This would need cycle detection to be properly handled.
+       */
       const schema = new Schema(
         {
           refField: { $ref: 'circular-schema' }
@@ -439,7 +441,7 @@ describe('getReferenceIds(schema, schemasMap)', () => {
         'circular-schema': circularSchema
       };
 
-      // The function will recurse infinitely with circular references
+      /* The function will recurse infinitely with circular references */
       expect(() => {
         getReferenceIds(schema, schemasMap);
       }).toThrow();

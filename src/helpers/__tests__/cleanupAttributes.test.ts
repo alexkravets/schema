@@ -357,7 +357,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
     });
 
     it('should handle object type with undefined properties (tests destructuring default)', () => {
-      // Create a manually constructed schema with undefined properties to test the default destructuring
+      /* Create a manually constructed schema with undefined properties to test the default destructuring */
       const object: TargetObject = {
         nestedObject: {
           someField: 'value'
@@ -368,7 +368,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
         properties: {
           nestedObject: {
             type: 'object' as const,
-            // properties is intentionally undefined to test the default = {} on line 58
+            /* properties is intentionally undefined to test the default = {} on line 58 */
             properties: undefined
           }
         }
@@ -377,7 +377,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      // Should handle undefined properties by using default {}
+      /* Should handle undefined properties by using default {} */
       expect(at(object, 'nestedObject')).toEqual({});
     });
 
@@ -921,7 +921,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
         properties: {
           arrayField: {
             type: 'array' as const
-            // items is intentionally undefined
+            /* items is intentionally undefined */
           }
         }
       } as ObjectSchema;
@@ -929,7 +929,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      // Should not modify array items when items schema is undefined
+      /* Should not modify array items when items schema is undefined */
       expect(at(object, 'arrayField')).toHaveLength(2);
       expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1', invalidField: 'value2' });
       expect(at(object, 'arrayField[1]')).toEqual({ validField: 'value3', invalidField: 'value4' });
@@ -942,13 +942,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
       };
       const schema = {
         id: 'test-schema'
-        // properties is intentionally undefined (malformed schema)
+        /* properties is intentionally undefined (malformed schema) */
       } as unknown as ObjectSchema;
       const schemasMap = {};
 
       cleanupAttributes(object, schema, schemasMap);
 
-      // Should not modify object when properties is undefined
+      /* Should not modify object when properties is undefined */
       expect(object).toEqual({ field1: 'value1', field2: 'value2' });
     });
   });

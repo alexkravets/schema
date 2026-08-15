@@ -662,14 +662,14 @@ describe('normalizeType(type, value)', () => {
       });
 
       it('should handle string numbers with multiple decimal points', () => {
-        expect(normalizeType('number', '12.34.56')).toBe('12.34.56'); // Invalid, preserved
-        expect(normalizeType('number', '12..34')).toBe('12..34'); // Invalid, preserved
+        expect(normalizeType('number', '12.34.56')).toBe('12.34.56'); /* Invalid, preserved */
+        expect(normalizeType('number', '12..34')).toBe('12..34'); /* Invalid, preserved */
       });
 
       it('should handle string numbers with invalid characters', () => {
-        expect(normalizeType('number', '12abc')).toBe('12abc'); // Invalid, preserved
-        expect(normalizeType('number', 'abc12')).toBe('abc12'); // Invalid, preserved
-        expect(normalizeType('number', '12-34')).toBe('12-34'); // Invalid, preserved
+        expect(normalizeType('number', '12abc')).toBe('12abc'); /* Invalid, preserved */
+        expect(normalizeType('number', 'abc12')).toBe('abc12'); /* Invalid, preserved */
+        expect(normalizeType('number', '12-34')).toBe('12-34'); /* Invalid, preserved */
       });
     });
 

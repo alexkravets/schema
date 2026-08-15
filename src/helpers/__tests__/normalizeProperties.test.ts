@@ -154,7 +154,7 @@ describe('normalizeProperties(schema)', () => {
             }
           }
         };
-        // Manually set items to test conflicting structure (object shouldn't have items)
+        /* Manually set items to test conflicting structure (object shouldn't have items) */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (schema.objectWithItems as any).items = { type: 'number' };
 
@@ -162,7 +162,7 @@ describe('normalizeProperties(schema)', () => {
 
         expect(at(schema, 'objectWithItems.type')).toBe('object');
         expect(at(schema, 'objectWithItems.properties')).toBeDefined();
-        // Object type should be normalized, items should be ignored
+        /* Object type should be normalized, items should be ignored */
         expect(at(schema, 'objectWithItems.properties.nested.type')).toBe('string');
       });
 
@@ -173,7 +173,7 @@ describe('normalizeProperties(schema)', () => {
             items: { type: 'string' }
           }
         };
-        // Manually set properties to test conflicting structure (array shouldn't have properties)
+        /* Manually set properties to test conflicting structure (array shouldn't have properties) */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (schema.arrayWithProperties as any).properties = {
           nested: { type: 'number' }
@@ -192,7 +192,7 @@ describe('normalizeProperties(schema)', () => {
             type: 'string'
           }
         };
-        // Manually set properties to test conflicting structure (string shouldn't have properties)
+        /* Manually set properties to test conflicting structure (string shouldn't have properties) */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (schema.stringWithProperties as any).properties = {
           nested: { type: 'number' }
@@ -209,7 +209,7 @@ describe('normalizeProperties(schema)', () => {
             type: 'string'
           }
         };
-        // Manually set items to test conflicting structure (string shouldn't have items)
+        /* Manually set items to test conflicting structure (string shouldn't have items) */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (schema.stringWithItems as any).items = { type: 'number' };
 
@@ -296,7 +296,7 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(at(schema, 'objectField.type')).toBe('object');
-        // When properties is null, it gets normalized to {} and recursive call uses || {}
+        /* When properties is null, it gets normalized to {} and recursive call uses || {} */
         expect(at(schema, 'objectField.properties')).toEqual({});
       });
 
@@ -311,27 +311,29 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(at(schema, 'objectField.type')).toBe('object');
-        // When properties is undefined, it gets set to {} on line 56, then || {} on line 59 uses the set value
+        /* When properties is undefined, it gets set to {} on line 56, then || {} on line 59 uses the set value */
         expect(at(schema, 'objectField.properties')).toEqual({});
       });
 
       it('should handle object with properties explicitly set to null after type is set (tests || {} fallback on line 59)', () => {
-        // Create an object where properties is null but type is already 'object'
-        // This tests the || {} fallback on line 59 when properties is falsy
+        /*
+         * Create an object where properties is null but type is already 'object'
+         * This tests the || {} fallback on line 59 when properties is falsy
+         */
         const schema: PropertiesSchema = {
           objectField: {
             type: 'object',
-            // Manually set properties to null to test the || {} branch
+            /* Manually set properties to null to test the || {} branch */
           }
         };
-        // Manually set properties to null after schema creation to bypass type checking
+        /* Manually set properties to null after schema creation to bypass type checking */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (schema.objectField as any).properties = null;
 
         normalizeProperties(schema);
 
         expect(at(schema, 'objectField.type')).toBe('object');
-        // The || {} fallback should handle null properties
+        /* The || {} fallback should handle null properties */
         expect(at(schema, 'objectField.properties')).toEqual({});
       });
 
@@ -439,7 +441,7 @@ describe('normalizeProperties(schema)', () => {
 
         expect(at(schema, 'arrayField.type')).toBe('array');
         expect(at(schema, 'arrayField.items.type')).toBe('string');
-        // Items without properties should not have type set to 'object'
+        /* Items without properties should not have type set to 'object' */
         expect(at(schema, 'arrayField.items.properties')).toBeUndefined();
       });
 
@@ -456,7 +458,7 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(at(schema, 'arrayField.type')).toBe('array');
-        // Items with undefined properties should not have type set to 'object'
+        /* Items with undefined properties should not have type set to 'object' */
         expect(at(schema, 'arrayField.items.type')).toBeUndefined();
       });
 
@@ -473,23 +475,23 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(at(schema, 'arrayField.type')).toBe('array');
-        // Items with null properties are treated as existing (not undefined), so type is set to 'object'
+        /* Items with null properties are treated as existing (not undefined), so type is set to 'object' */
         expect(at(schema, 'arrayField.items.type')).toBe('object');
       });
 
       it('should handle array items that is an empty object (tests destructuring with items existing)', () => {
-        // This ensures hasItems is true and we enter the block, testing the destructuring
+        /* This ensures hasItems is true and we enter the block, testing the destructuring */
         const schema: PropertiesSchema = {
           arrayField: {
             type: 'array',
-            items: {} // Empty object, hasItems will be true
+            items: {} /* Empty object, hasItems will be true */
           }
         };
 
         normalizeProperties(schema);
 
         expect(at(schema, 'arrayField.type')).toBe('array');
-        // Items exists but has no properties, so type should not be set to 'object'
+        /* Items exists but has no properties, so type should not be set to 'object' */
         expect(at(schema, 'arrayField.items.type')).toBeUndefined();
       });
 
@@ -521,8 +523,10 @@ describe('normalizeProperties(schema)', () => {
 
         expect(at(schema, 'arrayField.type')).toBe('array');
         const items = at(schema, 'arrayField.items') as EnumSchema;
-        // Enum normalization only applies to top-level EnumSchema, not nested items
-        // So items enum schema won't get type set automatically
+        /*
+         * Enum normalization only applies to top-level EnumSchema, not nested items
+         * So items enum schema won't get type set automatically
+         */
         expect(items.type).toBeUndefined();
         expect(items.enum).toEqual(['value1', 'value2', 'value3']);
       });
@@ -536,7 +540,7 @@ describe('normalizeProperties(schema)', () => {
             }
           }
         };
-        // Manually set properties to test items with both type and properties
+        /* Manually set properties to test items with both type and properties */
          
         (at(schema, 'arrayField.items') as ObjectPropertySchema).properties = {
           nested: { type: 'string' }
@@ -545,9 +549,9 @@ describe('normalizeProperties(schema)', () => {
         normalizeProperties(schema);
 
         expect(at(schema, 'arrayField.type')).toBe('array');
-        // When items has properties, type is set to 'object' (line 236), overriding existing type
+        /* When items has properties, type is set to 'object' (line 236), overriding existing type */
         expect(at(schema, 'arrayField.items.type')).toBe('object');
-        // Properties should still be normalized
+        /* Properties should still be normalized */
         expect(at(schema, 'arrayField.items.properties.nested.type')).toBe('string');
       });
     });
@@ -586,7 +590,7 @@ describe('normalizeProperties(schema)', () => {
         expect(at(schema, 'user.properties.addresses.items.properties.street.type')).toBe('string');
         expect(at(schema, 'user.properties.addresses.items.properties.city.type')).toBe('string');
         expect(at(schema, 'user.properties.metadata.type')).toBe('object');
-        // Array items without properties don't get a type set
+        /* Array items without properties don't get a type set */
         expect(at(schema, 'user.properties.metadata.properties.tags.items.')).toBeUndefined();
       });
 
@@ -613,7 +617,7 @@ describe('normalizeProperties(schema)', () => {
         expect(at(schema, 'objectField.type')).toBe('object');
         expect(at(schema, 'objectField.properties.nested.type')).toBe('string');
         expect(at(schema, 'arrayField.type')).toBe('array');
-        // Array items without properties don't get a type set
+        /* Array items without properties don't get a type set */
         expect(at(schema, 'arrayField.items.type')).toBeUndefined();
       });
     });
@@ -713,8 +717,10 @@ describe('normalizeProperties(schema)', () => {
         expect(at(schema, 'objectField.type')).toBe('object');
         expect(at(schema, 'objectField.properties.nestedArray.type')).toBe('array');
         expect(at(schema, 'objectField.properties.nestedArray.items.type')).toBe('array');
-        // Nested array items are not recursively normalized (only items with properties are normalized)
-        // So the nested items remain as {} without type being set
+        /*
+         * Nested array items are not recursively normalized (only items with properties are normalized)
+         * So the nested items remain as {} without type being set
+         */
         expect(at(schema, 'objectField.properties.nestedArray.items.items')).toEqual({});
       });
     });

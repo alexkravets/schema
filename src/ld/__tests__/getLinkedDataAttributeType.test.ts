@@ -102,7 +102,7 @@ describe('getLinkedDataAttributeType(propertySchema)', () => {
         type: 'number',
         format: 'date-time',
       };
-      // The function checks type before format, so number type takes priority
+      /* The function checks type before format, so number type takes priority */
       expect(getLinkedDataAttributeType(propertySchema)).toBe('schema:Number');
     });
   });

@@ -74,7 +74,7 @@ describe('createSchemasMap', () => {
 
       expect(schemasMap.Profile).toBeInstanceOf(Schema);
       expect(schemasMap.Profile.id).toBe('Profile');
-      // The custom schema should override the YAML one
+      /* The custom schema should override the YAML one */
       const source = schemasMap.Profile.source;
       expect(source).toHaveProperty('customField');
     });
@@ -134,7 +134,7 @@ describe('createSchemasMap', () => {
       expect(schemasMap).not.toBeNull();
       expect(Array.isArray(schemasMap)).toBe(false);
 
-      // Check that all values are Schema instances
+      /* Check that all values are Schema instances */
       Object.values(schemasMap).forEach((schema) => {
         expect(schema).toBeInstanceOf(Schema);
       });
@@ -159,18 +159,20 @@ describe('createSchemasMap', () => {
 
     it('should handle empty directory gracefully', () => {
       const emptyDir = path.join(__dirname, '../../../examples');
-      // This directory might have subdirectories but no YAML files directly
-      // We'll test with a path that exists but may have no YAML files
+      /*
+       * This directory might have subdirectories but no YAML files directly
+       * We'll test with a path that exists but may have no YAML files
+       */
       const schemasMap = createSchemasMap(emptyDir, []);
 
       expect(typeof schemasMap).toBe('object');
-      // If there are no YAML files, the map should be empty or contain only what's in modules
+      /* If there are no YAML files, the map should be empty or contain only what's in modules */
     });
 
     it('should ignore non-YAML files', () => {
       const schemasMap = createSchemasMap(examplesSchemasPath, []);
 
-      // Should only contain schemas from YAML files, not TypeScript files
+      /* Should only contain schemas from YAML files, not TypeScript files */
       Object.keys(schemasMap).forEach((key) => {
         expect(key).not.toBe('FavoriteItemSchema');
         expect(key).not.toBe('ProfileSchema');
@@ -188,7 +190,7 @@ describe('createSchemasMap', () => {
         undefined,
       ]);
 
-      // Should still have YAML schemas
+      /* Should still have YAML schemas */
       expect(schemasMap.FavoriteItem).toBeInstanceOf(Schema);
       expect(schemasMap.Profile).toBeInstanceOf(Schema);
     });

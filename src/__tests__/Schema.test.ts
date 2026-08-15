@@ -14,7 +14,7 @@ import { at } from './support';
 // eslint-disable-next-line jsdoc/require-jsdoc
 const loadSync = (yamlPath: string): Schema => {
   const id = yamlPath.split('.')[0].split('/').reverse()[0];
-  // Path is relative to project root
+  /* Path is relative to project root */
   const fullPath = yamlPath.startsWith('/') ? yamlPath : `${process.cwd()}/${yamlPath}`;
   const source = load(readFileSync(fullPath, 'utf8')) as PropertiesSchema | EnumSchema;
 
@@ -36,11 +36,11 @@ describe('Schema', () => {
 
       expect((source.name as StringPropertySchema).type).toEqual('string');
       expect((source.gender as StringPropertySchema).type).toEqual('string');
-      // items can be various property schema types, assert as StringPropertySchema for this test
+      /* items can be various property schema types, assert as StringPropertySchema for this test */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(((source.tags as ArrayPropertySchema).items as any as StringPropertySchema)?.type).toEqual('string');
       expect((source.favoriteItems as ArrayPropertySchema).type).toEqual('array');
-      // items may not have type property depending on the schema structure
+      /* items may not have type property depending on the schema structure */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(((source.favoriteItems as ArrayPropertySchema).items as any)?.type).toBeUndefined();
       expect((source.locations as ArrayPropertySchema).type).toEqual('array');
@@ -59,7 +59,7 @@ describe('Schema', () => {
 
       expect((stringEnumSchema.source as EnumSchema).type).toEqual('string');
 
-      // Testing number enum - EnumSchema type only allows string[], but the implementation supports number[]
+      /* Testing number enum - EnumSchema type only allows string[], but the implementation supports number[] */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const numbersEnumSchema = new Schema({ enum: [1, 2, 3] as any, type: 'number' } as EnumSchema, 'Points');
 
@@ -121,7 +121,7 @@ describe('Schema', () => {
       expect(contactDetails.properties?.mobileNumber?.default).toBeUndefined();
       const locations = source.locations as ArrayPropertySchema;
       const locationsItems = locations.items as ObjectPropertySchema;
-      // Note: 'require' is a typo in the original test, but keeping it to match expected behavior
+      /* Note: 'require' is a typo in the original test, but keeping it to match expected behavior */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((locationsItems.properties?.name as any)?.require).toBeUndefined();
       const addressProperty = locationsItems.properties?.address as ObjectPropertySchema;
@@ -175,8 +175,10 @@ describe('Schema', () => {
     it('returns schema that wraps source schema with object property', () => {
       const profileSchema = loadSync('examples/schemas/Profile.yaml');
 
-      // Test default behavior when id is undefined (should default to UNDEFINED_SCHEMA_ID)
-      // wrap() requires id: string, but we're testing the default behavior with undefined
+      /*
+       * Test default behavior when id is undefined (should default to UNDEFINED_SCHEMA_ID)
+       * wrap() requires id: string, but we're testing the default behavior with undefined
+       */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dataSchema = profileSchema.wrap('data', { required: true }, undefined as any);
       const dataSource = dataSchema.source as PropertiesSchema;
@@ -184,7 +186,7 @@ describe('Schema', () => {
       expect(dataSource.data).toBeDefined();
       expect((dataSource.data as ObjectPropertySchema).required).toBeDefined();
 
-      // wrap() expects default to be string, but we're testing with object-like string
+      /* wrap() expects default to be string, but we're testing with object-like string */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const alternativeDataSchema = profileSchema.wrap('data', { default: '{}' as any }, 'ResponseOutput');
       const altSource = alternativeDataSchema.source as PropertiesSchema;
@@ -377,8 +379,10 @@ describe('Schema', () => {
     it('uses default required: true when attributes is falsy', () => {
       const profileSchema = loadSync('examples/schemas/Profile.yaml');
 
-      // Test the attributes || { required: true } branch by passing null
-      // This tests line 169 where falsy attributes trigger the default
+      /*
+       * Test the attributes || { required: true } branch by passing null
+       * This tests line 169 where falsy attributes trigger the default
+       */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dataSchema = profileSchema.wrap('data', null as any, 'WrappedData');
       const dataSource = dataSchema.source as PropertiesSchema;
@@ -393,7 +397,7 @@ describe('Schema', () => {
       const dataSource = dataSchema.source;
 
       expect(at(dataSource, 'data.default')).toBe('test');
-      // When attributes is provided, required is not set by default
+      /* When attributes is provided, required is not set by default */
       expect(at(dataSource, 'data.required')).toBeUndefined();
     });
   });

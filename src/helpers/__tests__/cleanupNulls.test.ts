@@ -369,11 +369,13 @@ describe('cleanupNulls', () => {
         arrayField: [null, 'value1', null, 'value2']
       };
 
-      // Note: The current implementation doesn't remove null from arrays,
-      // it only processes array items if they are objects
+      /*
+       * Note: The current implementation doesn't remove null from arrays,
+       * it only processes array items if they are objects
+       */
       const result = cleanupNulls(object);
 
-      // Arrays with primitive nulls are not modified by the current implementation
+      /* Arrays with primitive nulls are not modified by the current implementation */
       expect(at(result, 'arrayField')).toEqual([null, 'value1', null, 'value2']);
     });
 
@@ -436,7 +438,7 @@ describe('cleanupNulls', () => {
       expect(at(result, 'mixedArray[0]')).not.toHaveProperty('field2');
       expect(at(result, 'mixedArray[1]')).toBe('primitive');
       expect(at(result, 'mixedArray[2]')).toBe(123);
-      expect(at(result, 'mixedArray[3]')).toBe(null); // Primitive nulls in arrays are preserved
+      expect(at(result, 'mixedArray[3]')).toBe(null); /* Primitive nulls in arrays are preserved */
       expect(at(result, 'mixedArray[4]')).toEqual({ field4: 'value4' });
       expect(at(result, 'mixedArray[4]')).not.toHaveProperty('field3');
       expect(at(result, 'mixedArray[5]')).toBe(false);
@@ -501,7 +503,7 @@ describe('cleanupNulls', () => {
       expect(at(result, 'sparseArray[0]')).not.toHaveProperty('field2');
       expect(at(result, 'sparseArray[5]')).toEqual({ field4: 'value4' });
       expect(at(result, 'sparseArray[5]')).not.toHaveProperty('field3');
-      expect(at(result, 'sparseArray[10]')).toBe(null); // Primitive nulls preserved
+      expect(at(result, 'sparseArray[10]')).toBe(null); /* Primitive nulls preserved */
     });
 
     it('should handle Date objects (treated as regular objects)', () => {
@@ -585,7 +587,7 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(deepObject);
 
-      // Verify structure is preserved and nulls are removed
+      /* Verify structure is preserved and nulls are removed */
       let current: Record<string, unknown> = result;
       for (let i = 9; i >= 0; i--) {
         expect(current).toHaveProperty('value', `level${i}`);
@@ -593,7 +595,7 @@ describe('cleanupNulls', () => {
         expect(current).toHaveProperty('nested');
         current = current.nested as Record<string, unknown>;
       }
-      // After all nested levels, we should reach the innermost object
+      /* After all nested levels, we should reach the innermost object */
       expect(current).toHaveProperty('field', 'value');
     });
 
@@ -687,7 +689,7 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      // Primitive nulls in arrays are preserved
+      /* Primitive nulls in arrays are preserved */
       expect(at(result, 'primitives.strings')).toEqual(['a', null, 'b']);
       expect(at(result, 'primitives.numbers')).toEqual([1, null, 2]);
       expect(at(result, 'primitives.booleans')).toEqual([true, null, false]);
@@ -758,7 +760,7 @@ describe('cleanupNulls', () => {
         ],
         metadata: {
           createdAt: expect.any(Date),
-          tags: ['important', null, 'user'] // Primitive nulls in arrays preserved
+          tags: ['important', null, 'user'] /* Primitive nulls in arrays preserved */
         }
       });
       expect(result).not.toHaveProperty('email');

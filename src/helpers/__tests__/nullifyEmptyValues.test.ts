@@ -20,7 +20,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
       inner: [],
     } as SchemaErrorDetail;
 
-    // Attach symbols to the error object (z-schema v9: symbols are on ZSchema class)
+    /* Attach symbols to the error object (z-schema v9: symbols are on ZSchema class) */
     (error as unknown as Record<symbol, unknown>)[ZSchema.schemaSymbol] = schema;
     (error as unknown as Record<symbol, unknown>)[ZSchema.jsonSymbol] = json;
 
@@ -37,7 +37,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
-      // Original object should not be modified
+      /* Original object should not be modified */
       expect(object.field).toBe('');
     });
 
@@ -351,7 +351,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // The function replaces '#/' with '', so 'field' becomes ['field']
+      /* The function replaces '#/' with '', so 'field' becomes ['field'] */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -416,7 +416,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Empty path should result in empty array after filter, which lodash.set handles
+      /* Empty path should result in empty array after filter, which lodash.set handles */
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
     });
@@ -431,7 +431,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
         validationErrors
       );
 
-      // Root level path should result in empty array after filter
+      /* Root level path should result in empty array after filter */
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
     });
@@ -443,7 +443,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Path doesn't exist, value is undefined, should not nullify
+      /* Path doesn't exist, value is undefined, should not nullify */
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
     });
@@ -456,7 +456,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Both errors should be processed and field should be nullified
+      /* Both errors should be processed and field should be nullified */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -468,7 +468,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Index out of bounds, value is undefined, should not nullify
+      /* Index out of bounds, value is undefined, should not nullify */
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
     });
@@ -480,7 +480,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Whitespace is not empty string, should not nullify
+      /* Whitespace is not empty string, should not nullify */
       expect(at(result, 'field')).toBe('   ');
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -493,7 +493,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Empty array is not empty string, should not nullify
+      /* Empty array is not empty string, should not nullify */
       expect(at(result, 'items')).toEqual([]);
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -506,7 +506,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Empty object is not empty string, should not nullify
+      /* Empty object is not empty string, should not nullify */
       expect(at(result, 'field')).toEqual({});
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -520,7 +520,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // String 'true' is not boolean true, should nullify
+      /* String 'true' is not boolean true, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -533,7 +533,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Number 1 is not boolean true, should nullify
+      /* Number 1 is not boolean true, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -546,7 +546,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // null is not boolean true, should nullify
+      /* null is not boolean true, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -562,13 +562,13 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
         inner: [],
       } as SchemaErrorDetail;
 
-      // Don't attach schemaSymbol
+      /* Don't attach schemaSymbol */
       (error as unknown as Record<symbol, unknown>)[ZSchema.jsonSymbol] = object;
       const validationErrors = [error];
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Missing schema should be treated as not required, should nullify
+      /* Missing schema should be treated as not required, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -584,13 +584,13 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
         inner: [],
       } as SchemaErrorDetail;
 
-      // Don't attach jsonSymbol - falls back to object for value lookup
+      /* Don't attach jsonSymbol - falls back to object for value lookup */
       (error as unknown as Record<symbol, unknown>)[ZSchema.schemaSymbol] = {};
       const validationErrors = [error];
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // When json is missing, falls back to object; empty string is nullified
+      /* When json is missing, falls back to object; empty string is nullified */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -637,7 +637,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Multiple slashes should be filtered out, path becomes ['field']
+      /* Multiple slashes should be filtered out, path becomes ['field'] */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -649,7 +649,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Trailing slash should be filtered out
+      /* Trailing slash should be filtered out */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -661,7 +661,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // undefined is not empty string, should not nullify
+      /* undefined is not empty string, should not nullify */
       expect(at(result, 'field')).toBeUndefined();
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -674,7 +674,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // 0 is not empty string, should not nullify
+      /* 0 is not empty string, should not nullify */
       expect(at(result, 'field')).toBe(0);
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -687,7 +687,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // false is not empty string, should not nullify
+      /* false is not empty string, should not nullify */
       expect(at(result, 'field')).toBe(false);
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(error);
@@ -736,7 +736,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Format error should nullify, type error should remain
+      /* Format error should nullify, type error should remain */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(1);
       expect(remainingErrors[0]).toBe(typeError);
@@ -750,7 +750,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // Empty schema object means not required, should nullify
+      /* Empty schema object means not required, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });
@@ -763,7 +763,7 @@ describe('nullifyEmptyValues(object, validationErrors)', () => {
 
       const [result, remainingErrors] = nullifyEmptyValues(object, validationErrors);
 
-      // undefined is not boolean true, should nullify
+      /* undefined is not boolean true, should nullify */
       expect(at(result, 'field')).toBeNull();
       expect(remainingErrors).toHaveLength(0);
     });

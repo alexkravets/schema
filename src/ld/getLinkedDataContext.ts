@@ -30,7 +30,7 @@ export type LinkedDataContext = ContextHeader & {
 const getLinkedDataContext = (properties: Record<string, PropertySchema>, vocabUri: string): LinkedDataContext => {
   const context = {} as Record<string, ContextProperty>;
 
-  // TODO: Add support for embedded object, array and enum.
+  /* TODO: Add support for embedded object, array and enum. */
   for (const key in properties) {
     const propertySchema = properties[key];
 

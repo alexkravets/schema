@@ -15,8 +15,10 @@ const getLinkedDataAttributeType = (propertySchema: PropertySchema): string | un
     return get(propertySchema, '@type');
   }
 
-  // TODO: Add support for all types and formats, extend schema library with
-  //       support for additional formats, e.g. URL, Duration etc.
+  /*
+   * TODO: Add support for all types and formats, extend schema library with
+   * support for additional formats, e.g. URL, Duration etc.
+   */
   const { type, format } = propertySchema;
 
   const isDate = format === 'date';

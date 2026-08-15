@@ -27,7 +27,7 @@ const cleanupAttributes = (
 
   const objectSchema = (jsonSchema as ObjectSchema);
 
-  // Guard against malformed schemas without properties
+  /* Guard against malformed schemas without properties */
   if (!objectSchema.properties) {
     return;
   }
@@ -51,7 +51,7 @@ const cleanupAttributes = (
       const referenceSchema = got(schemasMap, refSchemaId, 'Schema "$PATH" not found');
       const fieldValue = object[fieldName];
 
-      // Only recursively cleanup if the value is an object (not null, undefined, or primitive)
+      /* Only recursively cleanup if the value is an object (not null, undefined, or primitive) */
       if (fieldValue && typeof fieldValue === 'object' && !Array.isArray(fieldValue)) {
         cleanupAttributes(fieldValue as TargetObject, referenceSchema, schemasMap);
       }

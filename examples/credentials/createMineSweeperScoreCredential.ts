@@ -46,7 +46,7 @@ const videoGameScoreSchema = new Schema({
     type: 'integer',
     required: true
   },
-  // TODO: Add duration as format:
+  /* TODO: Add duration as format: */
   endurance: {
     type: 'string',
     '@type': 'schema:Duration',
@@ -61,12 +61,14 @@ const videoGameScoreSchema = new Schema({
     type: 'integer',
     required: true
   }
-  // difficultyLevel:
-  //   enum:
-  //     - EASY
-  //     - MEDIUM
-  //     - HARD
-  //   required: true
+  /*
+   * difficultyLevel:
+   * enum:
+   * - EASY
+   * - MEDIUM
+   * - HARD
+   * required: true
+   */
 }, 'VideoGameScore');
 
 const CREDENTIAL_URI = `https://example.com/schema/${GAME_NAME}ScoreV1`;

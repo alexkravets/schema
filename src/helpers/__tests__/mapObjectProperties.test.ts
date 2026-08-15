@@ -480,13 +480,13 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
     });
 
     it('should handle object type with undefined properties (tests destructuring default)', () => {
-      // Create a schema object manually without normalization to test the default destructuring
+      /* Create a schema object manually without normalization to test the default destructuring */
       const jsonSchema = {
         id: 'test-schema',
         properties: {
           nestedObject: {
             type: 'object' as const,
-            // properties is intentionally undefined to test the default = {} on line 62
+            /* properties is intentionally undefined to test the default = {} on line 62 */
           }
         }
       };
@@ -668,7 +668,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
         {
           arrayField: {
             type: 'array'
-            // items is intentionally undefined
+            /* items is intentionally undefined */
           }
         },
         'test-schema'
@@ -1067,7 +1067,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
     it('should handle schema with undefined properties (malformed schema)', () => {
       const jsonSchema = {
         id: 'test-schema'
-        // properties is intentionally undefined (malformed schema)
+        /* properties is intentionally undefined (malformed schema) */
       } as unknown as JsonSchema;
       const object = {
         field1: 'value1',

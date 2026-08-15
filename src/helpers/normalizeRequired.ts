@@ -36,16 +36,16 @@ const normalizeRequired = (jsonSchema: EnumSchema | ObjectSchema | ObjectPropert
 
     const isReference = !isUndefined(refSchemaId);
 
-    // Handle required flag for all properties (including references)
+    /* Handle required flag for all properties (including references) */
     if (property.required) {
       property['x-required'] = true;
       required.push(propertyName);
     }
 
-    // Delete required property for all properties (whether true or false)
+    /* Delete required property for all properties (whether true or false) */
     delete property.required;
 
-    // Skip recursive processing for reference properties
+    /* Skip recursive processing for reference properties */
     if (isReference) {
       continue;
     }

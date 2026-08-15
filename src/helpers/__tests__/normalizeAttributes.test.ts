@@ -439,7 +439,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        // Note: normalizeType converts string to number, doesn't truncate decimals
+        /* Note: normalizeType converts string to number, doesn't truncate decimals */
         expect(at(object, 'field')).toBe(45.67);
       });
     });

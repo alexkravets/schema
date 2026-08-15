@@ -34,7 +34,7 @@ const mapObjectProperties = (
 
   const hasProperties = !!objectSchema.properties;
 
-  // Guard against malformed schemas without properties
+  /* Guard against malformed schemas without properties */
   if (!hasProperties) {
     return;
   }
@@ -62,7 +62,7 @@ const mapObjectProperties = (
 
       const isObjectValue = value && typeof value === 'object' && !Array.isArray(value);
 
-      // Only recursively process if the value is an object (not null, undefined, or primitive)
+      /* Only recursively process if the value is an object (not null, undefined, or primitive) */
       if (isObjectValue) {
         mapObjectProperties(value as TargetObject, referenceSchema, schemasMap, callback);
       }
@@ -78,7 +78,7 @@ const mapObjectProperties = (
 
       const isObjectValue = value && typeof value === 'object' && !Array.isArray(value);
 
-      // Only recursively process if the value is an object (not null, undefined, or primitive)
+      /* Only recursively process if the value is an object (not null, undefined, or primitive) */
       if (isObjectValue) {
         const nestedJsonSchema = {
           id: `${objectSchema.id}.${propertyName}.properties`,
@@ -98,7 +98,7 @@ const mapObjectProperties = (
       const hasItems = !!items;
       const isArrayValue = Array.isArray(value);
 
-      // Only process if value is an array and items schema is defined
+      /* Only process if value is an array and items schema is defined */
       if (isArrayValue && hasItems) {
         const { $ref: itemRefSchemaId } = items as ReferencePropertySchema;
 
@@ -116,7 +116,7 @@ const mapObjectProperties = (
         for (const valueItem of value) {
           const isObjectItem = valueItem && typeof valueItem === 'object' && !Array.isArray(valueItem);
 
-          // Only recursively process if the item is an object (not null, undefined, or primitive)
+          /* Only recursively process if the item is an object (not null, undefined, or primitive) */
           if (isObjectItem) {
             mapObjectProperties(valueItem as TargetObject, itemSchema, schemasMap, callback);
           }

@@ -59,12 +59,12 @@ describe('getLinkedDataContext(properties, vocabUri)', () => {
         schema: { type: 'string' },
         name: { type: 'string' },
       };
-      // Use schema.org vocab so the header doesn't add a 'schema' property
+      /* Use schema.org vocab so the header doesn't add a 'schema' property */
       const vocabUri = 'https://schema.org/';
 
       const result = getLinkedDataContext(properties, vocabUri);
 
-      // The input 'schema' property should be skipped (it's protected)
+      /* The input 'schema' property should be skipped (it's protected) */
       expect(result).not.toHaveProperty('schema');
       expect(result.name).toEqual({ '@id': 'name' });
     });
@@ -94,12 +94,12 @@ describe('getLinkedDataContext(properties, vocabUri)', () => {
         '@custom': { type: 'string' },
         name: { type: 'string' },
       };
-      // Use schema.org vocab so the header doesn't add a 'schema' property
+      /* Use schema.org vocab so the header doesn't add a 'schema' property */
       const vocabUri = 'https://schema.org/';
 
       const result = getLinkedDataContext(properties, vocabUri);
 
-      // All protected properties from input should be skipped
+      /* All protected properties from input should be skipped */
       expect(result).not.toHaveProperty('id');
       expect(result).not.toHaveProperty('type');
       expect(result).not.toHaveProperty('schema');
@@ -271,9 +271,11 @@ describe('getLinkedDataContext(properties, vocabUri)', () => {
 
       const result = getLinkedDataContext(properties, vocabUri);
 
-      // Note: The implementation checks if vocab === 'https://schema.org/' exactly,
-      // so 'https://schema.org/#' will not match and schema will be added
-      // This tests the actual behavior of the implementation
+      /*
+       * Note: The implementation checks if vocab === 'https://schema.org/' exactly,
+       * so 'https://schema.org/#' will not match and schema will be added
+       * This tests the actual behavior of the implementation
+       */
       expect(result).toHaveProperty('schema', 'https://schema.org/');
       expect(result['@vocab']).toBe('https://schema.org/#');
     });
@@ -300,45 +302,45 @@ describe('getLinkedDataContext(properties, vocabUri)', () => {
   describe('mixed scenarios', () => {
     it('should handle complex properties object with various types', () => {
       const properties: Record<string, PropertySchema> = {
-        id: { type: 'string' }, // protected
-        type: { type: 'string' }, // protected
-        name: { type: 'string' }, // no @type
-        age: { type: 'integer' }, // schema:Integer
-        price: { type: 'number' }, // schema:Number
-        birthDate: { type: 'string', format: 'date' }, // schema:Date
-        createdAt: { type: 'string', format: 'date-time' }, // schema:DateTime
-        reference: { $ref: '#/definitions/Person' }, // $ref, no @type
-        custom: { '@type': 'schema:CustomType' }, // explicit @type
-        active: { type: 'boolean' }, // no @type
-        '@context': { type: 'string' }, // protected
+        id: { type: 'string' }, /* protected */
+        type: { type: 'string' }, /* protected */
+        name: { type: 'string' }, /* no @type */
+        age: { type: 'integer' }, /* schema:Integer */
+        price: { type: 'number' }, /* schema:Number */
+        birthDate: { type: 'string', format: 'date' }, /* schema:Date */
+        createdAt: { type: 'string', format: 'date-time' }, /* schema:DateTime */
+        reference: { $ref: '#/definitions/Person' }, /* $ref, no @type */
+        custom: { '@type': 'schema:CustomType' }, /* explicit @type */
+        active: { type: 'boolean' }, /* no @type */
+        '@context': { type: 'string' }, /* protected */
       };
       const vocabUri = 'https://example.com/vocab';
 
       const result = getLinkedDataContext(properties, vocabUri);
 
-      // Check header
+      /* Check header */
       expect(result['@vocab']).toBe('https://example.com/vocab#');
       expect(result['@version']).toBe(1.1);
       expect(result['@protected']).toBe(true);
       expect(result.schema).toBe('https://schema.org/');
 
-      // Check protected properties are skipped
+      /* Check protected properties are skipped */
       expect(result).not.toHaveProperty('id');
       expect(result).not.toHaveProperty('type');
       expect(result).not.toHaveProperty('@context');
 
-      // Check properties without @type
+      /* Check properties without @type */
       expect(result.name).toEqual({ '@id': 'name' });
       expect(result.active).toEqual({ '@id': 'active' });
 
-      // Check properties with @type
+      /* Check properties with @type */
       expect(result.age).toEqual({ '@id': 'age', '@type': 'schema:Integer' });
       expect(result.price).toEqual({ '@id': 'price', '@type': 'schema:Number' });
       expect(result.birthDate).toEqual({ '@id': 'birthDate', '@type': 'schema:Date' });
       expect(result.createdAt).toEqual({ '@id': 'createdAt', '@type': 'schema:DateTime' });
       expect(result.custom).toEqual({ '@id': 'custom', '@type': 'schema:CustomType' });
 
-      // Check property with $ref
+      /* Check property with $ref */
       expect(result.reference).toEqual({ '@id': 'reference' });
     });
 

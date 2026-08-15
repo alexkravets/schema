@@ -66,9 +66,11 @@ describe('Validator', () => {
     });
 
     it('validates schema structure during initialization', () => {
-      // The constructor validates schemas using z-schema
-      // Invalid references are caught (tested above)
-      // This test ensures valid schemas pass validation
+      /*
+       * The constructor validates schemas using z-schema
+       * Invalid references are caught (tested above)
+       * This test ensures valid schemas pass validation
+       */
       const validSchema = new Schema({
         name: { type: 'string', required: true }
       }, 'Valid');
@@ -258,7 +260,7 @@ describe('Validator', () => {
 
         const result = validator.validate(input, 'Profile', false, false);
 
-        // Null values in nested objects may be preserved depending on schema
+        /* Null values in nested objects may be preserved depending on schema */
         expect(result.name).toEqual('Oleksandr');
       });
     });
@@ -368,11 +370,11 @@ describe('Validator', () => {
         const input = {
           name: 'Oleksandr',
           status: 'ACTIVE',
-          gender: '', // Optional enum field
+          gender: '', /* Optional enum field */
           contactDetails: {
             email: 'a@kra.vc',
-            mobileNumber: '', // Optional pattern field
-            secondaryEmail: '' // Optional format field
+            mobileNumber: '', /* Optional pattern field */
+            secondaryEmail: '' /* Optional format field */
           }
         };
 
@@ -422,15 +424,15 @@ describe('Validator', () => {
         const validator = new Validator(SCHEMAS);
 
         const input = {
-          name: '', // Required field with empty string
-          gender: 'INVALID_ENUM', // Invalid enum value
+          name: '', /* Required field with empty string */
+          gender: 'INVALID_ENUM', /* Invalid enum value */
           contactDetails: {
             email: 'a@kra.vc',
-            mobileNumber: 'abc', // Invalid pattern
+            mobileNumber: 'abc', /* Invalid pattern */
             secondaryEmail: ''
           },
           preferences: {
-            age: 'invalid-number' // Invalid type
+            age: 'invalid-number' /* Invalid type */
           }
         };
 
@@ -443,9 +445,9 @@ describe('Validator', () => {
           expect(errorDetails.validationErrors.length).toBeGreaterThan(0);
 
           const codes = errorDetails.validationErrors.map((e: { code: string }) => e.code);
-          expect(codes).toContain('MIN_LENGTH'); // name is empty
-          expect(codes).toContain('ENUM_MISMATCH'); // gender is invalid
-          expect(codes).toContain('PATTERN'); // mobileNumber pattern mismatch
+          expect(codes).toContain('MIN_LENGTH'); /* name is empty */
+          expect(codes).toContain('ENUM_MISMATCH'); /* gender is invalid */
+          expect(codes).toContain('PATTERN'); /* mobileNumber pattern mismatch */
         }
       });
     });
@@ -524,18 +526,18 @@ describe('Validator', () => {
         const input = {
           name: 'Oleksandr',
           gender: 'Other',
-          status: 'ACTIVE', // References Status enum
+          status: 'ACTIVE', /* References Status enum */
           contactDetails: {
             email: 'a@kra.vc',
             mobileNumber: '380504112171'
           },
-          favoriteItems: [{ // References FavoriteItem schema
+          favoriteItems: [{ /* References FavoriteItem schema */
             id: '1',
             name: 'Book',
             categories: ['Education'],
             status: 'PENDING'
           }],
-          preferences: { // References Preferences schema
+          preferences: { /* References Preferences schema */
             height: 180,
             isNotificationEnabled: true
           }
@@ -636,13 +638,13 @@ describe('Validator', () => {
       const validator = new Validator(SCHEMAS);
 
       const input = {
-        // Missing required 'name' field
+        /* Missing required 'name' field */
         preferences: {
           height: '180'
         }
       };
 
-      // Should not throw even though required fields are missing
+      /* Should not throw even though required fields are missing */
       const result = validator.normalize(input, 'Profile');
 
       expect(result.preferences.height).toEqual(180);
@@ -679,8 +681,8 @@ describe('Validator', () => {
       const result = validator.normalize(input, 'Profile');
 
       expect(result).not.toBe(input);
-      expect(input.preferences.height).toEqual('180'); // Original unchanged
-      expect(result.preferences.height).toEqual(180); // Normalized in result
+      expect(input.preferences.height).toEqual('180'); /* Original unchanged */
+      expect(result.preferences.height).toEqual(180); /* Normalized in result */
     });
 
     it('throws error if schema not found', () => {
@@ -809,7 +811,7 @@ describe('Validator', () => {
     it('handles enum schemas correctly', () => {
       const validator = new Validator(SCHEMAS);
 
-      // Enum schemas typically don't have references
+      /* Enum schemas typically don't have references */
       const referenceIds = validator.getReferenceIds('Status');
 
       expect(Array.isArray(referenceIds)).toBe(true);

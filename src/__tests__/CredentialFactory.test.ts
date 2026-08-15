@@ -7,7 +7,7 @@ import {
 } from '../../examples';
 import { at } from './support';
 
-// Wrap documentLoader to return a Promise for jsonld compatibility
+/* Wrap documentLoader to return a Promise for jsonld compatibility */
 // eslint-disable-next-line jsdoc/require-jsdoc
 const asyncDocumentLoader = async (url: string) => {
   const result = documentLoader(url);
@@ -70,7 +70,7 @@ describe('CredentialFactory', () => {
       const factory = new CredentialFactory('https://example.com/schema/TestV1', [schemaWithoutUrl]);
       const context = factory.context;
 
-      // Schema should now have linkedDataType with factory URI
+      /* Schema should now have linkedDataType with factory URI */
       expect(context.TestSchema).toBeDefined();
       expect(context.TestSchema['@id']).toContain('https://example.com/schema/TestV1');
     });
@@ -85,14 +85,14 @@ describe('CredentialFactory', () => {
       const factory = new CredentialFactory('https://example.com/schema/TestV1', [schemaWithUrl]);
       const context = factory.context;
 
-      // Schema should keep its original URL
+      /* Schema should keep its original URL */
       expect(context.TestSchema).toBeDefined();
       expect(context.TestSchema['@id']).toContain('https://schema.org/');
       expect(context.TestSchema['@id']).not.toContain('https://example.com/schema/TestV1');
     });
 
     it('throws error if schema validation fails', () => {
-      // Create schemas with invalid reference that will fail validation
+      /* Create schemas with invalid reference that will fail validation */
       const schemaWithInvalidRef = new Schema({
         invalid: {
           $ref: 'NonExistentSchema',
@@ -100,7 +100,7 @@ describe('CredentialFactory', () => {
         }
       }, 'InvalidSchema');
 
-      // This will fail during Validator construction because referenced schema doesn't exist
+      /* This will fail during Validator construction because referenced schema doesn't exist */
       expect(
         () => new CredentialFactory('https://example.com/schema/TestV1', [schemaWithInvalidRef])
       ).toThrow('Schemas validation failed');
@@ -181,7 +181,7 @@ describe('CredentialFactory', () => {
     });
 
     it('does not include schemas without linkedDataType in context', () => {
-      // Schema without URL won't have linkedDataType
+      /* Schema without URL won't have linkedDataType */
       const schemaWithoutUrl = new Schema({
         name: { type: 'string' }
       }, 'TestSchema');
@@ -189,10 +189,12 @@ describe('CredentialFactory', () => {
       const factory = new CredentialFactory('https://example.com/schema/TestV1', [schemaWithoutUrl]);
       const context = factory.context;
 
-      // Only credential type should be present, schema without URL won't have linkedDataType
+      /* Only credential type should be present, schema without URL won't have linkedDataType */
       expect(context.TestV1).toBeDefined();
-      // Note: Schema without URL will get linkedDataType created during factory construction
-      // So TestSchema should actually be present
+      /*
+       * Note: Schema without URL will get linkedDataType created during factory construction
+       * So TestSchema should actually be present
+       */
       expect(context.TestSchema).toBeDefined();
     });
 
@@ -204,7 +206,7 @@ describe('CredentialFactory', () => {
       const factory = new CredentialFactory('https://example.com/schema/AccountV1', [schema]);
       const context = factory.context;
 
-      // Credential type should be first, then schema contexts
+      /* Credential type should be first, then schema contexts */
       expect(Object.keys(context)[0]).toBe('AccountV1');
       expect(context.Account).toBeDefined();
     });
@@ -339,7 +341,7 @@ describe('CredentialFactory', () => {
     it('creates credential with empty subject when schema allows it', () => {
       const optionalSchema = new Schema({
         id: {},
-        name: { type: 'string' } // Not required
+        name: { type: 'string' } /* Not required */
       }, 'OptionalUser');
 
       const optionalFactory = new CredentialFactory(
@@ -421,7 +423,7 @@ describe('CredentialFactory', () => {
           'did:holder:456',
           {
             id: 'did:holder:456'
-            // Missing required 'name' field
+            /* Missing required 'name' field */
           }
         )
       ).toThrow(ValidationError);
@@ -434,7 +436,7 @@ describe('CredentialFactory', () => {
           'did:holder:456',
           {
             id: 'did:holder:456'
-            // Missing required 'name' field
+            /* Missing required 'name' field */
           }
         );
         throw new Error('Should have thrown ValidationError');

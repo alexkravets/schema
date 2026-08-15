@@ -22,17 +22,17 @@ const normalizeAttributes = (
     const hasDefaultValue = !isUndefined(defaultValue);
     const shouldSetDefaultValue = hasDefaultValue && !hasValue;
 
-    // Set default value if property is undefined and default exists
+    /* Set default value if property is undefined and default exists */
     if (shouldSetDefaultValue) {
       object[propertyName] = defaultValue;
-      value = defaultValue; // Update value reference for normalization
+      value = defaultValue; /* Update value reference for normalization */
     }
 
     const hasType = !!type;
     const hasValueAfterDefault = !isUndefined(value);
     const shouldNormalizeValue = hasType && hasValueAfterDefault;
 
-    // Normalize the current value (original or default) if type is defined
+    /* Normalize the current value (original or default) if type is defined */
     if (shouldNormalizeValue) {
       object[propertyName] = normalizeType(type, value);
     }

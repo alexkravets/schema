@@ -41,7 +41,7 @@ describe('ValidationError', () => {
 
       const error = new ValidationError(schemaId, invalidObject, validationErrors);
 
-      // Access private properties through toJSON
+      /* Access private properties through toJSON */
       const json = error.toJSON();
       expect(json.schemaId).toBe('UserSchema');
       expect(json.object).toEqual({ email: 'invalid' });
@@ -150,7 +150,7 @@ describe('ValidationError', () => {
       const error = new ValidationError(schemaId, invalidObject, validationErrors);
       const json = error.toJSON();
 
-      // Should not throw when stringifying
+      /* Should not throw when stringifying */
       expect(() => JSON.stringify(json)).not.toThrow();
       const stringified = JSON.stringify(json);
       const parsed = JSON.parse(stringified);

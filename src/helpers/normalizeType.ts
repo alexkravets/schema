@@ -39,54 +39,54 @@ const isBooleanFalseString = (value: string): boolean =>
 
 /** Normalizes a value to match a specified JSON Schema type. */
 const normalizeType = (type: ValueType, value: unknown): string | number | boolean | unknown => {
-  // Preserve null and undefined values regardless of target type
+  /* Preserve null and undefined values regardless of target type */
   if (isNullOrUndefined(value)) {
     return value;
   }
 
-  // Handle number and integer types
+  /* Handle number and integer types */
   if (isNumericType(type)) {
-    // If already a number, return as-is
+    /* If already a number, return as-is */
     if (isNumberValue(value)) {
       return value;
     }
 
-    // Convert booleans to numbers: true → 1, false → 0
+    /* Convert booleans to numbers: true → 1, false → 0 */
     if (isBooleanValue(value)) {
       return value ? 1 : 0;
     }
 
-    // Attempt conversion for strings
+    /* Attempt conversion for strings */
     if (isStringValue(value)) {
-      // Preserve empty strings and whitespace-only strings
+      /* Preserve empty strings and whitespace-only strings */
       if (isEmptyOrWhitespaceString(value)) {
         return value;
       }
 
       const converted = Number(value);
-      // Check if conversion was successful (not NaN)
+      /* Check if conversion was successful (not NaN) */
       if (isValidNumber(converted)) {
         return converted;
       }
     }
 
-    // Return original value if conversion failed or type is not convertible
+    /* Return original value if conversion failed or type is not convertible */
     return value;
   }
 
-  // Handle boolean type
+  /* Handle boolean type */
   if (isBooleanType(type)) {
-    // If already a boolean, return as-is
+    /* If already a boolean, return as-is */
     if (isBooleanValue(value)) {
       return value;
     }
 
-    // Convert numbers: 0 → false, non-zero → true
+    /* Convert numbers: 0 → false, non-zero → true */
     if (isNumberValue(value)) {
       return Boolean(value);
     }
 
-    // Convert recognized string values
+    /* Convert recognized string values */
     if (isStringValue(value)) {
       if (isBooleanTrueString(value)) {
         return true;
@@ -96,11 +96,11 @@ const normalizeType = (type: ValueType, value: unknown): string | number | boole
       }
     }
 
-    // Return original value for unrecognized strings or non-convertible types
+    /* Return original value for unrecognized strings or non-convertible types */
     return value;
   }
 
-  // For string, object, and array types, return value as-is (no conversion)
+  /* For string, object, and array types, return value as-is (no conversion) */
   return value;
 };
 
