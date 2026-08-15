@@ -390,7 +390,7 @@ describe('Schema', () => {
       const profileSchema = loadSync('examples/schemas/Profile.yaml');
 
       const dataSchema = profileSchema.wrap('data', { default: 'test' }, 'WrappedData');
-      const dataSource = dataSchema.source as PropertiesSchema;
+      const dataSource = dataSchema.source;
 
       expect(at(dataSource, 'data.default')).toBe('test');
       // When attributes is provided, required is not set by default

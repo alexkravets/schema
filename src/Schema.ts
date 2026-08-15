@@ -8,6 +8,7 @@ import getLinkedDataContext from './ld/getLinkedDataContext';
 import removeRequiredAndDefault from './helpers/removeRequiredAndDefault';
 import type { LinkedDataContext } from './ld/getLinkedDataContext';
 import type { EnumSchema, ObjectSchema, PropertiesSchema } from './types';
+import type { InferSource, InferSourceOutput } from './infer';
 
 const UNDEFINED_SCHEMA_ID = 'UNDEFINED_SCHEMA_ID';
 
@@ -21,15 +22,29 @@ export type SchemaSource = EnumSchema | PropertiesSchema;
 
 export type PropertiesSchemaSource = PropertiesSchema;
 
+/** Removes `required` and `default` from a properties schema, recursively. */
+type Pured<S> = {
+  [K in keyof S]: Omit<S[K], 'required' | 'default'> extends infer Property
+    ? Property extends { properties: infer Nested }
+      ? Omit<Property, 'properties'> & { properties: Pured<Nested> }
+      : Property extends { items: infer Items }
+        ? Omit<Property, 'items'> & { items: Pured<{ item: Items }>['item'] }
+        : Property
+    : never;
+};
+
+/** Returns the source of a schema, narrowed to a properties schema. */
+type Properties<S> = S extends PropertiesSchema ? S : PropertiesSchema;
+
 /** Schema class for defining and manipulating JSON schemas for object validation. */
-class Schema {
+class Schema<const S = SchemaSource> {
   private _id: string;
   private _url?: string;
   private _source: PropertiesSchema | EnumSchema;
   private _linkedDataType?: LinkedDataType;
 
   /** Creates a new Schema instance. */
-  constructor(propertiesOrSchema: Schema | SchemaSource, id?: string, url?: string) {
+  constructor(propertiesOrSchema: Schema<S> | (S & SchemaSource), id?: string, url?: string) {
     this._id = id || UNDEFINED_SCHEMA_ID;
 
     this._url = url;
@@ -37,7 +52,7 @@ class Schema {
     const isSchema = propertiesOrSchema instanceof Schema;
 
     this._source = isSchema
-      ? propertiesOrSchema.source
+      ? propertiesOrSchema.source as SchemaSource
       : cloneDeep(propertiesOrSchema);
 
     const isLinkedDataType = !!url && !this._source.enum;
@@ -86,7 +101,7 @@ class Schema {
 
   /** Returns a deep clone of the schema's source properties or enum definition. */
   get source() {
-    return cloneDeep(this._source);
+    return cloneDeep(this._source) as S;
   }
 
   /** Checks if this schema is an enum schema (defines a set of allowed values). */
@@ -120,12 +135,12 @@ class Schema {
   }
 
   /** Creates a complete clone of the schema with a new identifier. */
-  clone(id?: string) {
-    return new Schema(this.source, id);
+  clone(id?: string): Schema<S> {
+    return new Schema(this.source as S & SchemaSource, id);
   }
 
   /** Creates a schema clone without required constraints and default values. */
-  pure(id?: string) {
+  pure(id?: string): Schema<Pured<Properties<S>>> {
     if (this.isEnum) {
       throw new Error('The "pure" method is not supported for enum schemas.');
     }
@@ -135,30 +150,41 @@ class Schema {
       properties: this.source as PropertiesSchema
     });
 
-    return new Schema(source, id);
+    return new Schema(source as Pured<Properties<S>> & SchemaSource, id);
   }
 
   /** Creates a schema clone containing only the specified properties. */
-  only(propertyNames: string[], id?: string) {
+  only<const K extends readonly (keyof Properties<S>)[]>(
+    propertyNames: K,
+    id?: string
+  ): Schema<Pick<Properties<S>, K[number]>> {
     if (this.isEnum) {
       throw new Error('The "only" method is not supported for enum schemas.');
     }
 
-    const source = pick(this.source, propertyNames);
-    return new Schema(source as PropertiesSchema, id);
+    const source = pick(this.source, propertyNames as readonly string[]);
+    return new Schema(source as Pick<Properties<S>, K[number]> & SchemaSource, id);
   }
 
   /** Creates a schema clone extended with additional properties. */
-  extend(properties: PropertiesSchema, id?: string) {
+  extend<const E extends PropertiesSchema>(
+    properties: E,
+    id?: string
+  ): Schema<Omit<Properties<S>, keyof E> & E> {
     if (this.isEnum) {
       throw new Error('The "extend" method is not supported for enum schemas.');
     }
 
-    return new Schema({ ...this.source, ...properties }, id);
+    const source = { ...this.source, ...properties };
+    return new Schema(source as unknown as Omit<Properties<S>, keyof E> & E & SchemaSource, id);
   }
 
   /** Creates a new schema that wraps the current schema as a nested property. */
-  wrap(propertyName: string, attributes: { default?: string; required?: boolean; }, id?: string) {
+  wrap<const N extends string, const A extends { default?: string; required?: boolean; }>(
+    propertyName: N,
+    attributes: A,
+    id?: string
+  ): Schema<{ [P in N]: { type: 'object'; properties: Properties<S> } & A }> {
     if (this.isEnum) {
       throw new Error('The "wrap" method is not supported for enum schemas.');
     }
@@ -169,10 +195,19 @@ class Schema {
         properties: this.source,
         ...(attributes || { required: true })
       }
-    } as PropertiesSchema;
+    } as { [P in N]: { type: 'object'; properties: Properties<S> } & A } & SchemaSource;
 
     return new Schema(source, id);
   }
 }
+
+/** Resolves the type a schema describes, as it is accepted on input. */
+export type Infer<T> = T extends Schema<infer S> ? InferSource<S> : never;
+
+/**
+ * Resolves the type a schema describes, as it is returned after validation,
+ * where every property carrying a default is present.
+ */
+export type InferOutput<T> = T extends Schema<infer S> ? InferSourceOutput<S> : never;
 
 export default Schema;

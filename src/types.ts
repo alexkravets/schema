@@ -1,6 +1,31 @@
+/**
+ * Maps a schema ID to the type it describes, so that a `$ref` can be resolved
+ * while inferring a type from a schema.
+ *
+ * A `$ref` is a runtime string the validator resolves against its schemas map,
+ * which the type system cannot follow on its own. Register a schema by merging
+ * into this interface from the module that defines it:
+ *
+ * ```ts
+ * export const schema = new Schema({ ... }, 'Profile');
+ * export type Profile = Infer<typeof schema>;
+ *
+ * declare module '@kravc/schema' {
+ *   interface SchemaRegistry {
+ *     Profile: Profile;
+ *   }
+ * }
+ * ```
+ *
+ * A `$ref` to an unregistered ID resolves to `unknown`. It stays an `interface`
+ * so that a schema is able to reference itself.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface SchemaRegistry {}
+
 export type EnumSchema = {
   id?: string;
-  enum: string[] | number[];
+  enum: readonly string[] | readonly number[];
   type?: 'string' | 'number';
   default?: string | number;
   example?: string | number;
@@ -95,8 +120,8 @@ export type ArrayPropertySchema = {
     minItems?: number;
     maxItems?: number;
   };
-  default?: unknown[];
-  example?: unknown[];
+  default?: readonly unknown[];
+  example?: readonly unknown[];
   required?: boolean;
   'x-title'?: string;
   description?: string;
