@@ -1092,7 +1092,7 @@ describe('mapObjectProperties(object, jsonSchema, schemasMap, callback)', () => 
         field: 'original'
       };
       const schemasMap = {};
-      const callback = jest.fn((propertyName, propertySchema, obj) => {
+      const callback = jest.fn((propertyName, _propertySchema, obj) => {
         if (propertyName === 'field') {
           obj[propertyName] = 'modified';
         }

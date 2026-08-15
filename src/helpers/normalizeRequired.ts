@@ -1,4 +1,11 @@
 import { isUndefined } from 'lodash';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../types';
 
 /**
  * Normalizes required field declarations in JSON schemas by converting property-level

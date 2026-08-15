@@ -1,12 +1,22 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types.d.ts" />
+import cleanupAttributesHelper from '../cleanupAttributes';
+import { at, asJsonSchema, asJsonSchemasMap, type SchemaFixture } from '../../__tests__/support';
+import type { TargetObject, ObjectSchema } from '../../types';
 
-import cleanupAttributes from '../cleanupAttributes';
+/** Invokes the helper with fixtures typed as this library's schema types. */
+const cleanupAttributes = (
+  object: TargetObject,
+  schema: SchemaFixture,
+  schemasMap?: Record<string, SchemaFixture>
+) => cleanupAttributesHelper(
+  object,
+  asJsonSchema(schema),
+  schemasMap ? asJsonSchemasMap(schemasMap) : undefined
+);
 
 describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
   describe('enum schema', () => {
     it('should return early and not modify object when schema is an enum', () => {
-      const object = { field1: 'value1', field2: 'value2' };
+      const object: TargetObject = { field1: 'value1', field2: 'value2' };
       const enumSchema = { enum: ['value1', 'value2', 'value3'] };
       const schemasMap = {};
 
@@ -18,7 +28,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
   describe('object schema', () => {
     it('should delete properties not defined in schema', () => {
-      const object = {
+      const object: TargetObject = {
         validField: 'value1',
         invalidField: 'value2',
         anotherInvalid: 'value3'
@@ -38,7 +48,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
     });
 
     it('should keep all properties that are defined in schema', () => {
-      const object = {
+      const object: TargetObject = {
         field1: 'value1',
         field2: 'value2',
         field3: 'value3'
@@ -62,7 +72,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
     });
 
     it('should handle empty object', () => {
-      const object = {};
+      const object: TargetObject = {};
       const schema: ObjectSchema = {
         id: 'test-schema',
         properties: {
@@ -76,7 +86,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
     });
 
     it('should handle object with no properties in schema', () => {
-      const object = {
+      const object: TargetObject = {
         field1: 'value1',
         field2: 'value2'
       };
@@ -93,7 +103,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
   describe('reference properties ($ref)', () => {
     it('should recursively cleanup referenced schema properties', () => {
-      const object = {
+      const object: TargetObject = {
         refField: {
           validField: 'value1',
           invalidField: 'value2'
@@ -117,12 +127,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField).toEqual({ validField: 'value1' });
-      expect(object.refField).not.toHaveProperty('invalidField');
+      expect(at(object, 'refField')).toEqual({ validField: 'value1' });
+      expect(at(object, 'refField')).not.toHaveProperty('invalidField');
     });
 
     it('should handle nested references', () => {
-      const object = {
+      const object: TargetObject = {
         refField: {
           nestedRef: {
             validField: 'value1',
@@ -155,12 +165,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField.nestedRef).toEqual({ validField: 'value1' });
-      expect(object.refField.nestedRef).not.toHaveProperty('invalidField');
+      expect(at(object, 'refField.nestedRef')).toEqual({ validField: 'value1' });
+      expect(at(object, 'refField.nestedRef')).not.toHaveProperty('invalidField');
     });
 
     it('should throw error when referenced schema is not found', () => {
-      const object = {
+      const object: TargetObject = {
         refField: {
           field: 'value'
         }
@@ -179,7 +189,7 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
     });
 
     it('should skip cleanup when reference property value is null', () => {
-      const object = {
+      const object: TargetObject = {
         refField: null
       };
       const schema = {
@@ -200,11 +210,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField).toBeNull();
+      expect(at(object, 'refField')).toBeNull();
     });
 
     it('should skip cleanup when reference property value is undefined', () => {
-      const object = {
+      const object: TargetObject = {
         refField: undefined
       };
       const schema = {
@@ -225,11 +235,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField).toBeUndefined();
+      expect(at(object, 'refField')).toBeUndefined();
     });
 
     it('should skip cleanup when reference property value is a primitive', () => {
-      const object = {
+      const object: TargetObject = {
         refField: 'string-value'
       };
       const schema = {
@@ -250,11 +260,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField).toBe('string-value');
+      expect(at(object, 'refField')).toBe('string-value');
     });
 
     it('should skip cleanup when reference property value is an array', () => {
-      const object = {
+      const object: TargetObject = {
         refField: ['item1', 'item2']
       };
       const schema = {
@@ -275,13 +285,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.refField).toEqual(['item1', 'item2']);
+      expect(at(object, 'refField')).toEqual(['item1', 'item2']);
     });
   });
 
   describe('object properties', () => {
     it('should recursively cleanup nested object properties', () => {
-      const object = {
+      const object: TargetObject = {
         nestedObject: {
           validField: 'value1',
           invalidField: 'value2'
@@ -302,12 +312,12 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.nestedObject).toEqual({ validField: 'value1' });
-      expect(object.nestedObject).not.toHaveProperty('invalidField');
+      expect(at(object, 'nestedObject')).toEqual({ validField: 'value1' });
+      expect(at(object, 'nestedObject')).not.toHaveProperty('invalidField');
     });
 
     it('should handle deeply nested objects', () => {
-      const object = {
+      const object: TargetObject = {
         level1: {
           level2: {
             level3: {
@@ -342,13 +352,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.level1.level2.level3).toEqual({ validField: 'value1' });
-      expect(object.level1.level2.level3).not.toHaveProperty('invalidField');
+      expect(at(object, 'level1.level2.level3')).toEqual({ validField: 'value1' });
+      expect(at(object, 'level1.level2.level3')).not.toHaveProperty('invalidField');
     });
 
     it('should handle object type with undefined properties (tests destructuring default)', () => {
       // Create a manually constructed schema with undefined properties to test the default destructuring
-      const object = {
+      const object: TargetObject = {
         nestedObject: {
           someField: 'value'
         }
@@ -368,11 +378,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
       cleanupAttributes(object, schema, schemasMap);
 
       // Should handle undefined properties by using default {}
-      expect(object.nestedObject).toEqual({});
+      expect(at(object, 'nestedObject')).toEqual({});
     });
 
     it('should skip cleanup when object property value is null', () => {
-      const object = {
+      const object: TargetObject = {
         nestedObject: null
       };
       const schema = {
@@ -390,11 +400,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.nestedObject).toBeNull();
+      expect(at(object, 'nestedObject')).toBeNull();
     });
 
     it('should skip cleanup when object property value is undefined', () => {
-      const object = {
+      const object: TargetObject = {
         nestedObject: undefined
       };
       const schema = {
@@ -412,11 +422,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.nestedObject).toBeUndefined();
+      expect(at(object, 'nestedObject')).toBeUndefined();
     });
 
     it('should skip cleanup when object property value is a primitive', () => {
-      const object = {
+      const object: TargetObject = {
         nestedObject: 'string-value'
       };
       const schema = {
@@ -434,11 +444,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.nestedObject).toBe('string-value');
+      expect(at(object, 'nestedObject')).toBe('string-value');
     });
 
     it('should skip cleanup when object property value is an array', () => {
-      const object = {
+      const object: TargetObject = {
         nestedObject: ['item1', 'item2']
       };
       const schema = {
@@ -456,13 +466,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.nestedObject).toEqual(['item1', 'item2']);
+      expect(at(object, 'nestedObject')).toEqual(['item1', 'item2']);
     });
   });
 
   describe('array properties', () => {
     it('should cleanup array items with reference schema', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1', invalidField: 'value2' },
           { validField: 'value3', invalidField: 'value4' }
@@ -489,15 +499,15 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(2);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[0]).not.toHaveProperty('invalidField');
-      expect(object.arrayField[1]).toEqual({ validField: 'value3' });
-      expect(object.arrayField[1]).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField')).toHaveLength(2);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[0]')).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField[1]')).toEqual({ validField: 'value3' });
+      expect(at(object, 'arrayField[1]')).not.toHaveProperty('invalidField');
     });
 
     it('should cleanup array items with object schema', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1', invalidField: 'value2' },
           { validField: 'value3', invalidField: 'value4' }
@@ -521,15 +531,15 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(2);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[0]).not.toHaveProperty('invalidField');
-      expect(object.arrayField[1]).toEqual({ validField: 'value3' });
-      expect(object.arrayField[1]).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField')).toHaveLength(2);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[0]')).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField[1]')).toEqual({ validField: 'value3' });
+      expect(at(object, 'arrayField[1]')).not.toHaveProperty('invalidField');
     });
 
     it('should handle empty arrays', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: []
       };
       const schema = {
@@ -553,11 +563,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toEqual([]);
+      expect(at(object, 'arrayField')).toEqual([]);
     });
 
     it('should handle arrays with mixed valid and invalid properties', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1' },
           { validField: 'value2', invalidField: 'value3' },
@@ -582,16 +592,16 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(3);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[1]).toEqual({ validField: 'value2' });
-      expect(object.arrayField[1]).not.toHaveProperty('invalidField');
-      expect(object.arrayField[2]).toEqual({});
-      expect(object.arrayField[2]).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField')).toHaveLength(3);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[1]')).toEqual({ validField: 'value2' });
+      expect(at(object, 'arrayField[1]')).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField[2]')).toEqual({});
+      expect(at(object, 'arrayField[2]')).not.toHaveProperty('invalidField');
     });
 
     it('should skip cleanup when array property value is not an array', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: 'not-an-array'
       };
       const schema = {
@@ -612,11 +622,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toBe('not-an-array');
+      expect(at(object, 'arrayField')).toBe('not-an-array');
     });
 
     it('should skip cleanup when array property value is null', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: null
       };
       const schema = {
@@ -637,11 +647,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toBeNull();
+      expect(at(object, 'arrayField')).toBeNull();
     });
 
     it('should skip cleanup when array property value is undefined', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: undefined
       };
       const schema = {
@@ -662,11 +672,11 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toBeUndefined();
+      expect(at(object, 'arrayField')).toBeUndefined();
     });
 
     it('should skip cleanup for array items that are null', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1' },
           null,
@@ -691,14 +701,14 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(3);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[1]).toBeNull();
-      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+      expect(at(object, 'arrayField')).toHaveLength(3);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[1]')).toBeNull();
+      expect(at(object, 'arrayField[2]')).toEqual({ validField: 'value2' });
     });
 
     it('should skip cleanup for array items that are undefined', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1' },
           undefined,
@@ -723,14 +733,14 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(3);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[1]).toBeUndefined();
-      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+      expect(at(object, 'arrayField')).toHaveLength(3);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[1]')).toBeUndefined();
+      expect(at(object, 'arrayField[2]')).toEqual({ validField: 'value2' });
     });
 
     it('should skip cleanup for array items that are primitives', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1' },
           'string-item',
@@ -757,16 +767,16 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(5);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[1]).toBe('string-item');
-      expect(object.arrayField[2]).toBe(123);
-      expect(object.arrayField[3]).toBe(true);
-      expect(object.arrayField[4]).toEqual({ validField: 'value2' });
+      expect(at(object, 'arrayField')).toHaveLength(5);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[1]')).toBe('string-item');
+      expect(at(object, 'arrayField[2]')).toBe(123);
+      expect(at(object, 'arrayField[3]')).toBe(true);
+      expect(at(object, 'arrayField[4]')).toEqual({ validField: 'value2' });
     });
 
     it('should skip cleanup for array items that are arrays', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1' },
           ['nested', 'array'],
@@ -791,16 +801,16 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField).toHaveLength(3);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1' });
-      expect(object.arrayField[1]).toEqual(['nested', 'array']);
-      expect(object.arrayField[2]).toEqual({ validField: 'value2' });
+      expect(at(object, 'arrayField')).toHaveLength(3);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[1]')).toEqual(['nested', 'array']);
+      expect(at(object, 'arrayField[2]')).toEqual({ validField: 'value2' });
     });
   });
 
   describe('complex nested scenarios', () => {
     it('should handle object with mix of reference, object, and array properties', () => {
-      const object = {
+      const object: TargetObject = {
         refField: {
           validField: 'value1',
           invalidField: 'value2'
@@ -848,16 +858,16 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
       cleanupAttributes(object, schema, schemasMap);
 
       expect(object).not.toHaveProperty('invalidTopLevel');
-      expect(object.refField).toEqual({ validField: 'value1' });
-      expect(object.refField).not.toHaveProperty('invalidField');
-      expect(object.nestedObject).toEqual({ validField: 'value3' });
-      expect(object.nestedObject).not.toHaveProperty('invalidField');
-      expect(object.arrayField[0]).toEqual({ validField: 'value5' });
-      expect(object.arrayField[0]).not.toHaveProperty('invalidField');
+      expect(at(object, 'refField')).toEqual({ validField: 'value1' });
+      expect(at(object, 'refField')).not.toHaveProperty('invalidField');
+      expect(at(object, 'nestedObject')).toEqual({ validField: 'value3' });
+      expect(at(object, 'nestedObject')).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value5' });
+      expect(at(object, 'arrayField[0]')).not.toHaveProperty('invalidField');
     });
 
     it('should handle array of objects with nested references', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           {
             refField: {
@@ -893,14 +903,14 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
 
       cleanupAttributes(object, schema, schemasMap);
 
-      expect(object.arrayField[0].refField).toEqual({ validField: 'value1' });
-      expect(object.arrayField[0].refField).not.toHaveProperty('invalidField');
+      expect(at(object, 'arrayField[0].refField')).toEqual({ validField: 'value1' });
+      expect(at(object, 'arrayField[0].refField')).not.toHaveProperty('invalidField');
     });
   });
 
   describe('edge cases and error handling', () => {
     it('should skip cleanup when array property has undefined items', () => {
-      const object = {
+      const object: TargetObject = {
         arrayField: [
           { validField: 'value1', invalidField: 'value2' },
           { validField: 'value3', invalidField: 'value4' }
@@ -920,13 +930,13 @@ describe('cleanupAttributes(object, jsonSchema, schemasMap)', () => {
       cleanupAttributes(object, schema, schemasMap);
 
       // Should not modify array items when items schema is undefined
-      expect(object.arrayField).toHaveLength(2);
-      expect(object.arrayField[0]).toEqual({ validField: 'value1', invalidField: 'value2' });
-      expect(object.arrayField[1]).toEqual({ validField: 'value3', invalidField: 'value4' });
+      expect(at(object, 'arrayField')).toHaveLength(2);
+      expect(at(object, 'arrayField[0]')).toEqual({ validField: 'value1', invalidField: 'value2' });
+      expect(at(object, 'arrayField[1]')).toEqual({ validField: 'value3', invalidField: 'value4' });
     });
 
     it('should return early when objectSchema has undefined properties', () => {
-      const object = {
+      const object: TargetObject = {
         field1: 'value1',
         field2: 'value2'
       };

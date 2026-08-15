@@ -7,6 +7,7 @@ import normalizeProperties from './helpers/normalizeProperties';
 import getLinkedDataContext from './ld/getLinkedDataContext';
 import removeRequiredAndDefault from './helpers/removeRequiredAndDefault';
 import type { LinkedDataContext } from './ld/getLinkedDataContext';
+import type { EnumSchema, ObjectSchema, PropertiesSchema } from './types';
 
 const UNDEFINED_SCHEMA_ID = 'UNDEFINED_SCHEMA_ID';
 
@@ -37,7 +38,7 @@ class Schema {
 
     this._source = isSchema
       ? propertiesOrSchema.source
-      : propertiesOrSchema;
+      : cloneDeep(propertiesOrSchema);
 
     const isLinkedDataType = !!url && !this._source.enum;
 

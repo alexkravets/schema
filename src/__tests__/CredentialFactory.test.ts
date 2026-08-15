@@ -1,10 +1,11 @@
-import { canonize } from 'jsonld';
+import { canonize, type JsonLdDocument } from 'jsonld';
 import { Schema, CredentialFactory, documentLoader } from '../../src';
 import ValidationError from '../ValidationError';
 import {
   createAccountCredential,
   createMineSweeperScoreCredential
 } from '../../examples';
+import { at } from './support';
 
 // Wrap documentLoader to return a Promise for jsonld compatibility
 // eslint-disable-next-line jsdoc/require-jsdoc
@@ -163,8 +164,8 @@ describe('CredentialFactory', () => {
 
       expect(context.AccountV1).toBeDefined();
       expect(context.Account).toBeDefined();
-      expect(context.Account['@id']).toBeDefined();
-      expect(context.Account['@context']).toBeDefined();
+      expect(at(context, 'Account.@id')).toBeDefined();
+      expect(at(context, 'Account.@context')).toBeDefined();
     });
 
     it('includes multiple schema types in context', () => {
@@ -235,7 +236,7 @@ describe('CredentialFactory', () => {
       const credential = await createAccountCredential('did:PLAYER_ID', 'CAHTEP');
 
       expect(credential).toBeDefined();
-      await canonize(credential, { documentLoader: asyncDocumentLoader });
+      await canonize(credential as JsonLdDocument, { documentLoader: asyncDocumentLoader });
 
       const { credentialSubject: { createdAt } } = credential;
       expect(credential).toEqual({
@@ -288,7 +289,7 @@ describe('CredentialFactory', () => {
       );
 
       expect(credential).toBeDefined();
-      await canonize(credential, { documentLoader: asyncDocumentLoader });
+      await canonize(credential as JsonLdDocument, { documentLoader: asyncDocumentLoader });
 
       const { credentialSubject } = credential;
       expect(credentialSubject.type).toBe('Player');
@@ -297,7 +298,7 @@ describe('CredentialFactory', () => {
       expect(credentialSubject.hasVideoGameScore.UNDEFINED).toBeUndefined();
 
       const customContext = credential['@context'][1];
-      expect(customContext.VideoGame).toEqual({
+      expect(at(customContext, 'VideoGame')).toEqual({
         '@id': 'https://schema.org/VideoGame',
         '@context': {
           '@protected': true,
@@ -409,8 +410,8 @@ describe('CredentialFactory', () => {
       );
 
       const customContext = credential['@context'][1];
-      expect(customContext.UserV1).toBeDefined();
-      expect(customContext.UserV1['@id']).toBe('https://example.com/schema/UserV1');
+      expect(at(customContext, 'UserV1')).toBeDefined();
+      expect(at(customContext, 'UserV1.@id')).toBe('https://example.com/schema/UserV1');
     });
 
     it('validates subject against root schema', () => {
@@ -436,7 +437,7 @@ describe('CredentialFactory', () => {
             // Missing required 'name' field
           }
         );
-        fail('Should have thrown ValidationError');
+        throw new Error('Should have thrown ValidationError');
       } catch (error) {
         expect(error).toBeInstanceOf(ValidationError);
         const validationError = error as ValidationError;

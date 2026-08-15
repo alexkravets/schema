@@ -1,4 +1,5 @@
 import { isObject, cloneDeep } from 'lodash';
+import type { TargetObject } from '../types';
 
 const { isArray } = Array;
 
@@ -36,7 +37,7 @@ const cleanupNulls = (target: TargetObject) => {
 };
 
 /** Returns a deep copy of the object with all null properties removed. */
-export default function (object: Record<string, unknown>) {
+export default function (object: TargetObject) {
   const clone = cloneDeep(object);
 
   cleanupNulls(clone);

@@ -3,6 +3,7 @@ import { get, isUndefined } from 'lodash';
 
 import normalizeType from './normalizeType';
 import mapObjectProperties from './mapObjectProperties';
+import type { TargetObject, PropertySchema } from '../types';
 
 /** Normalizes object attribute values based on a JSON Schema definition. */
 const normalizeAttributes = (

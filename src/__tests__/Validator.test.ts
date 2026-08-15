@@ -1,9 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../types.d.ts" />
-
 import { load } from 'js-yaml';
 import { readFileSync } from 'fs';
 import { Schema, Validator, ValidationError } from '../../src';
+import type { EnumSchema, PropertiesSchema } from '../types';
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 const loadSync = (yamlPath: string): Schema => {
@@ -389,7 +387,7 @@ describe('Validator', () => {
       it('handles validation error without details (falls back to empty array)', () => {
         const validator = new Validator(SCHEMAS);
         const validateSafeSpy = jest.spyOn(
-          (validator as { _engine: { validateSafe: (a: unknown, b: unknown) => { valid: boolean; err?: { details?: unknown[] } } } })._engine,
+          (validator as unknown as { _engine: { validateSafe: (a: unknown, b: unknown) => { valid: boolean; err?: { details?: unknown[] } } } })._engine,
           'validateSafe'
         ).mockReturnValueOnce({ valid: false, err: {} } as { valid: boolean; err?: { details?: unknown[] } });
 

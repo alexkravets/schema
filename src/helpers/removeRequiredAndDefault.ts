@@ -1,3 +1,9 @@
+import type {
+  EnumSchema,
+  PropertySchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+} from '../types';
 
 /** Recursively removes `required` and `default` attributes from a JSON schema. */
 const removeRequiredAndDefault = (jsonSchema: PropertySchema | EnumSchema) => {

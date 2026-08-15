@@ -2,6 +2,13 @@ import { isUndefined, uniq } from 'lodash';
 
 import got from './got';
 import Schema from '../Schema';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../types';
 
 /** Recursively extracts all referenced schema IDs from a schema structure. */
 const getReferenceIds = (schema: Schema, schemasMap: Record<string, Schema>): string[] => {

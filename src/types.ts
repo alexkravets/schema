@@ -1,4 +1,4 @@
-type EnumSchema = {
+export type EnumSchema = {
   id?: string;
   enum: string[] | number[];
   type?: 'string' | 'number';
@@ -10,7 +10,7 @@ type EnumSchema = {
   'x-required'?: boolean;
 };
 
-type ReferencePropertySchema = {
+export type ReferencePropertySchema = {
   $ref: string;
   default?: string | number | Record<string, unknown>;
   example?: string | number | Record<string, unknown>;
@@ -20,7 +20,7 @@ type ReferencePropertySchema = {
   'x-required'?: boolean;
 };
 
-type StringPropertySchema = {
+export type StringPropertySchema = {
   '@type'?: string;
   type?: 'string';
   format?: 'date' | 'date-time' | 'url' | 'email',
@@ -35,7 +35,7 @@ type StringPropertySchema = {
   'x-required'?: boolean;
 };
 
-type NumberPropertySchema = {
+export type NumberPropertySchema = {
   type: 'number';
   minimum?: number;
   maximum?: number;
@@ -47,7 +47,7 @@ type NumberPropertySchema = {
   'x-required'?: boolean;
 };
 
-type IntegerPropertySchema = {
+export type IntegerPropertySchema = {
   type: 'integer';
   minimum?: number;
   maximum?: number;
@@ -59,7 +59,7 @@ type IntegerPropertySchema = {
   'x-required'?: boolean;
 };
 
-type BooleanPropertySchema = {
+export type BooleanPropertySchema = {
   type: 'boolean';
   default?: boolean;
   example?: boolean;
@@ -69,7 +69,7 @@ type BooleanPropertySchema = {
   'x-required'?: boolean;
 };
 
-type ObjectPropertySchema = {
+export type ObjectPropertySchema = {
   type?: 'object';
   default?: Record<string, unknown>;
   example?: unknown;
@@ -80,9 +80,18 @@ type ObjectPropertySchema = {
   'x-required'?: boolean;
 }
 
-type ArrayPropertySchema = {
+export type ArrayPropertySchema = {
   type?: 'array';
-  items?: (ReferencePropertySchema | ObjectPropertySchema | StringPropertySchema | EnumSchema) & {
+  items?: (
+    EnumSchema |
+    ReferencePropertySchema |
+    ObjectPropertySchema |
+    ArrayPropertySchema |
+    StringPropertySchema |
+    NumberPropertySchema |
+    IntegerPropertySchema |
+    BooleanPropertySchema
+  ) & {
     minItems?: number;
     maxItems?: number;
   };
@@ -94,7 +103,7 @@ type ArrayPropertySchema = {
   'x-required'?: boolean;
 };
 
-type PropertySchema =
+export type PropertySchema =
   EnumSchema |
   ReferencePropertySchema |
   ObjectPropertySchema |
@@ -104,12 +113,12 @@ type PropertySchema =
   IntegerPropertySchema |
   BooleanPropertySchema;
 
-type PropertiesSchema = Record<string, PropertySchema>;
+export type PropertiesSchema = Record<string, PropertySchema>;
 
-type ObjectSchema = {
+export type ObjectSchema = {
   id: string;
   required?: string[];
   properties: PropertiesSchema;
 };
 
-type TargetObject = Record<string, unknown>;
+export type TargetObject = Record<string, unknown>;

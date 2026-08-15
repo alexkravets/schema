@@ -1,4 +1,5 @@
 import type { SchemaErrorDetail } from 'z-schema';
+import type { TargetObject } from './types';
 
 export type ValidationErrorOutput = {
   path: string;

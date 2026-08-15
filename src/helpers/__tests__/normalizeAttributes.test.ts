@@ -1,8 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types.d.ts" />
-
 import Schema from '../../Schema';
 import normalizeAttributes from '../normalizeAttributes';
+import { at } from '../../__tests__/support';
+import type { TargetObject } from '../../types';
 
 describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
   describe('default values', () => {
@@ -18,7 +17,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBe('default-value');
+      expect(at(object, 'field')).toBe('default-value');
     });
 
     it('should not set default value when property has a value', () => {
@@ -35,7 +34,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBe('existing-value');
+      expect(at(object, 'field')).toBe('existing-value');
     });
 
     it('should not set default value when property is null', () => {
@@ -52,7 +51,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field).toBeNull();
+      expect(at(object, 'field')).toBeNull();
     });
 
     it('should set default value for multiple properties', () => {
@@ -69,9 +68,9 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.field1).toBe('default1');
-      expect(object.field2).toBe(42);
-      expect(object.field3).toBe(true);
+      expect(at(object, 'field1')).toBe('default1');
+      expect(at(object, 'field2')).toBe(42);
+      expect(at(object, 'field3')).toBe(true);
     });
 
     describe('default value normalization', () => {
@@ -89,7 +88,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.count).toBe(42);
+        expect(at(object, 'count')).toBe(42);
       });
 
       it('should normalize default string to number when type is integer', () => {
@@ -105,7 +104,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.count).toBe(123);
+        expect(at(object, 'count')).toBe(123);
       });
 
       it('should normalize default string to boolean when type is boolean', () => {
@@ -121,7 +120,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.enabled).toBe(true);
+        expect(at(object, 'enabled')).toBe(true);
       });
 
       it('should normalize default string "yes" to boolean true', () => {
@@ -137,7 +136,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.verified).toBe(true);
+        expect(at(object, 'verified')).toBe(true);
       });
 
       it('should normalize default string "false" to boolean false', () => {
@@ -153,7 +152,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.enabled).toBe(false);
+        expect(at(object, 'enabled')).toBe(false);
       });
 
       it('should normalize default number to boolean when type is boolean', () => {
@@ -169,7 +168,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.enabled).toBe(true);
+        expect(at(object, 'enabled')).toBe(true);
       });
 
       it('should normalize default number 0 to boolean false', () => {
@@ -185,7 +184,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.enabled).toBe(false);
+        expect(at(object, 'enabled')).toBe(false);
       });
 
       it('should preserve default string when type is string', () => {
@@ -200,7 +199,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.name).toBe('default-name');
+        expect(at(object, 'name')).toBe('default-name');
       });
 
       it('should preserve invalid default string when type is number', () => {
@@ -216,7 +215,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.count).toBe('invalid');
+        expect(at(object, 'count')).toBe('invalid');
       });
 
       it('should preserve invalid default string when type is boolean', () => {
@@ -232,7 +231,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.enabled).toBe('maybe');
+        expect(at(object, 'enabled')).toBe('maybe');
       });
     });
   });
@@ -253,7 +252,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(123);
+        expect(at(object, 'field')).toBe(123);
       });
 
       it('should normalize decimal string to number', () => {
@@ -270,7 +269,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(45.67);
+        expect(at(object, 'field')).toBe(45.67);
       });
 
       it('should normalize negative string to number', () => {
@@ -287,7 +286,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(-123);
+        expect(at(object, 'field')).toBe(-123);
       });
 
       it('should normalize zero string to number', () => {
@@ -304,7 +303,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(0);
+        expect(at(object, 'field')).toBe(0);
       });
 
       it('should keep number as number', () => {
@@ -321,7 +320,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(456);
+        expect(at(object, 'field')).toBe(456);
       });
 
       it('should normalize boolean true to number 1', () => {
@@ -338,7 +337,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(1);
+        expect(at(object, 'field')).toBe(1);
       });
 
       it('should normalize boolean false to number 0', () => {
@@ -355,7 +354,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(0);
+        expect(at(object, 'field')).toBe(0);
       });
 
       it('should preserve empty string for number type', () => {
@@ -372,7 +371,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('');
+        expect(at(object, 'field')).toBe('');
       });
 
       it('should preserve whitespace string for number type', () => {
@@ -389,7 +388,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('   ');
+        expect(at(object, 'field')).toBe('   ');
       });
 
       it('should keep invalid number string as original value', () => {
@@ -406,7 +405,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('invalid');
+        expect(at(object, 'field')).toBe('invalid');
       });
 
       it('should handle integer type', () => {
@@ -423,7 +422,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(789);
+        expect(at(object, 'field')).toBe(789);
       });
 
       it('should normalize decimal string to number for integer type', () => {
@@ -441,7 +440,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
         // Note: normalizeType converts string to number, doesn't truncate decimals
-        expect(object.field).toBe(45.67);
+        expect(at(object, 'field')).toBe(45.67);
       });
     });
 
@@ -460,7 +459,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should normalize string "false" to boolean false', () => {
@@ -477,7 +476,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(false);
+        expect(at(object, 'field')).toBe(false);
       });
 
       it('should normalize string "yes" to boolean true', () => {
@@ -494,7 +493,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should normalize string "no" to boolean false', () => {
@@ -511,7 +510,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(false);
+        expect(at(object, 'field')).toBe(false);
       });
 
       it('should normalize string "1" to boolean true', () => {
@@ -528,7 +527,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should normalize string "0" to boolean false', () => {
@@ -545,7 +544,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(false);
+        expect(at(object, 'field')).toBe(false);
       });
 
       it('should normalize case-insensitive boolean strings', () => {
@@ -568,10 +567,10 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field1).toBe(true);
-        expect(object.field2).toBe(false);
-        expect(object.field3).toBe(true);
-        expect(object.field4).toBe(false);
+        expect(at(object, 'field1')).toBe(true);
+        expect(at(object, 'field2')).toBe(false);
+        expect(at(object, 'field3')).toBe(true);
+        expect(at(object, 'field4')).toBe(false);
       });
 
       it('should normalize number 1 to boolean true', () => {
@@ -588,7 +587,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should normalize number 0 to boolean false', () => {
@@ -605,7 +604,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(false);
+        expect(at(object, 'field')).toBe(false);
       });
 
       it('should normalize positive number to boolean true', () => {
@@ -622,7 +621,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should normalize negative number to boolean true', () => {
@@ -639,7 +638,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should keep boolean as boolean', () => {
@@ -656,7 +655,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
 
       it('should not normalize invalid boolean string', () => {
@@ -673,7 +672,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('maybe');
+        expect(at(object, 'field')).toBe('maybe');
       });
     });
 
@@ -692,7 +691,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('test-value');
+        expect(at(object, 'field')).toBe('test-value');
       });
 
       it('should preserve number as number when type is string', () => {
@@ -709,7 +708,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(123);
+        expect(at(object, 'field')).toBe(123);
       });
 
       it('should preserve boolean as boolean when type is string', () => {
@@ -726,7 +725,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe(true);
+        expect(at(object, 'field')).toBe(true);
       });
     });
 
@@ -745,7 +744,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toEqual({ a: 1, b: 2 });
+        expect(at(object, 'field')).toEqual({ a: 1, b: 2 });
       });
     });
 
@@ -764,7 +763,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toEqual([1, 2, 3]);
+        expect(at(object, 'field')).toEqual([1, 2, 3]);
       });
     });
 
@@ -783,7 +782,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('test-value');
+        expect(at(object, 'field')).toBe('test-value');
       });
     });
   });
@@ -869,7 +868,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.level1.level2.numberField).toBe(456);
+      expect(at(object, 'level1.level2.numberField')).toBe(456);
     });
   });
 
@@ -1126,10 +1125,10 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
       normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-      expect(object.stringField).toBe('default-string');
-      expect(object.numberField).toBe(123);
-      expect(object.booleanField).toBe(true);
-      expect(object.existingField).toBe(456);
+      expect(at(object, 'stringField')).toBe('default-string');
+      expect(at(object, 'numberField')).toBe(123);
+      expect(at(object, 'booleanField')).toBe(true);
+      expect(at(object, 'existingField')).toBe(456);
     });
 
     it('should handle nested object with defaults and normalization', () => {
@@ -1254,7 +1253,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.nullField).toBeNull();
+        expect(at(object, 'nullField')).toBeNull();
       });
 
       it('should handle null values with default', () => {
@@ -1271,7 +1270,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.nullField).toBeNull();
+        expect(at(object, 'nullField')).toBeNull();
       });
 
       it('should handle undefined values', () => {
@@ -1288,7 +1287,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.undefinedField).toBe('default');
+        expect(at(object, 'undefinedField')).toBe('default');
       });
 
       it('should handle empty object', () => {
@@ -1303,7 +1302,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('default');
+        expect(at(object, 'field')).toBe('default');
       });
     });
 
@@ -1328,10 +1327,10 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.numberField).toBeNull();
-        expect(object.booleanField).toBeNull();
-        expect(object.stringField).toBeNull();
-        expect(object.objectField).toBeNull();
+        expect(at(object, 'numberField')).toBeNull();
+        expect(at(object, 'booleanField')).toBeNull();
+        expect(at(object, 'stringField')).toBeNull();
+        expect(at(object, 'objectField')).toBeNull();
       });
 
       it('should handle NaN values', () => {
@@ -1350,8 +1349,8 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.numberField).toBeNaN();
-        expect(object.booleanField).toBe(false);
+        expect(at(object, 'numberField')).toBeNaN();
+        expect(at(object, 'booleanField')).toBe(false);
       });
 
       it('should handle Infinity values', () => {
@@ -1370,8 +1369,8 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.numberField).toBe(Infinity);
-        expect(object.booleanField).toBe(true);
+        expect(at(object, 'numberField')).toBe(Infinity);
+        expect(at(object, 'booleanField')).toBe(true);
       });
     });
 
@@ -1400,7 +1399,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('some-value');
+        expect(at(object, 'field')).toBe('some-value');
       });
 
       it('should handle property with type but no value and no default', () => {
@@ -1415,7 +1414,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBeUndefined();
+        expect(at(object, 'field')).toBeUndefined();
       });
 
       it('should handle property with default but no type', () => {
@@ -1430,7 +1429,7 @@ describe('normalizeAttributes(object, jsonSchema, schemasMap)', () => {
 
         normalizeAttributes(object, schema.jsonSchema, schemasMap);
 
-        expect(object.field).toBe('default-value');
+        expect(at(object, 'field')).toBe('default-value');
       });
     });
   });

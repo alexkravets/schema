@@ -1,4 +1,5 @@
 import cleanupNulls from '../cleanupNulls';
+import { at } from '../../__tests__/support';
 
 describe('cleanupNulls', () => {
   describe('basic null removal', () => {
@@ -76,7 +77,7 @@ describe('cleanupNulls', () => {
           field4: 'value4'
         }
       });
-      expect(result.nested).not.toHaveProperty('field3');
+      expect(at(result, 'nested')).not.toHaveProperty('field3');
     });
 
     it('should handle deeply nested objects', () => {
@@ -161,12 +162,12 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.arrayField).toHaveLength(3);
-      expect(result.arrayField[0]).toEqual({ field1: 'value1' });
-      expect(result.arrayField[0]).not.toHaveProperty('field2');
-      expect(result.arrayField[1]).toEqual({ field4: 'value4' });
-      expect(result.arrayField[1]).not.toHaveProperty('field3');
-      expect(result.arrayField[2]).toEqual({ field5: 'value5', field6: 'value6' });
+      expect(at(result, 'arrayField')).toHaveLength(3);
+      expect(at(result, 'arrayField[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'arrayField[0]')).not.toHaveProperty('field2');
+      expect(at(result, 'arrayField[1]')).toEqual({ field4: 'value4' });
+      expect(at(result, 'arrayField[1]')).not.toHaveProperty('field3');
+      expect(at(result, 'arrayField[2]')).toEqual({ field5: 'value5', field6: 'value6' });
     });
 
     it('should handle nested objects within array items', () => {
@@ -183,8 +184,8 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.arrayField[0].nested).toEqual({ field1: 'value1' });
-      expect((result.arrayField[0] as unknown as { nested: Record<string, unknown> }).nested).not.toHaveProperty('field2');
+      expect(at(result, 'arrayField[0].nested')).toEqual({ field1: 'value1' });
+      expect(at(result, 'arrayField[0].nested')).not.toHaveProperty('field2');
     });
 
     it('should handle empty arrays', () => {
@@ -194,7 +195,7 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.arrayField).toEqual([]);
+      expect(at(result, 'arrayField')).toEqual([]);
     });
 
     it('should handle arrays with empty objects', () => {
@@ -208,10 +209,10 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.arrayField).toHaveLength(3);
-      expect(result.arrayField[0]).toEqual({});
-      expect(result.arrayField[1]).toEqual({});
-      expect(result.arrayField[2]).toEqual({ field2: 'value2' });
+      expect(at(result, 'arrayField')).toHaveLength(3);
+      expect(at(result, 'arrayField[0]')).toEqual({});
+      expect(at(result, 'arrayField[1]')).toEqual({});
+      expect(at(result, 'arrayField[2]')).toEqual({ field2: 'value2' });
     });
   });
 
@@ -281,9 +282,9 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.array1[0]).toEqual({ field1: 'value1' });
-      expect((result.array1[1] as unknown as { nested: Record<string, unknown> }).nested).toEqual({ field4: 'value4' });
-      expect(result.array2[0]).toEqual({ field6: 'value6' });
+      expect(at(result, 'array1[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'array1[1].nested')).toEqual({ field4: 'value4' });
+      expect(at(result, 'array2[0]')).toEqual({ field6: 'value6' });
     });
   });
 
@@ -318,7 +319,7 @@ describe('cleanupNulls', () => {
       const result = cleanupNulls(object);
 
       expect(result).not.toBe(object);
-      expect(result.nested).not.toBe(object.nested);
+      expect(at(result, 'nested')).not.toBe(object.nested);
     });
   });
 
@@ -373,7 +374,7 @@ describe('cleanupNulls', () => {
       const result = cleanupNulls(object);
 
       // Arrays with primitive nulls are not modified by the current implementation
-      expect(result.arrayField).toEqual([null, 'value1', null, 'value2']);
+      expect(at(result, 'arrayField')).toEqual([null, 'value1', null, 'value2']);
     });
 
     it('should handle nested arrays (arrays containing arrays)', () => {
@@ -391,12 +392,12 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.nestedArrays[0][0]).toEqual({ field1: 'value1' });
-      expect(result.nestedArrays[0][0]).not.toHaveProperty('field2');
-      expect(result.nestedArrays[0][1]).toEqual({ field4: 'value4' });
-      expect(result.nestedArrays[0][1]).not.toHaveProperty('field3');
-      expect(result.nestedArrays[1][0]).toEqual({ field5: 'value5' });
-      expect(result.nestedArrays[1][0]).not.toHaveProperty('field6');
+      expect(at(result, 'nestedArrays[0][0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'nestedArrays[0][0]')).not.toHaveProperty('field2');
+      expect(at(result, 'nestedArrays[0][1]')).toEqual({ field4: 'value4' });
+      expect(at(result, 'nestedArrays[0][1]')).not.toHaveProperty('field3');
+      expect(at(result, 'nestedArrays[1][0]')).toEqual({ field5: 'value5' });
+      expect(at(result, 'nestedArrays[1][0]')).not.toHaveProperty('field6');
     });
 
     it('should handle arrays of arrays of objects with nulls', () => {
@@ -412,8 +413,8 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect((result.deepArrays[0][0][0] as Record<string, unknown>)).toEqual({ field1: 'value1' });
-      expect((result.deepArrays[0][0][0] as Record<string, unknown>)).not.toHaveProperty('field2');
+      expect(at(result, 'deepArrays[0][0][0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'deepArrays[0][0][0]')).not.toHaveProperty('field2');
     });
 
     it('should handle mixed arrays (objects and primitives)', () => {
@@ -431,15 +432,15 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.mixedArray[0]).toEqual({ field1: 'value1' });
-      expect(result.mixedArray[0]).not.toHaveProperty('field2');
-      expect(result.mixedArray[1]).toBe('primitive');
-      expect(result.mixedArray[2]).toBe(123);
-      expect(result.mixedArray[3]).toBe(null); // Primitive nulls in arrays are preserved
-      expect(result.mixedArray[4]).toEqual({ field4: 'value4' });
-      expect(result.mixedArray[4]).not.toHaveProperty('field3');
-      expect(result.mixedArray[5]).toBe(false);
-      expect(result.mixedArray[6]).toEqual([]);
+      expect(at(result, 'mixedArray[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'mixedArray[0]')).not.toHaveProperty('field2');
+      expect(at(result, 'mixedArray[1]')).toBe('primitive');
+      expect(at(result, 'mixedArray[2]')).toBe(123);
+      expect(at(result, 'mixedArray[3]')).toBe(null); // Primitive nulls in arrays are preserved
+      expect(at(result, 'mixedArray[4]')).toEqual({ field4: 'value4' });
+      expect(at(result, 'mixedArray[4]')).not.toHaveProperty('field3');
+      expect(at(result, 'mixedArray[5]')).toBe(false);
+      expect(at(result, 'mixedArray[6]')).toEqual([]);
     });
 
     it('should handle objects with numeric string keys', () => {
@@ -496,11 +497,11 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.sparseArray[0]).toEqual({ field1: 'value1' });
-      expect((result.sparseArray[0] as Record<string, unknown>)).not.toHaveProperty('field2');
-      expect(result.sparseArray[5]).toEqual({ field4: 'value4' });
-      expect((result.sparseArray[5] as Record<string, unknown>)).not.toHaveProperty('field3');
-      expect(result.sparseArray[10]).toBe(null); // Primitive nulls preserved
+      expect(at(result, 'sparseArray[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'sparseArray[0]')).not.toHaveProperty('field2');
+      expect(at(result, 'sparseArray[5]')).toEqual({ field4: 'value4' });
+      expect(at(result, 'sparseArray[5]')).not.toHaveProperty('field3');
+      expect(at(result, 'sparseArray[10]')).toBe(null); // Primitive nulls preserved
     });
 
     it('should handle Date objects (treated as regular objects)', () => {
@@ -518,11 +519,11 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.date1).toBeInstanceOf(Date);
-      expect(result.date2).toBeInstanceOf(Date);
+      expect(at(result, 'date1')).toBeInstanceOf(Date);
+      expect(at(result, 'date2')).toBeInstanceOf(Date);
       expect(result).not.toHaveProperty('nullDate');
-      expect((result.nested as Record<string, unknown>).date3).toBeInstanceOf(Date);
-      expect(result.nested).not.toHaveProperty('nullField');
+      expect(at(result, 'nested.date3')).toBeInstanceOf(Date);
+      expect(at(result, 'nested')).not.toHaveProperty('nullField');
     });
 
     it('should handle RegExp objects (treated as regular objects)', () => {
@@ -540,11 +541,11 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.regex1).toBeInstanceOf(RegExp);
-      expect(result.regex2).toBeInstanceOf(RegExp);
+      expect(at(result, 'regex1')).toBeInstanceOf(RegExp);
+      expect(at(result, 'regex2')).toBeInstanceOf(RegExp);
       expect(result).not.toHaveProperty('nullRegex');
-      expect((result.nested as Record<string, unknown>).regex3).toBeInstanceOf(RegExp);
-      expect(result.nested).not.toHaveProperty('nullField');
+      expect(at(result, 'nested.regex3')).toBeInstanceOf(RegExp);
+      expect(at(result, 'nested')).not.toHaveProperty('nullField');
     });
 
     it('should handle arrays containing Date and RegExp objects', () => {
@@ -562,13 +563,13 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.mixedTypes[0]).toEqual({ field1: 'value1' });
-      expect((result.mixedTypes[0] as Record<string, unknown>)).not.toHaveProperty('field2');
-      expect(result.mixedTypes[1]).toBeInstanceOf(Date);
-      expect(result.mixedTypes[2]).toBeInstanceOf(RegExp);
-      expect(result.mixedTypes[3]).toEqual({ field4: 'value4' });
-      expect((result.mixedTypes[3] as Record<string, unknown>)).not.toHaveProperty('field3');
-      expect(result.mixedTypes[4]).toBe(null);
+      expect(at(result, 'mixedTypes[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'mixedTypes[0]')).not.toHaveProperty('field2');
+      expect(at(result, 'mixedTypes[1]')).toBeInstanceOf(Date);
+      expect(at(result, 'mixedTypes[2]')).toBeInstanceOf(RegExp);
+      expect(at(result, 'mixedTypes[3]')).toEqual({ field4: 'value4' });
+      expect(at(result, 'mixedTypes[3]')).not.toHaveProperty('field3');
+      expect(at(result, 'mixedTypes[4]')).toBe(null);
     });
 
     it('should handle very deeply nested structures', () => {
@@ -609,7 +610,7 @@ describe('cleanupNulls', () => {
       expect(result['']).toBe('emptyKeyValue');
       expect(result[' ']).toBe('spaceKeyValue');
       expect(result).not.toHaveProperty('normalKey');
-      expect(result.anotherKey).toBe('value');
+      expect(at(result, 'anotherKey')).toBe('value');
     });
 
     it('should handle objects with very long property names', () => {
@@ -624,7 +625,7 @@ describe('cleanupNulls', () => {
 
       expect(result[longKey]).toBe('longKeyValue');
       expect(result).not.toHaveProperty('normalKey');
-      expect(result.shortKey).toBe('value');
+      expect(at(result, 'shortKey')).toBe('value');
     });
 
     it('should handle objects with unicode property names', () => {
@@ -642,7 +643,7 @@ describe('cleanupNulls', () => {
       expect(result).not.toHaveProperty('日本語');
       expect(result['🚀']).toBe('emojiValue');
       expect(result).not.toHaveProperty('русский');
-      expect(result.normalKey).toBe('value');
+      expect(at(result, 'normalKey')).toBe('value');
     });
 
     it('should handle arrays with mixed object types', () => {
@@ -660,16 +661,16 @@ describe('cleanupNulls', () => {
 
       const result = cleanupNulls(object);
 
-      expect(result.mixedObjects[0]).toEqual({ field1: 'value1' });
-      expect((result.mixedObjects[0] as Record<string, unknown>)).not.toHaveProperty('field2');
-      expect(result.mixedObjects[1]).toEqual({ nested: { field4: 'value4' } });
-      expect((result.mixedObjects[1] as Record<string, unknown>).nested).not.toHaveProperty('field5');
-      expect(result.mixedObjects[2]).toBeInstanceOf(Date);
-      expect(result.mixedObjects[3]).toBeInstanceOf(RegExp);
-      expect((result.mixedObjects[4] as Record<string, unknown>).field6).toBe('value6');
-      expect((result.mixedObjects[4] as Record<string, unknown>)).not.toHaveProperty('field7');
-      expect((result.mixedObjects[4] as Record<string, unknown>).date).toBeInstanceOf(Date);
-      expect((result.mixedObjects[4] as Record<string, unknown>).regex).toBeInstanceOf(RegExp);
+      expect(at(result, 'mixedObjects[0]')).toEqual({ field1: 'value1' });
+      expect(at(result, 'mixedObjects[0]')).not.toHaveProperty('field2');
+      expect(at(result, 'mixedObjects[1]')).toEqual({ nested: { field4: 'value4' } });
+      expect(at(result, 'mixedObjects[1].nested')).not.toHaveProperty('field5');
+      expect(at(result, 'mixedObjects[2]')).toBeInstanceOf(Date);
+      expect(at(result, 'mixedObjects[3]')).toBeInstanceOf(RegExp);
+      expect(at(result, 'mixedObjects[4].field6')).toBe('value6');
+      expect(at(result, 'mixedObjects[4]')).not.toHaveProperty('field7');
+      expect(at(result, 'mixedObjects[4].date')).toBeInstanceOf(Date);
+      expect(at(result, 'mixedObjects[4].regex')).toBeInstanceOf(RegExp);
     });
 
     it('should handle objects containing arrays with various primitive types', () => {
@@ -687,11 +688,11 @@ describe('cleanupNulls', () => {
       const result = cleanupNulls(object);
 
       // Primitive nulls in arrays are preserved
-      expect(result.primitives.strings).toEqual(['a', null, 'b']);
-      expect(result.primitives.numbers).toEqual([1, null, 2]);
-      expect(result.primitives.booleans).toEqual([true, null, false]);
-      expect(result.primitives.nulls).toEqual([null, null, null]);
-      expect(result.primitives.mixed).toEqual(['string', 123, true, null, false, 0, '']);
+      expect(at(result, 'primitives.strings')).toEqual(['a', null, 'b']);
+      expect(at(result, 'primitives.numbers')).toEqual([1, null, 2]);
+      expect(at(result, 'primitives.booleans')).toEqual([true, null, false]);
+      expect(at(result, 'primitives.nulls')).toEqual([null, null, null]);
+      expect(at(result, 'primitives.mixed')).toEqual(['string', 123, true, null, false, 0, '']);
       expect(result).not.toHaveProperty('nullField');
     });
 
@@ -761,12 +762,12 @@ describe('cleanupNulls', () => {
         }
       });
       expect(result).not.toHaveProperty('email');
-      expect((result.profile as Record<string, unknown>)).not.toHaveProperty('avatar');
-      expect((result.profile as Record<string, unknown>).preferences).not.toHaveProperty('notifications');
-      expect((result.addresses[0] as Record<string, unknown>)).not.toHaveProperty('zip');
-      expect((result.addresses[0] as Record<string, unknown>).coordinates).not.toHaveProperty('lng');
-      expect((result.addresses[1] as Record<string, unknown>)).not.toHaveProperty('street');
-      expect((result.metadata as Record<string, unknown>)).not.toHaveProperty('updatedAt');
+      expect(at(result, 'profile')).not.toHaveProperty('avatar');
+      expect(at(result, 'profile.preferences')).not.toHaveProperty('notifications');
+      expect(at(result, 'addresses[0]')).not.toHaveProperty('zip');
+      expect(at(result, 'addresses[0].coordinates')).not.toHaveProperty('lng');
+      expect(at(result, 'addresses[1]')).not.toHaveProperty('street');
+      expect(at(result, 'metadata')).not.toHaveProperty('updatedAt');
     });
   });
 });

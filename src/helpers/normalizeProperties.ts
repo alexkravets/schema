@@ -1,4 +1,11 @@
 import { get, set, isUndefined } from 'lodash';
+import type {
+  EnumSchema,
+  PropertiesSchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../types';
 
 /** Normalizes JSON schema properties by ensuring all properties have an explicit `type` attribute. */
 const normalizeProperties = (schema: EnumSchema | PropertiesSchema) => {

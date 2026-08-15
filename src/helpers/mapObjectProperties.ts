@@ -2,6 +2,15 @@ import { isUndefined } from 'lodash';
 import { type JsonSchema } from 'z-schema';
 
 import got from './got';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  TargetObject,
+  PropertySchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../types';
 
 /**
  * Recursively traverses an object's properties based on a JSON schema and applies a callback

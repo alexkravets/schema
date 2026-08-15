@@ -1,5 +1,6 @@
 import { get, set } from 'lodash';
 import ZSchema, { type SchemaErrorDetail } from 'z-schema';
+import type { TargetObject } from '../types';
 
 /**
  * Format error codes that indicate validation failures due to format mismatches.

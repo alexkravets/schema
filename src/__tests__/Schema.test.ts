@@ -1,9 +1,15 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../types.d.ts" />
-
 import { load } from 'js-yaml';
 import { readFileSync } from 'fs';
 import { Schema } from '../../src';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  PropertiesSchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  StringPropertySchema,
+} from '../types';
+import { at } from './support';
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 const loadSync = (yamlPath: string): Schema => {
@@ -58,6 +64,34 @@ describe('Schema', () => {
       const numbersEnumSchema = new Schema({ enum: [1, 2, 3] as any, type: 'number' } as EnumSchema, 'Points');
 
       expect((numbersEnumSchema.source as EnumSchema).type).toEqual('number');
+    });
+
+    it('does not mutate the source it is created from', () => {
+      const source = {
+        name: { required: true },
+        location: { properties: { city: { required: true } } },
+      } as PropertiesSchema;
+
+      const sourceJson = JSON.stringify(source);
+
+      const schema = new Schema(source, 'Entity');
+
+      expect(JSON.stringify(source)).toEqual(sourceJson);
+      expect(schema.source).not.toBe(source);
+    });
+
+    it('is not affected by changes to the source after creation', () => {
+      const source = { name: { required: true } } as PropertiesSchema;
+
+      const schema = new Schema(source, 'Entity');
+
+      source.name.required = false;
+      source.extra = { type: 'string' };
+
+      const schemaSource = schema.source as PropertiesSchema;
+
+      expect(schemaSource.name.required).toBe(true);
+      expect(schemaSource.extra).toBeUndefined();
     });
 
     it('creates schema from other schemas source', () => {
@@ -185,7 +219,7 @@ describe('Schema', () => {
       expect(objectSchema).toHaveProperty('type', 'object');
       expect(objectSchema).toHaveProperty('properties');
       expect(objectSchema.required).toEqual(['name', 'contactDetails']);
-      expect(objectSchema.properties.contactDetails.required).toEqual(['email']);
+      expect(at(objectSchema, 'properties.contactDetails.required')).toEqual(['email']);
     });
 
     it('returns json schema without required attributes', () => {
@@ -358,9 +392,9 @@ describe('Schema', () => {
       const dataSchema = profileSchema.wrap('data', { default: 'test' }, 'WrappedData');
       const dataSource = dataSchema.source as PropertiesSchema;
 
-      expect((dataSource.data as ObjectPropertySchema).default).toBe('test');
+      expect(at(dataSource, 'data.default')).toBe('test');
       // When attributes is provided, required is not set by default
-      expect((dataSource.data as ObjectPropertySchema).required).toBeUndefined();
+      expect(at(dataSource, 'data.required')).toBeUndefined();
     });
   });
 });

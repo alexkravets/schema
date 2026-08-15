@@ -1,8 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../types.d.ts" />
-
 import { get } from 'lodash';
 import normalizeRequired from '../normalizeRequired';
+import { at } from '../../__tests__/support';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  PropertySchema,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../../types';
 
 describe('normalizeRequired(schema)', () => {
   describe('basic functionality', () => {
@@ -23,7 +29,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['requiredField']);
+      expect(at(schema, 'required')).toEqual(['requiredField']);
       expect(schema.properties.requiredField['x-required']).toBe(true);
       expect(schema.properties.requiredField.required).toBeUndefined();
       expect(schema.properties.optionalField['x-required']).toBeUndefined();
@@ -54,7 +60,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['field1', 'field2', 'field3']);
+      expect(at(schema, 'required')).toEqual(['field1', 'field2', 'field3']);
       expect(schema.properties.field1['x-required']).toBe(true);
       expect(schema.properties.field2['x-required']).toBe(true);
       expect(schema.properties.field3['x-required']).toBe(true);
@@ -76,7 +82,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toBeUndefined();
+      expect(at(schema, 'required')).toBeUndefined();
       expect(schema.properties.field1['x-required']).toBeUndefined();
       expect(schema.properties.field2['x-required']).toBeUndefined();
     });
@@ -126,12 +132,12 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['nestedObject']);
+      expect(at(schema, 'required')).toEqual(['nestedObject']);
       expect(schema.properties.nestedObject['x-required']).toBe(true);
 
       const nested = schema.properties.nestedObject as ObjectPropertySchema;
       // The function sets required on the nested object schema itself
-      expect(nested.required).toEqual(['nestedRequired']);
+      expect(at(nested, 'required')).toEqual(['nestedRequired']);
       expect(nested.properties!.nestedRequired['x-required']).toBe(true);
       expect(nested.properties!.nestedRequired.required).toBeUndefined();
       expect(nested.properties!.nestedOptional['x-required']).toBeUndefined();
@@ -171,9 +177,9 @@ describe('normalizeRequired(schema)', () => {
       const level2 = level1.properties!.level2 as ObjectPropertySchema;
       const level3 = level2.properties!.level3 as ObjectPropertySchema;
 
-      expect(level2.required).toEqual(['level3']);
+      expect(at(level2, 'required')).toEqual(['level3']);
       expect(level2.properties!.level3['x-required']).toBe(true);
-      expect(level3.required).toEqual(['deepField']);
+      expect(at(level3, 'required')).toEqual(['deepField']);
       expect(level3.properties!.deepField['x-required']).toBe(true);
     });
 
@@ -198,7 +204,7 @@ describe('normalizeRequired(schema)', () => {
       normalizeRequired(schema);
 
       const nested = schema.properties.nestedObject as ObjectPropertySchema;
-      expect(nested.required).toBeUndefined();
+      expect(at(nested, 'required')).toBeUndefined();
       expect(nested.properties!.field1['x-required']).toBeUndefined();
       expect(nested.properties!.field2['x-required']).toBeUndefined();
     });
@@ -230,13 +236,13 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['arrayField']);
+      expect(at(schema, 'required')).toEqual(['arrayField']);
       expect(schema.properties.arrayField['x-required']).toBe(true);
       expect(schema.properties.arrayField.required).toBeUndefined();
 
       const arrayField = schema.properties.arrayField as ArrayPropertySchema;
       const items = arrayField.items as ObjectPropertySchema;
-      expect(items.required).toEqual(['itemRequired']);
+      expect(at(items, 'required')).toEqual(['itemRequired']);
       expect(items.properties!.itemRequired['x-required']).toBe(true);
       expect(items.properties!.itemRequired.required).toBeUndefined();
       expect(items.properties!.itemOptional['x-required']).toBeUndefined();
@@ -262,7 +268,7 @@ describe('normalizeRequired(schema)', () => {
       const items = arrayField.items as ReferencePropertySchema;
       // ReferencePropertySchema without properties returns early, so required flag is not processed
       // The function only processes schemas with properties
-      expect(items.required).toBe(true); // Still present since function returns early for refs without properties
+      expect(at(items, 'required')).toBe(true); // Still present since function returns early for refs without properties
     });
 
     it('should handle array property without items', () => {
@@ -278,7 +284,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['arrayField']);
+      expect(at(schema, 'required')).toEqual(['arrayField']);
       expect(schema.properties.arrayField['x-required']).toBe(true);
       expect(schema.properties.arrayField.required).toBeUndefined();
     });
@@ -316,7 +322,7 @@ describe('normalizeRequired(schema)', () => {
       // So nested arrays are not fully processed - this is a limitation of the current implementation.
       // The items of the inner array are not processed because normalizeRequired returns early
       // when called on the innerArray (which is an ArrayPropertySchema without properties).
-      expect(items.required).toBeUndefined();
+      expect(at(items, 'required')).toBeUndefined();
       expect(items.properties!.deepField.required).toBe(true); // Still present, not processed
     });
 
@@ -352,12 +358,12 @@ describe('normalizeRequired(schema)', () => {
 
       const complexArray = schema.properties.complexArray as ArrayPropertySchema;
       const items = complexArray.items as ObjectPropertySchema;
-      expect(items.required).toEqual(['nestedArray']);
+      expect(at(items, 'required')).toEqual(['nestedArray']);
       expect(items.properties!.nestedArray['x-required']).toBe(true);
 
       const nestedArray = items.properties!.nestedArray as ArrayPropertySchema;
       const nestedItems = nestedArray.items as ObjectPropertySchema;
-      expect(nestedItems.required).toEqual(['field']);
+      expect(at(nestedItems, 'required')).toEqual(['field']);
       expect(nestedItems.properties!.field['x-required']).toBe(true);
     });
   });
@@ -411,20 +417,20 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['requiredString', 'nestedObject']);
+      expect(at(schema, 'required')).toEqual(['requiredString', 'nestedObject']);
 
       const nestedObject = schema.properties.nestedObject as ObjectPropertySchema;
-      expect(nestedObject.required).toEqual(['nestedRequired']);
+      expect(at(nestedObject, 'required')).toEqual(['nestedRequired']);
       expect(nestedObject.properties!.nestedRequired['x-required']).toBe(true);
 
       const nestedArray = nestedObject.properties!.nestedArray as ArrayPropertySchema;
       const nestedArrayItems = nestedArray.items as ObjectPropertySchema;
-      expect(nestedArrayItems.required).toEqual(['arrayItemRequired']);
+      expect(at(nestedArrayItems, 'required')).toEqual(['arrayItemRequired']);
       expect(nestedArrayItems.properties!.arrayItemRequired['x-required']).toBe(true);
 
       const arrayField = schema.properties.arrayField as ArrayPropertySchema;
       const arrayItems = arrayField.items as ObjectPropertySchema;
-      expect(arrayItems.required).toEqual(['itemField']);
+      expect(at(arrayItems, 'required')).toEqual(['itemField']);
       expect(arrayItems.properties!.itemField['x-required']).toBe(true);
     });
 
@@ -464,12 +470,12 @@ describe('normalizeRequired(schema)', () => {
 
       const users = schema.properties.users as ArrayPropertySchema;
       const userItems = users.items as ObjectPropertySchema;
-      expect(userItems.required).toEqual(['name', 'address']);
+      expect(at(userItems, 'required')).toEqual(['name', 'address']);
       expect(userItems.properties!.name['x-required']).toBe(true);
       expect(userItems.properties!.address['x-required']).toBe(true);
 
       const address = userItems.properties!.address as ObjectPropertySchema;
-      expect(address.required).toEqual(['street']);
+      expect(at(address, 'required')).toEqual(['street']);
       expect(address.properties!.street['x-required']).toBe(true);
       expect(address.properties!.city['x-required']).toBeUndefined();
     });
@@ -486,7 +492,7 @@ describe('normalizeRequired(schema)', () => {
       normalizeRequired(schema);
 
       // EnumSchema returns early, so no changes should be made
-      expect(schema.required).toBe(true);
+      expect(at(schema, 'required')).toBe(true);
       expect(schema['x-required']).toBeUndefined();
     });
 
@@ -497,7 +503,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toBeUndefined();
+      expect(at(schema, 'required')).toBeUndefined();
     });
 
     it('should handle schema with empty properties object', () => {
@@ -508,7 +514,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toBeUndefined();
+      expect(at(schema, 'required')).toBeUndefined();
     });
 
     it('should handle ObjectPropertySchema input', () => {
@@ -527,7 +533,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['field1']);
+      expect(at(schema, 'required')).toEqual(['field1']);
       expect(schema.properties!.field1['x-required']).toBe(true);
       expect(schema.properties!.field2['x-required']).toBeUndefined();
     });
@@ -542,7 +548,7 @@ describe('normalizeRequired(schema)', () => {
 
       // ReferencePropertySchema without properties returns early, so required flag is not processed
       // The function only processes schemas with properties
-      expect(schema.required).toBe(true); // Still present since function returns early
+      expect(at(schema, 'required')).toBe(true); // Still present since function returns early
       expect(schema['x-required']).toBeUndefined();
     });
 
@@ -564,7 +570,7 @@ describe('normalizeRequired(schema)', () => {
       normalizeRequired(schema);
 
       // Reference property required flag should be normalized (added to required array and removed from property)
-      expect(schema.required).toEqual(['refField', 'normalField']);
+      expect(at(schema, 'required')).toEqual(['refField', 'normalField']);
       expect(schema.properties.refField.required).toBeUndefined(); // Removed after normalization
       expect(schema.properties.refField['x-required']).toBe(true); // x-required flag set
 
@@ -585,7 +591,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['field']);
+      expect(at(schema, 'required')).toEqual(['field']);
       expect(schema.properties.field['x-required']).toBe(true);
       expect(schema.properties.field.required).toBeUndefined();
     });
@@ -635,7 +641,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toEqual(['field1', 'field2', 'field3']);
+      expect(at(schema, 'required')).toEqual(['field1', 'field2', 'field3']);
       expect(schema.properties.field1['x-required']).toBe(true);
       expect(schema.properties.field2['x-required']).toBe(true);
       expect(schema.properties.field3['x-required']).toBe(true);
@@ -656,7 +662,7 @@ describe('normalizeRequired(schema)', () => {
 
       normalizeRequired(schema);
 
-      expect(schema.required).toBeUndefined();
+      expect(at(schema, 'required')).toBeUndefined();
       expect(schema.properties.field1['x-required']).toBeUndefined();
       expect(schema.properties.field2['x-required']).toBeUndefined();
     });

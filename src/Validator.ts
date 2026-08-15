@@ -9,6 +9,7 @@ import ValidationError from './ValidationError';
 import cleanupAttributes from './helpers/cleanupAttributes';
 import nullifyEmptyValues from './helpers/nullifyEmptyValues';
 import normalizeAttributes from './helpers/normalizeAttributes';
+import type { TargetObject } from './types';
 
 /** Validator for validating and normalizing objects against JSON schemas. */
 class Validator {

@@ -2,6 +2,14 @@ import { isUndefined } from 'lodash';
 import { type JsonSchema } from 'z-schema';
 
 import got from './got';
+import type {
+  EnumSchema,
+  ObjectSchema,
+  TargetObject,
+  ArrayPropertySchema,
+  ObjectPropertySchema,
+  ReferencePropertySchema,
+} from '../types';
 
 /** Removes properties from an object that are not defined in the JSON schema. */
 const cleanupAttributes = (

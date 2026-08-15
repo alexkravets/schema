@@ -4,27 +4,27 @@ describe('got', () => {
   describe('returns value when it exists', () => {
     it('returns value for simple property path', () => {
       const obj = { name: 'John', age: 30 };
-      expect(got(obj, 'name')).toBe('John');
-      expect(got(obj, 'age')).toBe(30);
+      expect(got(obj, 'name') as unknown).toBe('John');
+      expect(got(obj, 'age') as unknown).toBe(30);
     });
 
     it('returns value for nested property path', () => {
       const obj = { user: { profile: { name: 'John' } } };
-      expect(got(obj, 'user.profile.name')).toBe('John');
-      expect(got(obj, 'user.profile')).toEqual({ name: 'John' });
+      expect(got(obj, 'user.profile.name') as unknown).toBe('John');
+      expect(got(obj, 'user.profile') as unknown).toEqual({ name: 'John' });
     });
 
     it('returns value for array index path', () => {
       const obj = { items: ['a', 'b', 'c'] };
-      expect(got(obj, 'items[0]')).toBe('a');
-      expect(got(obj, 'items[1]')).toBe('b');
-      expect(got(obj, 'items[2]')).toBe('c');
+      expect(got(obj, 'items[0]') as unknown).toBe('a');
+      expect(got(obj, 'items[1]') as unknown).toBe('b');
+      expect(got(obj, 'items[2]') as unknown).toBe('c');
     });
 
     it('returns value for nested array path', () => {
       const obj = { data: { items: [{ id: 1 }, { id: 2 }] } };
-      expect(got(obj, 'data.items[0].id')).toBe(1);
-      expect(got(obj, 'data.items[1].id')).toBe(2);
+      expect(got(obj, 'data.items[0].id') as unknown).toBe(1);
+      expect(got(obj, 'data.items[1].id') as unknown).toBe(2);
     });
 
     it('returns falsy but defined values (null, false, 0, empty string)', () => {
@@ -34,24 +34,24 @@ describe('got', () => {
         zeroValue: 0,
         emptyString: '',
       };
-      expect(got(obj, 'nullValue')).toBeNull();
-      expect(got(obj, 'falseValue')).toBe(false);
-      expect(got(obj, 'zeroValue')).toBe(0);
-      expect(got(obj, 'emptyString')).toBe('');
+      expect(got(obj, 'nullValue') as unknown).toBeNull();
+      expect(got(obj, 'falseValue') as unknown).toBe(false);
+      expect(got(obj, 'zeroValue') as unknown).toBe(0);
+      expect(got(obj, 'emptyString') as unknown).toBe('');
     });
 
     it('returns empty object and empty array as values', () => {
       const obj = { emptyObj: {}, emptyArr: [] };
-      expect(got(obj, 'emptyObj')).toEqual({});
-      expect(got(obj, 'emptyArr')).toEqual([]);
+      expect(got(obj, 'emptyObj') as unknown).toEqual({});
+      expect(got(obj, 'emptyArr') as unknown).toEqual([]);
     });
 
     it('returns object and array by reference', () => {
       const nestedObj = { nested: true };
       const arr = [1, 2, 3];
       const obj = { data: nestedObj, items: arr };
-      expect(got(obj, 'data')).toBe(nestedObj);
-      expect(got(obj, 'items')).toBe(arr);
+      expect(got(obj, 'data') as unknown).toBe(nestedObj);
+      expect(got(obj, 'items') as unknown).toBe(arr);
     });
 
     it('returns value for deeply nested path', () => {
@@ -64,23 +64,23 @@ describe('got', () => {
           },
         },
       };
-      expect(got(obj, 'level1.level2.level3.level4.value')).toBe('deep');
+      expect(got(obj, 'level1.level2.level3.level4.value') as unknown).toBe('deep');
     });
 
     it('handles paths with special characters in property names', () => {
       const obj = { 'property-with-dashes': 'value' };
-      expect(got(obj, 'property-with-dashes')).toBe('value');
+      expect(got(obj, 'property-with-dashes') as unknown).toBe('value');
     });
 
     it('handles numeric property names', () => {
       const obj = { '123': 'numeric-key' };
-      expect(got(obj, '123')).toBe('numeric-key');
+      expect(got(obj, '123') as unknown).toBe('numeric-key');
     });
 
     it('handles bracket and dot notation for array indices', () => {
       const obj = { items: ['a', 'b'] };
-      expect(got(obj, 'items.0')).toBe('a');
-      expect(got(obj, 'items[0]')).toBe('a');
+      expect(got(obj, 'items.0') as unknown).toBe('a');
+      expect(got(obj, 'items[0]') as unknown).toBe('a');
     });
   });
 
@@ -170,7 +170,7 @@ describe('got', () => {
       const schemasMap: Record<string, { id: string }> = {
         'schema-a': { id: 'schema-a' },
       };
-      expect(got(schemasMap, 'schema-a', 'Schema "$PATH" not found')).toEqual({
+      expect(got(schemasMap, 'schema-a', 'Schema "$PATH" not found') as unknown).toEqual({
         id: 'schema-a',
       });
       expect(() =>

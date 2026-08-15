@@ -3,6 +3,7 @@ import Schema from '../Schema';
 import { load } from 'js-yaml';
 import { keyBy } from 'lodash';
 import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
+import type { EnumSchema, PropertiesSchema } from '../types';
 
 /** Reads schema source from YAML file and returns a Schema instance. */
 export const loadSync = (yamlPath: string) => {

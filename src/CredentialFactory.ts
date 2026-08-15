@@ -3,6 +3,7 @@ import { constants } from 'credentials-context';
 import Validator from './Validator';
 import validateId from './helpers/validateId';
 import Schema, { type LinkedDataType } from './Schema';
+import type { TargetObject } from './types';
 
 const { CREDENTIALS_CONTEXT_V1_URL } = constants;
 
